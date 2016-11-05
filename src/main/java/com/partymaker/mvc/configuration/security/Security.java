@@ -1,5 +1,6 @@
 package com.partymaker.mvc.configuration.security;
 
+import com.partymaker.mvc.service.security.MainUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -28,16 +29,15 @@ import java.io.IOException;
 public class Security extends WebSecurityConfigurerAdapter {
 
 
-    @Autowired()
+    @Autowired
+    @Qualifier("userDetailsService")
     UserDetailsService userDetailsService;
 
     /* */
     @Autowired
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        /*auth.inMemoryAuthentication()
-                .withUser("1").password("1").roles("GOER").and()
-                .withUser("a").password("a").roles("PROMOTER");*/
+
         auth.userDetailsService(userDetailsService);
         auth.authenticationProvider(authenticationProvider());
     }
@@ -47,13 +47,13 @@ public class Security extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http
                 .authorizeRequests()
-                .antMatchers("/goer/signup", "/promoter/signup", "/goer/signin", "/promoter/signin").permitAll()
-                .antMatchers("/token").access("hasRole('ROLE_STREET_DANCER')")
-                .antMatchers("/promoter/**").access("hasRole('ROLE_PARTY_MAKER')")
-
+                .antMatchers("/maker/signup", "/dancer/signup", "/user").permitAll()
+                .antMatchers("/signin").access("hasRole('ROLE_STREET_DANCER') or hasRole('ROLE_PARTY_MAKER')")
+                .antMatchers("/maker/event").access("hasRole('ROLE_PARTY_MAKER')")
                 .anyRequest().authenticated()
-                .and().formLogin().loginPage("login")
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/user/test")
+
+                /*.and().formLogin().defaultSuccessUrl("/token")*/
+//                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/user/test")
                 .and().requestCache()
                 .requestCache(new NullRequestCache())
                 .and()

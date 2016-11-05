@@ -14,13 +14,13 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema mydb
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
-USE `mydb` ;
+CREATE SCHEMA IF NOT EXISTS partymaker2 DEFAULT CHARACTER SET utf8 ;
+USE partymaker2 ;
 
 -- -----------------------------------------------------
 -- Table `mydb`.`role`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`role` (
+CREATE TABLE IF NOT EXISTS partymaker2.`role` (
   `id_role` INT NOT NULL AUTO_INCREMENT,
   `user_role` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`id_role`))
@@ -30,7 +30,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`billing`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`billing` (
+CREATE TABLE IF NOT EXISTS partymaker2.`billing` (
   `id_billing` INT NOT NULL AUTO_INCREMENT,
   `card_number` VARCHAR(45) NULL,
   PRIMARY KEY (`id_billing`))
@@ -40,12 +40,11 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`user` (
+CREATE TABLE IF NOT EXISTS partymaker2.`user` (
   `id_user` INT NOT NULL AUTO_INCREMENT,
   `user_name` VARCHAR(45) NULL DEFAULT NULL,
   `phone_number` VARCHAR(45) NULL DEFAULT NULL,
   `email` VARCHAR(45) NULL DEFAULT NULL,
-  `billing_info` VARCHAR(45) NULL DEFAULT NULL,
   `emergency_contact` VARCHAR(45) NULL DEFAULT NULL,
   `password` VARCHAR(45) NULL DEFAULT NULL,
   `enable` TINYINT(1) NULL DEFAULT NULL,
@@ -58,12 +57,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`user` (
   INDEX `fk_user_billing1_idx` (`id_billing` ASC),
   CONSTRAINT `fk_user_role`
     FOREIGN KEY (`id_role`)
-    REFERENCES `mydb`.`role` (`id_role`)
+    REFERENCES partymaker2.`role` (`id_role`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_billing1`
     FOREIGN KEY (`id_billing`)
-    REFERENCES `mydb`.`billing` (`id_billing`)
+    REFERENCES partymaker2.`billing` (`id_billing`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -72,7 +71,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`event`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`event` (
+CREATE TABLE IF NOT EXISTS partymaker2.`event` (
   `id_event` INT NOT NULL AUTO_INCREMENT,
   `club_name` VARCHAR(45) NULL DEFAULT NULL,
   `date` VARCHAR(45) NULL DEFAULT NULL,
@@ -88,7 +87,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`user_has_event`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`user_has_event` (
+CREATE TABLE IF NOT EXISTS partymaker2.`user_has_event` (
   `id_user` INT NOT NULL,
   `id_role` INT NOT NULL,
   `id_event` INT NOT NULL,
@@ -97,12 +96,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`user_has_event` (
   INDEX `fk_user_has_event_user1_idx` (`id_user` ASC, `id_role` ASC),
   CONSTRAINT `fk_user_has_event_user1`
     FOREIGN KEY (`id_user` , `id_role`)
-    REFERENCES `mydb`.`user` (`id_user` , `id_role`)
+    REFERENCES partymaker2.`user` (`id_user` , `id_role`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_event_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES `mydb`.`event` (`id_event`)
+    REFERENCES partymaker2.`event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -111,7 +110,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`table_type`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`table_type` (
+CREATE TABLE IF NOT EXISTS partymaker2.`table_type` (
   `id_table_type` INT NOT NULL AUTO_INCREMENT,
   `type` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`id_table_type`))
@@ -121,7 +120,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`table`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`table` (
+CREATE TABLE IF NOT EXISTS partymaker2.`table` (
   `id_table` INT NOT NULL AUTO_INCREMENT,
   `price` VARCHAR(45) NULL DEFAULT NULL,
   `available` VARCHAR(45) NULL DEFAULT NULL,
@@ -133,12 +132,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`table` (
   INDEX `fk_table_table_type1_idx` (`id_table_type` ASC),
   CONSTRAINT `fk_table_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES `mydb`.`event` (`id_event`)
+    REFERENCES partymaker2.`event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_table_table_type1`
     FOREIGN KEY (`id_table_type`)
-    REFERENCES `mydb`.`table_type` (`id_table_type`)
+    REFERENCES partymaker2.`table_type` (`id_table_type`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -147,7 +146,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`bottle_type`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`bottle_type` (
+CREATE TABLE IF NOT EXISTS partymaker2.`bottle_type` (
   `id_bottle_type` INT NOT NULL,
   `type` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`id_bottle_type`))
@@ -157,7 +156,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`bottle`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`bottle` (
+CREATE TABLE IF NOT EXISTS partymaker2.`bottle` (
   `id_bottle` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL DEFAULT NULL,
   `prise` VARCHAR(45) NULL DEFAULT NULL,
@@ -172,12 +171,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`bottle` (
   INDEX `fk_bottle_bottle_type1_idx` (`id_bottle_type` ASC),
   CONSTRAINT `fk_bottle_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES `mydb`.`event` (`id_event`)
+    REFERENCES partymaker2.`event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_bottle_bottle_type1`
     FOREIGN KEY (`id_bottle_type`)
-    REFERENCES `mydb`.`bottle_type` (`id_bottle_type`)
+    REFERENCES partymaker2.`bottle_type` (`id_bottle_type`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -186,7 +185,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`ticket`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`ticket` (
+CREATE TABLE IF NOT EXISTS partymaker2.`ticket` (
   `id_ticket` INT NOT NULL AUTO_INCREMENT,
   `price` VARCHAR(45) NULL DEFAULT NULL,
   `available` VARCHAR(45) NULL DEFAULT NULL,
@@ -197,7 +196,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`ticket` (
   INDEX `fk_ticket_event1_idx` (`id_event` ASC),
   CONSTRAINT `fk_ticket_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES `mydb`.`event` (`id_event`)
+    REFERENCES partymaker2.`event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -206,7 +205,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`photo`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`photo` (
+CREATE TABLE IF NOT EXISTS partymaker2.`photo` (
   `id_photo` INT NOT NULL AUTO_INCREMENT,
   `photo` VARCHAR(45) NULL DEFAULT NULL,
   `id_event` INT NOT NULL,
@@ -214,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`photo` (
   INDEX `fk_photo_event1_idx` (`id_event` ASC),
   CONSTRAINT `fk_photo_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES `mydb`.`event` (`id_event`)
+    REFERENCES partymaker2.`event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -223,7 +222,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `mydb`.`ranting`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`ranting` (
+CREATE TABLE IF NOT EXISTS partymaker2.`ranting` (
   `id_ranting` INT NOT NULL,
   `text` LONGTEXT NULL DEFAULT NULL,
   `id_event` INT NOT NULL,
@@ -234,12 +233,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`ranting` (
   INDEX `fk_ranting_user1_idx` (`id_user` ASC, `id_role` ASC),
   CONSTRAINT `fk_ranting_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES `mydb`.`event` (`id_event`)
+    REFERENCES partymaker2.`event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ranting_user1`
     FOREIGN KEY (`id_user` , `id_role`)
-    REFERENCES `mydb`.`user` (`id_user` , `id_role`)
+    REFERENCES partymaker2.`user` (`id_user` , `id_role`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

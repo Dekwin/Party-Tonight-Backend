@@ -1,8 +1,11 @@
 package com.partymaker.mvc.service.user;
 
+import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.dao.user.UserDao;
-import com.partymaker.mvc.model.user.User;
+import com.partymaker.mvc.model.whole.EventEntity;
+import com.partymaker.mvc.model.whole.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,18 +17,21 @@ import java.util.Objects;
  */
 @Service("userService")
 @Transactional()
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService<UserEntity> {
 
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private EventDAO eventDAO;
+
     @Override
-    public User findUserBuId(Long id) {
-        return (User) userDao.findById(id);
+    public UserEntity findUserBuId(Long id) {
+        return (UserEntity) userDao.findById(id);
     }
 
     @Override
-    public List<User> findAllUsers() {
+    public List<UserEntity> findAllUsers() {
         return userDao.findAll();
     }
 
@@ -36,31 +42,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(User user) {
+    public void saveUser(UserEntity user) {
         userDao.save(user);
     }
 
     /* since we use the Transaction,
      don't need to update, just set fetched user with new parameters */
     @Override
-    public void updateUser(User user) {
-        User user1 = (User) userDao.findById(user.getIdUser());
+    public void updateUser(UserEntity user) {
+        UserEntity user1 = (UserEntity) userDao.findById(user.getId_user());
 
-        user1.setDateUpdate(user.getDateUpdate());
-        user1.setEmail(user.getEmail());
-        user1.setPassword(user.getPassword());
-        user1.setPhone(user.getPhone());
-        user1.setUserRole(user.getUserRole());
     }
 
     @Override
-    public User findUserByEmail(String value) {
-        return (User) userDao.findByField("email", value);
+    public void addEvent(String userEmail, EventEntity event) {
+        UserEntity entity = (UserEntity) userDao.findByField(userEmail,userEmail);
+        EventEntity eventEntity = (EventEntity) eventDAO.getByCode(event.getZip_code());
+        if (Objects.nonNull(entity) && Objects.nonNull(eventEntity)) {
+            entity.getEvents().add(eventEntity);
+        }
+    }
+
+    @Override
+    public UserEntity findUserByEmail(String value) {
+        return (UserEntity) userDao.findByField("email", value);
     }
 
     @Override
     public boolean isExist(String email) {
 
-        return Objects.nonNull(findUserByEmail(email));
+        return Objects.nonNull(userDao.findByField(email, email));
+    }
+
+    @Override
+    public boolean isExistByName(String string) {
+        return Objects.nonNull(userDao.findByName(string));
     }
 }

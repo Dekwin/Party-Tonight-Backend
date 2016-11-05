@@ -1,26 +1,30 @@
 package com.partymaker.mvc.service.user;
 
-import com.partymaker.mvc.model.user.User;
+import com.partymaker.mvc.model.whole.EventEntity;
+import com.partymaker.mvc.model.whole.UserEntity;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 
 /**
  * Created by anton on 09/10/16.
  */
-public interface UserService {
+public interface UserService<T> {
 
-    User findUserBuId(Long id);
+    T findUserBuId(Long id);
 
-    List<User> findAllUsers();
+    List<T> findAllUsers();
 
     void deleteUser(Long id);
 
-    void saveUser(User user);
+    void saveUser(T user);
 
-    void updateUser(User user);
+    void updateUser(T user);
 
-    User findUserByEmail(String value);
+    void addEvent(String userEmail, EventEntity event);
+
+    T findUserByEmail(String value);
 
     boolean isExist(String email);
+
+    boolean isExistByName(String string);
 }
