@@ -2,10 +2,9 @@ package com.partymaker.mvc.service.user;
 
 import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.dao.user.UserDao;
-import com.partymaker.mvc.model.whole.EventEntity;
+import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.model.whole.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,9 +54,9 @@ public class UserServiceImpl implements UserService<UserEntity> {
     }
 
     @Override
-    public void addEvent(String userEmail, EventEntity event) {
+    public void addEvent(String userEmail, event event) {
         UserEntity entity = (UserEntity) userDao.findByField(userEmail,userEmail);
-        EventEntity eventEntity = (EventEntity) eventDAO.getByCode(event.getZip_code());
+        com.partymaker.mvc.model.whole.event eventEntity = (com.partymaker.mvc.model.whole.event) eventDAO.getByCode(event.getZip_code());
         if (Objects.nonNull(entity) && Objects.nonNull(eventEntity)) {
             entity.getEvents().add(eventEntity);
         }

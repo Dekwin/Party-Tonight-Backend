@@ -7,15 +7,21 @@ import java.io.Serializable;
  * Created by anton on 01/11/16.
  */
 @Entity
-@Table(name = "photo", schema = "partymaker2", catalog = "")
-@IdClass(PhotoEntityPK.class)
+@Table(name = "photo", schema = "partymaker2")
 public class PhotoEntity implements Serializable {
-    private int idPhoto;
-    private String photo;
-    private int idEvent;
-
     @Id
+    @GeneratedValue
     @Column(name = "id_photo", nullable = false)
+    private int idPhoto;
+
+    @Column(name = "photo")
+    private String photo;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_event")
+    private event eventEntity;
+
+
     public int getIdPhoto() {
         return idPhoto;
     }
@@ -24,8 +30,6 @@ public class PhotoEntity implements Serializable {
         this.idPhoto = idPhoto;
     }
 
-    @Basic
-    @Column(name = "photo", nullable = true, length = 45)
     public String getPhoto() {
         return photo;
     }
@@ -34,14 +38,13 @@ public class PhotoEntity implements Serializable {
         this.photo = photo;
     }
 
-    @Id
-    @Column(name = "id_event", nullable = false)
-    public int getIdEvent() {
-        return idEvent;
+
+    public event getEventEntity() {
+        return eventEntity;
     }
 
-    public void setIdEvent(int idEvent) {
-        this.idEvent = idEvent;
+    public void setEventEntity(event eventEntity) {
+        this.eventEntity = eventEntity;
     }
 
     @Override
@@ -52,7 +55,6 @@ public class PhotoEntity implements Serializable {
         PhotoEntity that = (PhotoEntity) o;
 
         if (idPhoto != that.idPhoto) return false;
-        if (idEvent != that.idEvent) return false;
         if (photo != null ? !photo.equals(that.photo) : that.photo != null) return false;
 
         return true;
@@ -62,7 +64,6 @@ public class PhotoEntity implements Serializable {
     public int hashCode() {
         int result = idPhoto;
         result = 31 * result + (photo != null ? photo.hashCode() : 0);
-        result = 31 * result + idEvent;
         return result;
     }
 }

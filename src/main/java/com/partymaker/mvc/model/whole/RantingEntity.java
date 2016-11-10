@@ -8,26 +8,36 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "ranting", schema = "partymaker2", catalog = "")
-@IdClass(RantingEntityPK.class)
 public class RantingEntity implements Serializable {
-    private int idRanting;
-    private String text;
-    private int idEvent;
-    private int idUser;
-    private int idRole;
 
     @Id
     @Column(name = "id_ranting", nullable = false)
-    public int getIdRanting() {
-        return idRanting;
+    private int id_ranting;
+    @Column(name = "text")
+    private String text;
+
+    @Id
+    @Column(name = "id_event", nullable = false)
+    private int idEvent;
+
+    @Id
+    @Column(name = "id_user", nullable = false)
+    private int idUser;
+
+    @Id
+    @Column(name = "id_role", nullable = false)
+    private int idRole;
+
+
+    public int getId_ranting() {
+        return id_ranting;
     }
 
-    public void setIdRanting(int idRanting) {
-        this.idRanting = idRanting;
+    public void setId_ranting(int id_ranting) {
+        this.id_ranting = id_ranting;
     }
 
-    @Basic
-    @Column(name = "text", nullable = true, length = -1)
+
     public String getText() {
         return text;
     }
@@ -36,8 +46,7 @@ public class RantingEntity implements Serializable {
         this.text = text;
     }
 
-    @Id
-    @Column(name = "id_event", nullable = false)
+
     public int getIdEvent() {
         return idEvent;
     }
@@ -46,8 +55,7 @@ public class RantingEntity implements Serializable {
         this.idEvent = idEvent;
     }
 
-    @Id
-    @Column(name = "id_user", nullable = false)
+
     public int getIdUser() {
         return idUser;
     }
@@ -56,8 +64,7 @@ public class RantingEntity implements Serializable {
         this.idUser = idUser;
     }
 
-    @Id
-    @Column(name = "id_role", nullable = false)
+
     public int getIdRole() {
         return idRole;
     }
@@ -73,7 +80,7 @@ public class RantingEntity implements Serializable {
 
         RantingEntity that = (RantingEntity) o;
 
-        if (idRanting != that.idRanting) return false;
+        if (id_ranting != that.id_ranting) return false;
         if (idEvent != that.idEvent) return false;
         if (idUser != that.idUser) return false;
         if (idRole != that.idRole) return false;
@@ -84,7 +91,7 @@ public class RantingEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = idRanting;
+        int result = id_ranting;
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + idEvent;
         result = 31 * result + idUser;

@@ -1,6 +1,6 @@
 package com.partymaker.mvc.service.event;
 
-import com.partymaker.mvc.model.whole.EventEntity;
+import com.partymaker.mvc.model.whole.event;
 
 import java.util.List;
 
@@ -9,11 +9,14 @@ import java.util.List;
  */
 public interface EventService {
 
-    EventEntity findById(int id);
+    event findById(int id);
+    event findByHash(String timeHash);
 
-    List<EventEntity> findAll();
+    List<event> findAll();
 
-    void delete(EventEntity eventEntity);
+    void delete(event eventEntity);
 
-    void save(EventEntity eventEntity);
+    void save(event eventEntity);
+
+    boolean isExist(String party_name);
 }

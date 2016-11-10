@@ -1,0 +1,29 @@
+package com.partymaker.mvc.service.bottle;
+
+import com.partymaker.mvc.dao.event.bottle.BottleDAO;
+import com.partymaker.mvc.model.whole.BottleEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.List;
+
+/**
+ * Created by anton on 06/11/16.
+ */
+@Transactional
+@Service
+public class BottleServiceImpl implements BottleService {
+    @Autowired
+    private BottleDAO bottleDAO;
+
+    @Override
+    public void save(BottleEntity bottleEntity) {
+        bottleDAO.save(bottleEntity);
+    }
+
+    @Override
+    public List<BottleEntity> findAllByEventId(int event_id) {
+        return bottleDAO.findAllByEvent(event_id);
+    }
+}

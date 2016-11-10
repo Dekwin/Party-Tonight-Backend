@@ -8,30 +8,34 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "table", schema = "partymaker2", catalog = "")
-public class TableEntity implements Serializable{
+public class TableEntity implements Serializable {
+
     @Id
-    @Column(name = "id_table", nullable = false)
-    private int idTable;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_table")
+    private int id_table;
     @Column(name = "price", nullable = true, length = 45)
     private String price;
+
+    @Column(name = "type", nullable = true, length = 45)
+    private String type;
+
     @Column(name = "available", nullable = true, length = 45)
     private String available;
     @Column(name = "booked", nullable = true, length = 45)
     private String booked;
-    @Id
-    @Column(name = "id_event", nullable = false)
-    private int idEvent;
-    @Id
-    @Column(name = "id_table_type", nullable = false)
-    private int idTableType;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_event")
+    private event eventEntity;
 
 
-    public int getIdTable() {
-        return idTable;
+    public int getId_table() {
+        return id_table;
     }
 
-    public void setIdTable(int idTable) {
-        this.idTable = idTable;
+    public void setId_table(int id_table) {
+        this.id_table = id_table;
     }
 
     public String getPrice() {
@@ -58,20 +62,21 @@ public class TableEntity implements Serializable{
         this.booked = booked;
     }
 
-    public int getIdEvent() {
-        return idEvent;
+
+    public String getType() {
+        return type;
     }
 
-    public void setIdEvent(int idEvent) {
-        this.idEvent = idEvent;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public int getIdTableType() {
-        return idTableType;
+    public event getEventEntity() {
+        return eventEntity;
     }
 
-    public void setIdTableType(int idTableType) {
-        this.idTableType = idTableType;
+    public void setEventEntity(event eventEntity) {
+        this.eventEntity = eventEntity;
     }
 
     @Override
@@ -81,24 +86,32 @@ public class TableEntity implements Serializable{
 
         TableEntity that = (TableEntity) o;
 
-        if (idTable != that.idTable) return false;
-        if (idEvent != that.idEvent) return false;
-        if (idTableType != that.idTableType) return false;
+        if (id_table != that.id_table) return false;
         if (price != null ? !price.equals(that.price) : that.price != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (available != null ? !available.equals(that.available) : that.available != null) return false;
         if (booked != null ? !booked.equals(that.booked) : that.booked != null) return false;
-
         return true;
+
     }
 
     @Override
     public int hashCode() {
-        int result = idTable;
+        int result = id_table;
         result = 31 * result + (price != null ? price.hashCode() : 0);
         result = 31 * result + (available != null ? available.hashCode() : 0);
         result = 31 * result + (booked != null ? booked.hashCode() : 0);
-        result = 31 * result + idEvent;
-        result = 31 * result + idTableType;
         return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("TableEntity{");
+        sb.append("id_table=").append(id_table);
+        sb.append(", price='").append(price).append('\'');
+        sb.append(", available='").append(available).append('\'');
+        sb.append(", booked='").append(booked).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

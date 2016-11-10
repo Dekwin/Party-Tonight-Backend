@@ -1,7 +1,6 @@
 package com.partymaker.mvc.service.user;
 
-import com.partymaker.mvc.model.whole.EventEntity;
-import com.partymaker.mvc.model.whole.UserEntity;
+import com.partymaker.mvc.model.whole.event;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public interface UserService<T> {
 
     void updateUser(T user);
 
-    void addEvent(String userEmail, EventEntity event);
+    void addEvent(String userEmail, event event);
 
     T findUserByEmail(String value);
 

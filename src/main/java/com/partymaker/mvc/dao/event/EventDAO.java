@@ -9,7 +9,7 @@ import java.util.List;
 public interface EventDAO<T> {
     T getByID(int id);
 
-    T getByCode(String code);
+    T getByCode(String time);
 
     List<T> getAll();
 

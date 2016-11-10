@@ -48,7 +48,7 @@ public class DancerRESTSingUp {
                     if (userService.isExist(user.getEmail())) {
                         return new ResponseEntity<Object>("401", HttpStatus.FORBIDDEN);
                     }
-                    if (userService.isExistByName(user.getUser_name())) {
+                    if (userService.isExistByName(user.getUserName())) {
                         return new ResponseEntity<Object>("403", HttpStatus.FORBIDDEN);
                     }
                     if (billingService.isExist(user.getBilling())) {
@@ -56,6 +56,7 @@ public class DancerRESTSingUp {
                     }
                 } catch (Exception e) {
                     logger.info("Checking failed" + e);
+                    return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);
                 }
 
                 date = new Date();

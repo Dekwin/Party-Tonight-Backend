@@ -1,7 +1,5 @@
 package com.partymaker.mvc.model.whole;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,16 +16,16 @@ public class UserEntity implements Serializable {
     private int id_user;
 
     @Column(name = "user_name", nullable = true, length = 45)
-    private String user_name;
+    private String userName;
 
     @Column(name = "phone_number", nullable = true, length = 45)
-    private String phone_number;
+    private String phoneNumber;
 
     @Column(name = "email", nullable = true, length = 45)
     private String email;
 
     @Column(name = "emergency_contact", nullable = true, length = 45)
-    private String emergency_contact;
+    private String emergencyContact;
 
     @Column(name = "password", nullable = true, length = 45)
     private String password;
@@ -45,7 +43,6 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "id_role")
     private RoleEntity role;
 
-    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_billing", nullable = false)
     private BillingEntity billing;
@@ -54,7 +51,7 @@ public class UserEntity implements Serializable {
     @JoinTable(name = "user_has_event",
             joinColumns = {@JoinColumn(name = "id_user")},
             inverseJoinColumns = {@JoinColumn(name = "id_event")})
-    private List<EventEntity> events = new ArrayList<>();
+    private List<event> events = new ArrayList<>();
 
 
     public int getId_user() {
@@ -65,20 +62,20 @@ public class UserEntity implements Serializable {
         this.id_user = id_user;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public String getPhone_number() {
-        return phone_number;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone_number(String phone_number) {
-        this.phone_number = phone_number;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
@@ -89,12 +86,12 @@ public class UserEntity implements Serializable {
         this.email = email;
     }
 
-    public String getEmergency_contact() {
-        return emergency_contact;
+    public String getEmergencyContact() {
+        return emergencyContact;
     }
 
-    public void setEmergency_contact(String emergency_contact) {
-        this.emergency_contact = emergency_contact;
+    public void setEmergencyContact(String emergencyContact) {
+        this.emergencyContact = emergencyContact;
     }
 
     public String getPassword() {
@@ -147,11 +144,11 @@ public class UserEntity implements Serializable {
         return enable;
     }
 
-    public List<EventEntity> getEvents() {
+    public List<event> getEvents() {
         return events;
     }
 
-    public void setEvents(List<EventEntity> events) {
+    public void setEvents(List<event> events) {
         this.events = events;
     }
 
@@ -160,10 +157,10 @@ public class UserEntity implements Serializable {
     public String toString() {
         final StringBuffer sb = new StringBuffer("UserEntity{");
         sb.append("id_user=").append(id_user);
-        sb.append(", user_name='").append(user_name).append('\'');
-        sb.append(", phone_number='").append(phone_number).append('\'');
+        sb.append(", userName='").append(userName).append('\'');
+        sb.append(", phoneNumber='").append(phoneNumber).append('\'');
         sb.append(", email='").append(email).append('\'');
-        sb.append(", emergency_contact='").append(emergency_contact).append('\'');
+        sb.append(", emergencyContact='").append(emergencyContact).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append(", enable=").append(enable);
         sb.append(", updatedDate='").append(updatedDate).append('\'');

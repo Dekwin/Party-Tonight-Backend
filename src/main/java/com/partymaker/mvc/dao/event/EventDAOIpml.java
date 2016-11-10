@@ -1,7 +1,7 @@
 package com.partymaker.mvc.dao.event;
 
 import com.partymaker.mvc.dao.AbstractDao;
-import com.partymaker.mvc.model.whole.EventEntity;
+import com.partymaker.mvc.model.whole.event;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
@@ -12,33 +12,33 @@ import java.util.List;
  * Created by anton on 04/11/16.
  */
 @Repository("eventDAO")
-public class EventDAOIpml extends AbstractDao<Integer, EventEntity> implements EventDAO<EventEntity> {
+public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDAO<event> {
 
     @Override
-    public EventEntity getByID(int id) {
+    public event getByID(int id) {
         return getByKey(id);
     }
 
     @Override
-    public EventEntity getByCode(String code) {
+    public event getByCode(String time) {
         Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("zip_code", code));
-        return (EventEntity) criteria.uniqueResult();
+        criteria.add(Restrictions.eq("time", time));
+        return (event) criteria.uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<EventEntity> getAll() {
+    public List<event> getAll() {
         return createEntityCriteria().list();
     }
 
     @Override
-    public void save(EventEntity eventEntity) {
+    public void save(event eventEntity) {
         persist(eventEntity);
     }
 
     @Override
-    public void delete(EventEntity eventEntity) {
+    public void delete(event eventEntity) {
         delete(eventEntity);
     }
 }

@@ -17,7 +17,7 @@ import java.io.IOException;
  * Created by anton on 10/10/16.
  */
 @Configuration
-@EnableRedisHttpSession // enable redis import
+@EnableRedisHttpSession // add servlet filter that replay HttpSession to SpringSession
 public class HttpSecuritySession {
 
     /* integration to use HTTP headers */
@@ -33,15 +33,15 @@ public class HttpSecuritySession {
         return factory;
     }
 
-    @Autowired
+    /*@Autowired
     public SessionRepository sessionRepository(RedisConnectionFactory connectionFactory) {
         RedisOperationsSessionRepository redisOperationsSessionRepository =
                 new RedisOperationsSessionRepository(connectionFactory);
 
-       /* redisOperationsSessionRepository.setDefaultMaxInactiveInterval(90);*/
+        redisOperationsSessionRepository.setDefaultMaxInactiveInterval(90);
         redisOperationsSessionRepository.createSession();
         redisOperationsSessionRepository.setRedisKeyNamespace("savelife");
 
         return redisOperationsSessionRepository;
-    }
+    }*/
 }

@@ -8,9 +8,10 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "ticket", schema = "partymaker2", catalog = "")
-public class TicketEntity implements Serializable{
+public class TicketEntity implements Serializable {
     @Id
-    @Column(name = "id_ticket", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_ticket")
     private int idTicket;
     @Column(name = "price", nullable = true, length = 45)
     private String price;
@@ -19,10 +20,11 @@ public class TicketEntity implements Serializable{
     @Column(name = "booked", nullable = true, length = 45)
     private String booked;
     @Column(name = "created_date", nullable = true, length = 45)
-    private String createdDate;
-    @Id
-    @Column(name = "id_event", nullable = false)
-    private int idEvent;
+    private String created_date;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_event")
+    private event eventEntity;
 
 
     public int getIdTicket() {
@@ -59,48 +61,31 @@ public class TicketEntity implements Serializable{
     }
 
 
-    public String getCreatedDate() {
-        return createdDate;
+    public String getCreated_date() {
+        return created_date;
     }
 
-    public void setCreatedDate(String createdDate) {
-        this.createdDate = createdDate;
+    public void setCreated_date(String created_date) {
+        this.created_date = created_date;
     }
 
-
-    public int getIdEvent() {
-        return idEvent;
+    public event getEventEntity() {
+        return eventEntity;
     }
 
-    public void setIdEvent(int idEvent) {
-        this.idEvent = idEvent;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TicketEntity that = (TicketEntity) o;
-
-        if (idTicket != that.idTicket) return false;
-        if (idEvent != that.idEvent) return false;
-        if (price != null ? !price.equals(that.price) : that.price != null) return false;
-        if (available != null ? !available.equals(that.available) : that.available != null) return false;
-        if (booked != null ? !booked.equals(that.booked) : that.booked != null) return false;
-        if (createdDate != null ? !createdDate.equals(that.createdDate) : that.createdDate != null) return false;
-
-        return true;
+    public void setEventEntity(event eventEntity) {
+        this.eventEntity = eventEntity;
     }
 
     @Override
-    public int hashCode() {
-        int result = idTicket;
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        result = 31 * result + (available != null ? available.hashCode() : 0);
-        result = 31 * result + (booked != null ? booked.hashCode() : 0);
-        result = 31 * result + (createdDate != null ? createdDate.hashCode() : 0);
-        result = 31 * result + idEvent;
-        return result;
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("TicketEntity{");
+        sb.append("idTicket=").append(idTicket);
+        sb.append(", price='").append(price).append('\'');
+        sb.append(", available='").append(available).append('\'');
+        sb.append(", booked='").append(booked).append('\'');
+        sb.append(", created_date='").append(created_date).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
