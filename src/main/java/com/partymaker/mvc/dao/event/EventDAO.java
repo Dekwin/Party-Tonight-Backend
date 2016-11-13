@@ -16,4 +16,6 @@ public interface EventDAO<T> {
     void save(T eventEntity);
 
     void delete(T eventEntity);
+
+
 }

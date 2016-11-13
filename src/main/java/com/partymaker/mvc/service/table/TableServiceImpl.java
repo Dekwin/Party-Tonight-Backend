@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * Created by anton on 06/11/16.
@@ -20,5 +21,10 @@ public class TableServiceImpl implements TableService {
     @Override
     public void save(TableEntity tableEntity) {
         tableDAO.save(tableEntity);
+    }
+
+    @Override
+    public List<TableEntity> findAllTablesByEventAndUser(int id_user, String party_name) {
+        return tableDAO.findAllByEventAndUser(id_user, party_name);
     }
 }

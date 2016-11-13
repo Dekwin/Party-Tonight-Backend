@@ -1,5 +1,7 @@
 package com.partymaker.mvc.controller.functional.maker.event;
 
+import com.partymaker.mvc.model.business.DoorRevenue;
+import com.partymaker.mvc.model.business.StatementTotal;
 import com.partymaker.mvc.model.whole.*;
 import com.partymaker.mvc.service.bottle.BottleService;
 import com.partymaker.mvc.service.event.EventService;
@@ -21,15 +23,12 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -57,8 +56,10 @@ public class EventRESTMaker {
 
     @Autowired
     BottleService bottleService;
+
     @Autowired
     TicketService ticketService;
+
     @Autowired
     TableService tableService;
 
@@ -119,19 +120,128 @@ public class EventRESTMaker {
         };
     }
 
-    @GetMapping(value = {"/bottles"})
-    public Callable<ResponseEntity<?>> getEventBottle() {
+    /**
+     * calculate door revenue basing on ticket booked and prise fields
+     */
+    @GetMapping(value = {"/revenue"})
+    public Callable<ResponseEntity<?>> getDoorRevenue(@RequestHeader("partyName") String partyName) {
         return () -> {
-
-            return new ResponseEntity<Object>(, HttpStatus.OK);
+            DoorRevenue doorRevenue;
+            try {
+                UserEntity userEntity = userService.findUserByEmail(getPrincipal());
+                doorRevenue = new DoorRevenue();
+                ticketService.findAllTicketsByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
+                    doorRevenue.setRevenue(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                });
+            } catch (Exception e) {
+                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<Object>(doorRevenue, HttpStatus.OK);
         };
     }
 
-    @GetMapping(value = {"/revenue"})
-    public Callable<ResponseEntity<?>> getDoorRevenue() {
-        return () -> {
 
-            return new ResponseEntity<Object>(, HttpStatus.OK);
+    @GetMapping(value = {"/bottles"})
+    public Callable<ResponseEntity<?>> getEventBottle(@RequestHeader("partyName") String partyName) {
+        return () -> {
+            List<BottleEntity> foundBottles;
+            try {
+                UserEntity userEntity = userService.findUserByEmail(getPrincipal());
+                foundBottles = new ArrayList<>();
+                bottleService.findAllBottlesByEventAndUser(userEntity.getId_user(), partyName).forEach(foundBottles::add);
+            } catch (Exception e) {
+                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<Object>(foundBottles, HttpStatus.OK);
+        };
+    }
+
+    @GetMapping(value = {"/tables"})
+    public Callable<ResponseEntity<?>> getEventTables(@RequestHeader("partyName") String partyName) {
+        return () -> {
+            List<TableEntity> foundTabbles;
+            try {
+                UserEntity userEntity = userService.findUserByEmail(getPrincipal());
+                foundTabbles = new ArrayList<>();
+                tableService.findAllTablesByEventAndUser(userEntity.getId_user(), partyName).forEach(foundTabbles::add);
+            } catch (Exception e) {
+                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<Object>(foundTabbles, HttpStatus.OK);
+        };
+    }
+
+    @GetMapping(value = {"/total"})
+    public Callable<ResponseEntity<?>> getStatementTotal(@RequestHeader("partyName") String partyName) {
+        return () -> {
+            StatementTotal statementTotal;
+
+            try {
+                UserEntity userEntity = userService.findUserByEmail(getPrincipal());
+
+                statementTotal = new StatementTotal();
+
+                ticketService.findAllTicketsByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
+                    /**
+                     * calculate the unbooked tickets
+                     * */
+                    statementTotal.setRefunds(String.valueOf(
+                            (Integer.parseInt(statementTotal.getRefunds()))
+                                    - (
+                                    Integer.parseInt(v.getAvailable()) - Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())
+                            )
+                    ));
+                    /**
+                     * calculate the booked tickets
+                     * */
+                    statementTotal.setTicketsSales(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                });
+
+                tableService.findAllTablesByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
+                    /**
+                     * calculate the unbooked tables
+                     * */
+                    statementTotal.setRefunds(String.valueOf(
+                            (Integer.parseInt(statementTotal.getRefunds()))
+                                    - (
+                                    Integer.parseInt(v.getAvailable()) - Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())
+                            )
+                    ));
+                    /**
+                     * calculate the booked tables
+                     * */
+                    statementTotal.setTableSales(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                });
+                bottleService.findAllBottlesByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
+                    /**
+                     * calculate the unbooked bottles
+                     * */
+                    statementTotal.setRefunds(String.valueOf(
+                            (Integer.parseInt(statementTotal.getRefunds()))
+                                    - (
+                                    Integer.parseInt(v.getAvailable()) - Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())
+                            )
+                    ));
+                    /**
+                     * calculate the booked tables
+                     * */
+                    statementTotal.setBottleSales(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                });
+
+                /**
+                 * add withdrawn summary of all above components
+                 * */
+                statementTotal.setWithdrawn(String.valueOf(
+                        Integer.parseInt(statementTotal.getBottleSales())
+                                + Integer.parseInt(statementTotal.getTableSales())
+                                + Integer.parseInt(statementTotal.getTicketsSales())
+                                - Integer.parseInt(statementTotal.getRefunds())
+                ));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<Object>(statementTotal, HttpStatus.OK);
         };
     }
 

@@ -1,5 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -25,6 +27,7 @@ public class TableEntity implements Serializable {
     @Column(name = "booked", nullable = true, length = 45)
     private String booked;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")
     private event eventEntity;

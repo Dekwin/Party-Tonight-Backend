@@ -36,12 +36,14 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
         persist(eventEntity);
     }
 
-    @SuppressWarnings("unckecked")
+    @SuppressWarnings("unchecked")
     @Override
-    public List<BottleEntity> findAllByEvent(int event_id) {
-        Query query = getSession().createQuery("from bottle where id_event = :event_id");
-        query.setParameter("event_id", event_id);
-        return query.list();
+    public List<BottleEntity> findAllByEventAndUser(int id_user, String party_name) {
+        Query query = getSession().createSQLQuery("SELECT * FROM bottle LEFT JOIN event ON bottle.id_event = event.id_event and event.party_name =:partyName LEFT JOIN user_has_event ON event.id_event = user_has_event.id_event LEFT JOIN user ON event.id_event = user_has_event.id_user WHERE user_has_event.id_user = :idUser")
+                .addEntity(BottleEntity.class)
+                .setParameter("partyName", party_name)
+                .setParameter("idUser", id_user);
+        return (List<BottleEntity>) query.list();
     }
 
     public void delete(BottleEntity eventEntity) {

@@ -152,7 +152,6 @@ public class UserEntity implements Serializable {
         this.events = events;
     }
 
-
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("UserEntity{");

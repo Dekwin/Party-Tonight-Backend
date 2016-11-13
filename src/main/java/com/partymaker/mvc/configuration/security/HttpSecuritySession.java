@@ -33,15 +33,15 @@ public class HttpSecuritySession {
         return factory;
     }
 
-    /*@Autowired
+    @Autowired
     public SessionRepository sessionRepository(RedisConnectionFactory connectionFactory) {
         RedisOperationsSessionRepository redisOperationsSessionRepository =
                 new RedisOperationsSessionRepository(connectionFactory);
 
-        redisOperationsSessionRepository.setDefaultMaxInactiveInterval(90);
+        redisOperationsSessionRepository.setDefaultMaxInactiveInterval(Integer.MAX_VALUE);
         redisOperationsSessionRepository.createSession();
         redisOperationsSessionRepository.setRedisKeyNamespace("savelife");
 
         return redisOperationsSessionRepository;
-    }*/
+    }
 }

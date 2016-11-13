@@ -14,6 +14,7 @@ import java.util.List;
 @Transactional
 @Service
 public class BottleServiceImpl implements BottleService {
+
     @Autowired
     private BottleDAO bottleDAO;
 
@@ -23,7 +24,7 @@ public class BottleServiceImpl implements BottleService {
     }
 
     @Override
-    public List<BottleEntity> findAllByEventId(int event_id) {
-        return bottleDAO.findAllByEvent(event_id);
+    public List<BottleEntity> findAllBottlesByEventAndUser(int id_user, String party_name) {
+        return bottleDAO.findAllByEventAndUser(id_user, party_name);
     }
 }

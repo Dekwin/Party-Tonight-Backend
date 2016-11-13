@@ -1,5 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -12,7 +14,7 @@ public class BottleEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    /*@Column(name = "id_bottle")*/
+    @Column(name = "id_bottle")
     private int id_bottle;
     @Column(name = "name")
     private String name;
@@ -27,6 +29,7 @@ public class BottleEntity implements Serializable {
     @Column(name = "created_date")
     private String createdDate;
 
+    @JsonIgnore
     @ManyToOne(optional = false, targetEntity = event.class)
     @JoinColumn(name = "id_event")
     private event event;

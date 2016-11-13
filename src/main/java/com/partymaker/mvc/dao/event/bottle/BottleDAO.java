@@ -11,5 +11,5 @@ import java.util.List;
 public interface BottleDAO {
     void save(BottleEntity bottleEntity);
 
-    List<BottleEntity> findAllByEvent(int event_id);
+    List<BottleEntity> findAllByEventAndUser(int id_user, String party_name);
 }
