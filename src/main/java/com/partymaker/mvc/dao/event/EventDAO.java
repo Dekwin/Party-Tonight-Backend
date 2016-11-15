@@ -13,6 +13,8 @@ public interface EventDAO<T> {
 
     List<T> getAll();
 
+    List<T> getAllByUserId(int id_user);
+
     void save(T eventEntity);
 
     void delete(T eventEntity);

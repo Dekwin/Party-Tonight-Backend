@@ -3,6 +3,7 @@ package com.partymaker.mvc.dao.event;
 import com.partymaker.mvc.dao.AbstractDao;
 import com.partymaker.mvc.model.whole.event;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -26,10 +27,20 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
         return (event) criteria.uniqueResult();
     }
 
+
     @SuppressWarnings("unchecked")
     @Override
     public List<event> getAll() {
         return createEntityCriteria().list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<event> getAllByUserId(int id_user) {
+        Query query = getSession().createSQLQuery("SELECT * from event JOIN user_has_event ON event.id_event = user_has_event.id_event JOIN user on user_has_event.id_user = user.id_user WHERE user.id_user=:user_id")
+                .addEntity(event.class)
+                .setParameter("user_id", id_user);
+        return (List<event>) query.list();
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.partymaker.mvc.model.whole;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
@@ -10,12 +12,10 @@ import javax.persistence.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Created by anton on 01/11/16.
@@ -55,6 +55,9 @@ public class event implements Serializable {
 
     @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
     private List<PhotoEntity> photos = new ArrayList<>();
+
+    @Transient
+    private List<MultipartFile> images;
 
     public int getId_event() {
         return id_event;
@@ -155,6 +158,14 @@ public class event implements Serializable {
         this.photos = photos;
     }
 
+    public List<MultipartFile> getImages() {
+        return images;
+    }
+
+    public void setImages(List<MultipartFile> images) {
+        this.images = images;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -226,17 +237,15 @@ public class event implements Serializable {
         byte[] bytes = bos.toByteArray();
 
 
-
         String butesString = Arrays.toString(bytes);
 
-        /*System.out.println(butesString);*/
+        System.out.println(butesString);
 
-            String[] byteValues = butesString.substring(1, butesString.length() - 1).split(",");
+        String[] byteValues = butesString.substring(1, butesString.length() - 1).split(",");
         bytes = new byte[byteValues.length];
 
         for (int i = 0, len = bytes.length; i < len; i++) {
             bytes[i] = Byte.parseByte(byteValues[i].trim());
-            System.out.print(bytes[i]);
         }
 
         /*
@@ -264,10 +273,10 @@ public class event implements Serializable {
         Graphics2D g2 = bufferedImage.createGraphics();
         g2.drawImage(image, null, null);
 
-        File imageFile = new File("/home/anton/deploy/3434.jpeg");
+        File imageFile = new File("/home/anton/deploy/myimage.jpeg");
         ImageIO.write(bufferedImage, "jpeg", imageFile);
 
-        System.out.println(imageFile.getPath());
+        System.out.println(imageFile.getAbsolutePath());
 
     }
 }

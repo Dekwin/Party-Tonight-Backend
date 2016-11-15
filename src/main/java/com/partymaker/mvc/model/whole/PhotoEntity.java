@@ -22,6 +22,10 @@ public class PhotoEntity implements Serializable {
     private event eventEntity;
 
 
+    public PhotoEntity(String photo) {
+        this.photo = photo;
+    }
+
     public int getIdPhoto() {
         return idPhoto;
     }

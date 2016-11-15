@@ -10,7 +10,6 @@ import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -18,21 +17,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import javax.persistence.criteria.CriteriaBuilder;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -69,54 +61,97 @@ public class EventRESTMaker {
     @PostMapping(value = {"/create"})
     public Callable<ResponseEntity<?>> createEvent(@RequestBody event eventEntity) {
         return () -> {
-            logger.info("Creating event " + eventEntity);
-            System.out.println(eventEntity);
+            try {
 
-            List<BottleEntity> bottles = new ArrayList<>();
-            eventEntity.getBottles().forEach(bottles::add);
+                logger.info("Creating event " + eventEntity);
+                System.out.println(eventEntity);
+
+                List<BottleEntity> bottles = new ArrayList<>();
+                eventEntity.getBottles().forEach(bottles::add);
 
 
-            List<TableEntity> tables = new ArrayList<>();
-            eventEntity.getTables().forEach(v -> tables.add(v));
+                List<TableEntity> tables = new ArrayList<>();
+                eventEntity.getTables().forEach(tables::add);
 
-            TicketEntity ticketEntity = eventEntity.getTickets().get(0);
+                TicketEntity ticketEntity = eventEntity.getTickets().get(0);
 
-            PhotoEntity photoEntity = eventEntity.getPhotos().get(0);
+                List<MultipartFile> images = eventEntity.getImages();
 
-            eventEntity.setTables(null);
-            eventEntity.setTickets(null);
-            eventEntity.setBottles(null);
-            eventEntity.setPhotos(null);
+                List<PhotoEntity> photoEntity = new ArrayList<>();
 
-            /* generate hash */
-            date = new Date();
-            String hash = String.valueOf(Objects.hash(dateFormat.format(date)));
-            eventEntity.setTime(hash);
+                eventEntity.setTables(null);
+                eventEntity.setTickets(null);
+                eventEntity.setBottles(null);
+                eventEntity.setPhotos(null);
+
+                /* generate hash */
+                date = new Date();
+                String hash = String.valueOf(Objects.hash(dateFormat.format(date)));
+                eventEntity.setTime(hash);
+
+                if (Objects.nonNull(images)) {
+                    images.forEach(v -> {
+                        File imageFile = new File("/home/images/" + hash + v.getName());
+                        photoEntity.add(new PhotoEntity(hash + v.getName()));
+                        try {
+                            v.transferTo(imageFile);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
 
             /*writeToFileNIOWay2(hash, photoEntity.getPhoto());*/
-            // save event
-            eventService.save(eventEntity);
-            userService.addEvent(getPrincipal(), eventEntity);
+                // save event
+                eventService.save(eventEntity);
+                userService.addEvent(getPrincipal(), eventEntity);
 
-            // get event fro db to add tickets, ...
-            event event = eventService.findByHash(eventEntity.getTime());
-            System.out.println(event);
+                // get event fro db to add tickets, ...
+                event event = eventService.findByHash(eventEntity.getTime());
+                System.out.println(event);
 
-            // add tickets, ...
-            bottles.forEach(v -> v.setEvent(event));
-            tables.forEach(v -> v.setEventEntity(event));
-            ticketEntity.setEventEntity(event);
-            photoEntity.setEventEntity(event);
+                // add ...
+                bottles.forEach(v -> v.setEvent(event));
+                tables.forEach(v -> v.setEventEntity(event));
+                ticketEntity.setEventEntity(event);
+                // add image
+//            photoEntity.setPhoto(saveImage(hash, photoEntity.getPhoto()));
+                photoEntity.forEach(v -> v.setEventEntity(event));
 
-            System.out.println(event);
+                bottles.forEach(v -> bottleService.save(v));
+                ticketService.save(ticketEntity);
+                tables.forEach(v -> tableService.save(v));
+                photoEntity.forEach(v -> photoService.save(v));
 
-            bottles.forEach(v -> bottleService.save(v));
-            ticketService.save(ticketEntity);
-            tables.forEach(v -> tableService.save(v));
-            photoService.save(photoEntity);
-
-            logger.info("Event has been added to user with email " + getPrincipal());
+                logger.info("Event has been added to user with email " + getPrincipal());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+            }
             return new ResponseEntity<Object>(HttpStatus.CREATED);
+        };
+    }
+
+    @GetMapping(value = {"/get"})
+    public Callable<ResponseEntity<?>> getAllEvents() {
+        return () -> {
+            try {
+                UserEntity entity = userService.findUserByEmail(getPrincipal());
+                List<event> events = eventService.findAllByUserId(entity.getId_user());
+                events.forEach(v -> {
+                    List<BottleEntity> bottles = bottleService.findAllBottlesByEventAndUser(entity.getId_user(), v.getParty_name());
+                    v.setBottles(bottles);
+                    List<TableEntity> tables = tableService.findAllTablesByEventAndUser(entity.getId_user(), v.getParty_name());
+                    v.setTables(tables);
+                    List<TicketEntity> tickets = ticketService.findAllTicketsByEventAndUser(entity.getId_user(),v.getParty_name());
+                    v.setTickets(tickets);
+                    v.setPhotos(null);
+                });
+                return new ResponseEntity<List>(events, HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+            }
         };
     }
 
@@ -131,7 +166,7 @@ public class EventRESTMaker {
                 UserEntity userEntity = userService.findUserByEmail(getPrincipal());
                 doorRevenue = new DoorRevenue();
                 ticketService.findAllTicketsByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
-                    doorRevenue.setRevenue(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                    doorRevenue.setRevenue(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
                 });
             } catch (Exception e) {
                 return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
@@ -186,15 +221,15 @@ public class EventRESTMaker {
                      * calculate the unbooked tickets
                      * */
                     statementTotal.setRefunds(String.valueOf(
-                            (Integer.parseInt(statementTotal.getRefunds()))
+                            (Double.parseDouble(statementTotal.getRefunds()))
                                     - (
-                                    Integer.parseInt(v.getAvailable()) - Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())
+                                    Double.parseDouble(v.getAvailable()) - Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())
                             )
                     ));
                     /**
                      * calculate the booked tickets
                      * */
-                    statementTotal.setTicketsSales(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                    statementTotal.setTicketsSales(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
                 });
 
                 tableService.findAllTablesByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
@@ -202,40 +237,40 @@ public class EventRESTMaker {
                      * calculate the unbooked tables
                      * */
                     statementTotal.setRefunds(String.valueOf(
-                            (Integer.parseInt(statementTotal.getRefunds()))
+                            (Double.parseDouble(statementTotal.getRefunds()))
                                     - (
-                                    Integer.parseInt(v.getAvailable()) - Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())
+                                    Double.parseDouble(v.getAvailable()) - Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())
                             )
                     ));
                     /**
                      * calculate the booked tables
                      * */
-                    statementTotal.setTableSales(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                    statementTotal.setTableSales(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
                 });
                 bottleService.findAllBottlesByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
                     /**
                      * calculate the unbooked bottles
                      * */
                     statementTotal.setRefunds(String.valueOf(
-                            (Integer.parseInt(statementTotal.getRefunds()))
+                            (Double.parseDouble(statementTotal.getRefunds()))
                                     - (
-                                    Integer.parseInt(v.getAvailable()) - Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())
+                                    Double.parseDouble(v.getAvailable()) - Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())
                             )
                     ));
                     /**
                      * calculate the booked tables
                      * */
-                    statementTotal.setBottleSales(String.valueOf(Integer.parseInt(v.getBooked()) * Integer.parseInt(v.getPrice())));
+                    statementTotal.setBottleSales(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
                 });
 
                 /**
                  * add withdrawn summary of all above components
                  * */
                 statementTotal.setWithdrawn(String.valueOf(
-                        Integer.parseInt(statementTotal.getBottleSales())
-                                + Integer.parseInt(statementTotal.getTableSales())
-                                + Integer.parseInt(statementTotal.getTicketsSales())
-                                - Integer.parseInt(statementTotal.getRefunds())
+                        Double.parseDouble(statementTotal.getBottleSales())
+                                + Double.parseDouble(statementTotal.getTableSales())
+                                + Double.parseDouble(statementTotal.getTicketsSales())
+                                - Double.parseDouble(statementTotal.getRefunds())
                 ));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -260,42 +295,25 @@ public class EventRESTMaker {
         return userName;
     }
 
+    /**
+     * save photo and return its the path
+     */
+    public String saveImage(String nameFile, byte[] image) throws IOException {
 
-    public void writeToFileNIOWay2(String nameFile, String messageToWrite) throws IOException {
-        File file = new File("/home/anton/" + nameFile + ".jpeg");
-
-        String[] byteValues = messageToWrite.substring(0, messageToWrite.length() - 1).split("");
+        /*System.out.println(image);
+        String[] byteValues = image.substring(1, image.length() - 1).split(",");
         byte[] bytes = new byte[byteValues.length];
 
         for (int i = 0, len = bytes.length; i < len; i++) {
             bytes[i] = Byte.parseByte(byteValues[i].trim());
         }
+*/
+        InputStream in = new ByteArrayInputStream(image);
+        BufferedImage bImageFromConvert = ImageIO.read(in);
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        Iterator<?> readers = ImageIO.getImageReadersByFormatName("jpeg");
-
-        //ImageIO is a class containing static methods for locating ImageReaders
-        //and ImageWriters, and performing simple encoding and decoding.
-
-        ImageReader reader = (ImageReader) readers.next();
-        Object source = bis;
-        ImageInputStream iis = ImageIO.createImageInputStream(source);
-        reader.setInput(iis, true);
-        ImageReadParam param = reader.getDefaultReadParam();
-
-        Image image = reader.read(0, param);
-        //got an image file
-
-        BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-        //bufferedImage is the RenderedImage to be written
-
-        Graphics2D g2 = bufferedImage.createGraphics();
-        g2.drawImage(image, null, null);
-
-        File imageFile = new File("/home/anton/deploy/3434.jpeg");
-        ImageIO.write(bufferedImage, "jpeg", imageFile);
-
-        System.out.println(imageFile.getPath());
+        File imageFile = new File("/home/anton/deploy/" + nameFile + ".jpg");
+        ImageIO.write(bImageFromConvert, "jpg", imageFile);
+        return imageFile.getAbsolutePath();
     }
 
 }

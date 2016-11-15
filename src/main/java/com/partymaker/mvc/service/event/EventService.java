@@ -13,6 +13,7 @@ public interface EventService {
     event findByHash(String timeHash);
 
     List<event> findAll();
+    List<event> findAllByUserId(int id_user);
 
     void delete(event eventEntity);
 

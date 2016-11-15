@@ -20,7 +20,6 @@ public class EventServiceImpl implements EventService {
     @Autowired
     private EventDAO eventDAO;
 
-
     @Override
     public event findById(int id) {
         return (event) eventDAO.getByID(id);
@@ -34,6 +33,11 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<event> findAll() {
         return eventDAO.getAll();
+    }
+
+    @Override
+    public List<event> findAllByUserId(int id_user) {
+        return eventDAO.getAllByUserId(id_user);
     }
 
     @Override

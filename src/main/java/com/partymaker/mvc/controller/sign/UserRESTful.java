@@ -9,14 +9,20 @@ import com.partymaker.mvc.service.user.role.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,8 +57,23 @@ public class UserRESTful {
 
     @GetMapping(value = {"/user"})
     public Callable<?> getUser() {
-        return () ->{
-            return new ResponseEntity<UserEntity>(new UserEntity(), HttpStatus.OK);
+        return () -> {
+            /*try {
+                event event = new event();
+                Path file = Paths.get("/home/anton/deploy/-1895623107.jpg");
+                byte[] content;
+                content = Files.readAllBytes(file);
+                List<MultipartFile> images = new ArrayList<>();
+
+                images.add((new MockMultipartFile("new", content)));
+                images.add((new MockMultipartFile("new", content)));
+                images.add((new MockMultipartFile("new", content)));
+                return new ResponseEntity<List>(images, HttpStatus.OK);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;*/
+            return new ResponseEntity<UserEntity>(new UserEntity(),HttpStatus.OK);
         };
     }
 
