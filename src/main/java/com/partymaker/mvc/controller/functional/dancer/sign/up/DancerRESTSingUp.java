@@ -1,5 +1,6 @@
 package com.partymaker.mvc.controller.functional.dancer.sign.up;
 
+import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.billing.BillingService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 /**
@@ -46,14 +48,18 @@ public class DancerRESTSingUp {
             try {
                 try {
                     if (userService.isExist(user.getEmail())) {
-                        return new ResponseEntity<Object>("401", HttpStatus.FORBIDDEN);
+                        return new ResponseEntity<Object>("Goer with current email has already exist", HttpStatus.FORBIDDEN);
                     }
                     if (userService.isExistByName(user.getUserName())) {
-                        return new ResponseEntity<Object>("403", HttpStatus.FORBIDDEN);
+                        return new ResponseEntity<Object>("Goer with current name has already exist", HttpStatus.FORBIDDEN);
                     }
-                    if (billingService.isExist(user.getBilling())) {
-                        return new ResponseEntity<Object>("402", HttpStatus.FORBIDDEN);
-                    }
+                    /**
+                     *
+                     * it will be uncommented with PayPal needs
+                     * */
+                   /* if (billingService.isExist(user.getBilling())) {
+                        return new ResponseEntity<Object>("Goer with current billing info has already exist", HttpStatus.FORBIDDEN);
+                    }*/
                 } catch (Exception e) {
                     logger.info("Checking failed" + e);
                     return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);
@@ -64,15 +70,20 @@ public class DancerRESTSingUp {
                 // hard code
                 user.setRole(new RoleEntity(1, "STREET_DANCER"));
 
-                billingService.saveBilling(user.getBilling());
+                /* a little  hard code */
+                BillingEntity billing = new BillingEntity("dancer" + UUID.randomUUID().toString());
+                billingService.saveBilling(billing);
+
+                // sent enable without confirmation
                 user.setEnable(true);
 
-                user.setBilling(billingService.findByCard(user.getBilling().getCard_number()));
+                user.setBilling(billingService.findByCard(billing.getCard_number()));
 
                 userService.saveUser(user);
                 logger.info("User has been saved");
-                return new ResponseEntity<String>("Created!", HttpStatus.CREATED);
+                return new ResponseEntity<String>("Successful registration!", HttpStatus.CREATED);
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.info("Failed to create dancer = " + user + ", due to: " + e);
                 return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
             }

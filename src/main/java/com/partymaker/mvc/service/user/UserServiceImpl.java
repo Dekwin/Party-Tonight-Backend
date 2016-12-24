@@ -56,7 +56,9 @@ public class UserServiceImpl implements UserService<UserEntity> {
     @Override
     public void addEvent(String userEmail, event event) {
         UserEntity entity = (UserEntity) userDao.findByField(userEmail,userEmail);
-        com.partymaker.mvc.model.whole.event eventEntity = (com.partymaker.mvc.model.whole.event) eventDAO.getByCode(event.getZip_code());
+
+        event eventEntity = (event) eventDAO.getByCode(event.getTime());
+
         if (Objects.nonNull(entity) && Objects.nonNull(eventEntity)) {
             entity.getEvents().add(eventEntity);
         }

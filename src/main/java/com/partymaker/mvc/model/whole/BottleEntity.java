@@ -29,6 +29,7 @@ public class BottleEntity implements Serializable {
     @Column(name = "created_date")
     private String createdDate;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")
     private event event;

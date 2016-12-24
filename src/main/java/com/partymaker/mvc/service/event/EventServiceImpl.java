@@ -41,6 +41,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public List<event> findAllByCode(String code) {
+        return eventDAO.getAllCode(code);
+    }
+
+    @Override
     public void delete(event eventEntity) {
         eventDAO.delete(eventEntity);
     }

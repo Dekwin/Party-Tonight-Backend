@@ -23,7 +23,7 @@ public class BillingEntity implements Serializable {
     public BillingEntity() {
     }
 
-    public BillingEntity( String cardNumber) {
+    public BillingEntity(String cardNumber) {
         this.card_number = cardNumber;
     }
 

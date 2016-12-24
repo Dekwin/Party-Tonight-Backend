@@ -27,4 +27,9 @@ public class TicketServiceImpl implements TicketService {
     public List<TicketEntity> findAllTicketsByEventAndUser(int id_user, String party_name) {
         return ticketDAO.findAllByEventAndUser(id_user, party_name);
     }
+
+    @Override
+    public List<TicketEntity> findAllTicketsByEventId(int id_event) {
+        return ticketDAO.findAllByEventId(id_event);
+    }
 }

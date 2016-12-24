@@ -12,4 +12,6 @@ public interface TableDAO {
     void save(TableEntity tableEntity);
 
     List<TableEntity> findAllByEventAndUser(int id_user, String party_name);
+
+    List<TableEntity> findAllByEventId(int id_event);
 }

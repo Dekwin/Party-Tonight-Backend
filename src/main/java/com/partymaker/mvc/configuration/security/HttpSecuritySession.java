@@ -37,9 +37,8 @@ public class HttpSecuritySession {
     public SessionRepository sessionRepository(RedisConnectionFactory connectionFactory) {
         RedisOperationsSessionRepository redisOperationsSessionRepository =
                 new RedisOperationsSessionRepository(connectionFactory);
-        redisOperationsSessionRepository.setDefaultMaxInactiveInterval(2000000000);
-        redisOperationsSessionRepository.createSession();
-        redisOperationsSessionRepository.setRedisKeyNamespace("savelife");
+        redisOperationsSessionRepository.setDefaultMaxInactiveInterval(2592000);
+        redisOperationsSessionRepository.setRedisKeyNamespace("partymaker");
 
         return redisOperationsSessionRepository;
     }

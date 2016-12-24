@@ -47,37 +47,48 @@ public class PartyMakerRESTSignUp {
             try {
                 try {
                     if (userService.isExist(user.getEmail())) {
-                        return new ResponseEntity<Object>("401", HttpStatus.FORBIDDEN);
+                        return new ResponseEntity<Object>("Promoter with such email is already exist", HttpStatus.IM_USED);
                     }
                     if (userService.isExistByName(user.getUserName())) {
-                        return new ResponseEntity<Object>("403", HttpStatus.FORBIDDEN);
+                        return new ResponseEntity<Object>("Promoter with such username is already exist", HttpStatus.IM_USED);
                     }
                     if (billingService.isExist(user.getBilling())) {
-                        return new ResponseEntity<Object>("402", HttpStatus.FORBIDDEN);
+                        return new ResponseEntity<Object>("Promoter with current billing info is already exist", HttpStatus.IM_USED);
                     }
-
                 } catch (Exception e) {
-                    logger.info("Checking failed" + e);
-                    return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);
+                    logger.info("Checking failed " + e);
                 }
+                logger.info("Creating user ");
                 date = new Date();
                 user.setCreatedDate(dateFormat.format(date));
                 // hard code
                 user.setRole(new RoleEntity(2, "PARTY_MAKER"));
 
+                logger.info("saving billing");
                 billingService.saveBilling(user.getBilling());
+                logger.info("saved billing");
                 user.setEnable(true);
 
-                user.setBilling(billingService.findByCard(user.getBilling().getCard_number()));
+                try {
+                    logger.info("try to get  billing");
+                    user.setBilling(billingService.findByCard(user.getBilling().getCard_number()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.info("Failed to fetch billing due to " + e);
+                }
 
                 userService.saveUser(user);
                 logger.info("Created maker = " + user);
                 return new ResponseEntity<String>("", HttpStatus.CREATED);
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.info("Failed to create maker = " + user + ", due to: " + e);
                 return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
             }
         };
     }
 
+    private void validationUser() {
+
+    }
 }

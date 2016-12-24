@@ -89,14 +89,13 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS partymaker2.`user_has_event` (
   `id_user` INT NOT NULL,
-  `id_role` INT NOT NULL,
   `id_event` INT NOT NULL,
-  PRIMARY KEY (`id_user`, `id_role`, `id_event`),
+  PRIMARY KEY (`id_user`,`id_event`),
   INDEX `fk_user_has_event_event1_idx` (`id_event` ASC),
-  INDEX `fk_user_has_event_user1_idx` (`id_user` ASC, `id_role` ASC),
+  INDEX `fk_user_has_event_user1_idx` (`id_user` ASC),
   CONSTRAINT `fk_user_has_event_user1`
-    FOREIGN KEY (`id_user` , `id_role`)
-    REFERENCES partymaker2.`user` (`id_user` , `id_role`)
+    FOREIGN KEY (`id_user` )
+    REFERENCES partymaker2.`user` (`id_user`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_event_event1`

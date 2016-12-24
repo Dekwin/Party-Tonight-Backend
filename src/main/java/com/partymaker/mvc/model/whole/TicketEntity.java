@@ -1,5 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -22,6 +24,7 @@ public class TicketEntity implements Serializable {
     @Column(name = "created_date", nullable = true, length = 45)
     private String created_date;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")
     private event eventEntity;

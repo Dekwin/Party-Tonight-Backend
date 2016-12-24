@@ -1,28 +1,20 @@
 package com.partymaker.mvc.controller.sign;
 
 import com.partymaker.mvc.model.whole.BillingEntity;
-import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
+import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.service.user.UserService;
 import com.partymaker.mvc.service.user.role.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.MultiValueMap;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,8 +41,9 @@ public class UserRESTful {
 
 
     @GetMapping(value = {"/signin"})
-    public Callable<?> signIn(HttpSession session) {
-        logger.info("Sign in user:, with token = " + session.getId());
+    public Callable<?> tokens(HttpSession session) {
+        logger.info("Sign in user: with token = " + session.getId());
+        logger.info("User details : " + getPrincipal());
         return () -> new ResponseEntity<>(Collections.singletonMap("token", session.getId()), HttpStatus.OK);
     }
 
@@ -58,21 +51,6 @@ public class UserRESTful {
     @GetMapping(value = {"/user"})
     public Callable<?> getUser() {
         return () -> {
-            /*try {
-                event event = new event();
-                Path file = Paths.get("/home/anton/deploy/-1895623107.jpg");
-                byte[] content;
-                content = Files.readAllBytes(file);
-                List<MultipartFile> images = new ArrayList<>();
-
-                images.add((new MockMultipartFile("new", content)));
-                images.add((new MockMultipartFile("new", content)));
-                images.add((new MockMultipartFile("new", content)));
-                return new ResponseEntity<List>(images, HttpStatus.OK);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;*/
             return new ResponseEntity<UserEntity>(new UserEntity(),HttpStatus.OK);
         };
     }
@@ -97,5 +75,19 @@ public class UserRESTful {
             list.add(new event());
             return new ResponseEntity<Object>(list, HttpStatus.OK);
         };
+    }
+    /**
+     * This method returns the principal[user-name] of logged-in user.
+     */
+    private String getPrincipal() {
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails) principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
     }
 }

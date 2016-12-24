@@ -1,5 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -12,15 +14,19 @@ public class PhotoEntity implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "id_photo", nullable = false)
+    @JsonIgnore
     private int idPhoto;
 
     @Column(name = "photo")
     private String photo;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")
     private event eventEntity;
 
+    public PhotoEntity() {
+    }
 
     public PhotoEntity(String photo) {
         this.photo = photo;

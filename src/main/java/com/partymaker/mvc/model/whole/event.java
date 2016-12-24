@@ -2,6 +2,10 @@ package com.partymaker.mvc.model.whole;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.sun.glass.ui.View;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -33,6 +37,9 @@ public class event implements Serializable {
     private String club_name;
     @Column(name = "date")
     private String date;
+
+    /* no visible to frontend (has my inner unique filed) */
+    @JsonIgnore
     @Column(name = "time", nullable = true, length = 45)
     private String time;
     @Column(name = "location")
@@ -44,20 +51,21 @@ public class event implements Serializable {
     @Column(name = "zip_code")
     private String zip_code;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event")
     private List<BottleEntity> bottles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "eventEntity")
     private List<TicketEntity> tickets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "eventEntity")
     private List<TableEntity> tables = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "eventEntity")
     private List<PhotoEntity> photos = new ArrayList<>();
 
-    @Transient
-    private List<MultipartFile> images;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "events")
+    private List<UserEntity> users = new ArrayList<>();
 
     public int getId_event() {
         return id_event;
@@ -158,12 +166,12 @@ public class event implements Serializable {
         this.photos = photos;
     }
 
-    public List<MultipartFile> getImages() {
-        return images;
+    public List<UserEntity> getUsers() {
+        return users;
     }
 
-    public void setImages(List<MultipartFile> images) {
-        this.images = images;
+    public void setUsers(List<UserEntity> users) {
+        this.users = users;
     }
 
     @Override
@@ -171,18 +179,23 @@ public class event implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        event that = (event) o;
+        event event = (event) o;
 
-        if (id_event != that.id_event) return false;
-        if (club_name != null ? !club_name.equals(that.club_name) : that.club_name != null) return false;
-        if (date != null ? !date.equals(that.date) : that.date != null) return false;
-        if (location != null ? !location.equals(that.location) : that.location != null) return false;
-        if (club_capacity != null ? !club_capacity.equals(that.club_capacity) : that.club_capacity != null)
+        if (id_event != event.id_event) return false;
+        if (club_name != null ? !club_name.equals(event.club_name) : event.club_name != null) return false;
+        if (date != null ? !date.equals(event.date) : event.date != null) return false;
+        if (time != null ? !time.equals(event.time) : event.time != null) return false;
+        if (location != null ? !location.equals(event.location) : event.location != null) return false;
+        if (club_capacity != null ? !club_capacity.equals(event.club_capacity) : event.club_capacity != null)
             return false;
-        if (party_name != null ? !party_name.equals(that.party_name) : that.party_name != null) return false;
-        if (zip_code != null ? !zip_code.equals(that.zip_code) : that.zip_code != null) return false;
+        if (party_name != null ? !party_name.equals(event.party_name) : event.party_name != null) return false;
+        if (zip_code != null ? !zip_code.equals(event.zip_code) : event.zip_code != null) return false;
+        if (bottles != null ? !bottles.equals(event.bottles) : event.bottles != null) return false;
+        if (tickets != null ? !tickets.equals(event.tickets) : event.tickets != null) return false;
+        if (tables != null ? !tables.equals(event.tables) : event.tables != null) return false;
+        if (photos != null ? !photos.equals(event.photos) : event.photos != null) return false;
+        return users != null ? users.equals(event.users) : event.users == null;
 
-        return true;
     }
 
     @Override
@@ -190,10 +203,16 @@ public class event implements Serializable {
         int result = id_event;
         result = 31 * result + (club_name != null ? club_name.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (time != null ? time.hashCode() : 0);
         result = 31 * result + (location != null ? location.hashCode() : 0);
         result = 31 * result + (club_capacity != null ? club_capacity.hashCode() : 0);
         result = 31 * result + (party_name != null ? party_name.hashCode() : 0);
         result = 31 * result + (zip_code != null ? zip_code.hashCode() : 0);
+        result = 31 * result + (bottles != null ? bottles.hashCode() : 0);
+        result = 31 * result + (tickets != null ? tickets.hashCode() : 0);
+        result = 31 * result + (tables != null ? tables.hashCode() : 0);
+        result = 31 * result + (photos != null ? photos.hashCode() : 0);
+        result = 31 * result + (users != null ? users.hashCode() : 0);
         return result;
     }
 
@@ -203,80 +222,12 @@ public class event implements Serializable {
         sb.append("id_event=").append(id_event);
         sb.append(", club_name='").append(club_name).append('\'');
         sb.append(", date='").append(date).append('\'');
+        sb.append(", time='").append(time).append('\'');
         sb.append(", location='").append(location).append('\'');
         sb.append(", club_capacity='").append(club_capacity).append('\'');
         sb.append(", party_name='").append(party_name).append('\'');
         sb.append(", zip_code='").append(zip_code).append('\'');
         sb.append('}');
         return sb.toString();
-    }
-
-
-    public static void main(String[] args) throws IOException {
-        /*
-         * 1. How to convert an image file to  byte array?
-    	 */
-
-        File file = new File("/home/anton/863946db_o.jpeg");
-
-        FileInputStream fis = new FileInputStream(file);
-        //create FileInputStream which obtains input bytes from a file in a file system
-        //FileInputStream is meant for reading streams of raw bytes such as image data. For reading streams of characters, consider using FileReader.
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        try {
-            for (int readNum; (readNum = fis.read(buf)) != -1; ) {
-                //Writes to this byte array output stream
-                bos.write(buf, 0, readNum);
-                System.out.println("read " + readNum + " bytes,");
-            }
-        } catch (IOException ex) {
-        }
-
-        byte[] bytes = bos.toByteArray();
-
-
-        String butesString = Arrays.toString(bytes);
-
-        System.out.println(butesString);
-
-        String[] byteValues = butesString.substring(1, butesString.length() - 1).split(",");
-        bytes = new byte[byteValues.length];
-
-        for (int i = 0, len = bytes.length; i < len; i++) {
-            bytes[i] = Byte.parseByte(byteValues[i].trim());
-        }
-
-        /*
-         * 2. How to convert byte array back to an image file?
-         */
-
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        Iterator<?> readers = ImageIO.getImageReadersByFormatName("jpeg");
-
-        //ImageIO is a class containing static methods for locating ImageReaders
-        //and ImageWriters, and performing simple encoding and decoding.
-
-        ImageReader reader = (ImageReader) readers.next();
-        Object source = bis;
-        ImageInputStream iis = ImageIO.createImageInputStream(source);
-        reader.setInput(iis, true);
-        ImageReadParam param = reader.getDefaultReadParam();
-
-        Image image = reader.read(0, param);
-        //got an image file
-
-        BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-        //bufferedImage is the RenderedImage to be written
-
-        Graphics2D g2 = bufferedImage.createGraphics();
-        g2.drawImage(image, null, null);
-
-        File imageFile = new File("/home/anton/deploy/myimage.jpeg");
-        ImageIO.write(bufferedImage, "jpeg", imageFile);
-
-        System.out.println(imageFile.getAbsolutePath());
-
     }
 }

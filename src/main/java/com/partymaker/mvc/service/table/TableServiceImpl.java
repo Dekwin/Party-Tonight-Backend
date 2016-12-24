@@ -27,4 +27,9 @@ public class TableServiceImpl implements TableService {
     public List<TableEntity> findAllTablesByEventAndUser(int id_user, String party_name) {
         return tableDAO.findAllByEventAndUser(id_user, party_name);
     }
+
+    @Override
+    public List<TableEntity> findAllTablesByEventId(int id_event) {
+        return tableDAO.findAllByEventId(id_event);
+    }
 }

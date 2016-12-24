@@ -12,4 +12,6 @@ public interface TicketService {
     void save(TicketEntity ticketEntity);
 
     List<TicketEntity> findAllTicketsByEventAndUser(int id_user, String party_name);
+
+    List<TicketEntity> findAllTicketsByEventId(int id_event);
 }

@@ -10,10 +10,14 @@ import java.util.List;
 public interface EventService {
 
     event findById(int id);
+
     event findByHash(String timeHash);
 
     List<event> findAll();
+
     List<event> findAllByUserId(int id_user);
+
+    List<event> findAllByCode(String code);
 
     void delete(event eventEntity);
 

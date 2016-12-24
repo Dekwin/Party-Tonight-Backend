@@ -11,4 +11,6 @@ public interface TableService {
     void save(TableEntity tableEntity);
 
     List<TableEntity> findAllTablesByEventAndUser(int id_user, String party_name);
+
+    List<TableEntity> findAllTablesByEventId(int id_event);
 }

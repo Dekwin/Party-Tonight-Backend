@@ -15,9 +15,9 @@ public interface EventDAO<T> {
 
     List<T> getAllByUserId(int id_user);
 
+    List<T> getAllCode(String code);
+
     void save(T eventEntity);
 
     void delete(T eventEntity);
-
-
 }

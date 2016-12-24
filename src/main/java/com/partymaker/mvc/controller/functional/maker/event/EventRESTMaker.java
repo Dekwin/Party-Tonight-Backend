@@ -1,6 +1,7 @@
 package com.partymaker.mvc.controller.functional.maker.event;
 
 import com.partymaker.mvc.model.business.DoorRevenue;
+import com.partymaker.mvc.model.business.ImageMessage;
 import com.partymaker.mvc.model.business.StatementTotal;
 import com.partymaker.mvc.model.whole.*;
 import com.partymaker.mvc.service.bottle.BottleService;
@@ -12,6 +13,8 @@ import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,9 +22,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -37,7 +39,11 @@ public class EventRESTMaker {
     private static final Logger logger = Logger.getLogger(EventRESTMaker.class);
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
     private static Date date;
+
+    //    private String imageStorePath = "/static/images";
+    private String imageStoreFULLPAth = "http://45.55.226.134:8080/static/images/";
 
     @Autowired
     @Qualifier("userService")
@@ -62,22 +68,12 @@ public class EventRESTMaker {
     public Callable<ResponseEntity<?>> createEvent(@RequestBody event eventEntity) {
         return () -> {
             try {
-
                 logger.info("Creating event " + eventEntity);
-                System.out.println(eventEntity);
 
-                List<BottleEntity> bottles = new ArrayList<>();
-                eventEntity.getBottles().forEach(bottles::add);
-
-
-                List<TableEntity> tables = new ArrayList<>();
-                eventEntity.getTables().forEach(tables::add);
-
+                List<BottleEntity> bottles = eventEntity.getBottles();
+                List<TableEntity> tables = eventEntity.getTables();
                 TicketEntity ticketEntity = eventEntity.getTickets().get(0);
-
-                List<MultipartFile> images = eventEntity.getImages();
-
-                List<PhotoEntity> photoEntity = new ArrayList<>();
+                List<PhotoEntity> photoEntity = eventEntity.getPhotos();
 
                 eventEntity.setTables(null);
                 eventEntity.setTickets(null);
@@ -89,33 +85,19 @@ public class EventRESTMaker {
                 String hash = String.valueOf(Objects.hash(dateFormat.format(date)));
                 eventEntity.setTime(hash);
 
-                if (Objects.nonNull(images)) {
-                    images.forEach(v -> {
-                        File imageFile = new File("/home/images/" + hash + v.getName());
-                        photoEntity.add(new PhotoEntity(hash + v.getName()));
-                        try {
-                            v.transferTo(imageFile);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-
-            /*writeToFileNIOWay2(hash, photoEntity.getPhoto());*/
                 // save event
                 eventService.save(eventEntity);
                 userService.addEvent(getPrincipal(), eventEntity);
 
-                // get event fro db to add tickets, ...
+                // get event by unique value which stored in time dbFiled from db to add tickets, ...
                 event event = eventService.findByHash(eventEntity.getTime());
-                System.out.println(event);
+                logger.info("Fetched event = " + event);
 
                 // add ...
                 bottles.forEach(v -> v.setEvent(event));
                 tables.forEach(v -> v.setEventEntity(event));
                 ticketEntity.setEventEntity(event);
                 // add image
-//            photoEntity.setPhoto(saveImage(hash, photoEntity.getPhoto()));
                 photoEntity.forEach(v -> v.setEventEntity(event));
 
                 bottles.forEach(v -> bottleService.save(v));
@@ -132,20 +114,26 @@ public class EventRESTMaker {
         };
     }
 
+    /**
+     * get all events by party name
+     */
     @GetMapping(value = {"/get"})
     public Callable<ResponseEntity<?>> getAllEvents() {
         return () -> {
             try {
-                UserEntity entity = userService.findUserByEmail(getPrincipal());
-                List<event> events = eventService.findAllByUserId(entity.getId_user());
+                logger.info("Get events");
+                UserEntity user = userService.findUserByEmail(getPrincipal());
+                logger.info("Get events with user " + user);
+                List<event> events = eventService.findAllByUserId(user.getId_user());
                 events.forEach(v -> {
-                    List<BottleEntity> bottles = bottleService.findAllBottlesByEventAndUser(entity.getId_user(), v.getParty_name());
+                    List<BottleEntity> bottles = bottleService.findAllBottlesByEventID(v.getId_event());
                     v.setBottles(bottles);
-                    List<TableEntity> tables = tableService.findAllTablesByEventAndUser(entity.getId_user(), v.getParty_name());
+                    List<TableEntity> tables = tableService.findAllTablesByEventId(v.getId_event());
                     v.setTables(tables);
-                    List<TicketEntity> tickets = ticketService.findAllTicketsByEventAndUser(entity.getId_user(),v.getParty_name());
+                    List<TicketEntity> tickets = ticketService.findAllTicketsByEventId(v.getId_event());
                     v.setTickets(tickets);
-                    v.setPhotos(null);
+                    List<PhotoEntity> photoEntities = photoService.findAllPhotosByEventId(v.getId_event());
+                    v.setPhotos(photoEntities);
                 });
                 return new ResponseEntity<List>(events, HttpStatus.OK);
             } catch (Exception e) {
@@ -174,7 +162,6 @@ public class EventRESTMaker {
             return new ResponseEntity<Object>(doorRevenue, HttpStatus.OK);
         };
     }
-
 
     @GetMapping(value = {"/bottles"})
     public Callable<ResponseEntity<?>> getEventBottle(@RequestHeader("partyName") String partyName) {
@@ -209,8 +196,8 @@ public class EventRESTMaker {
     @GetMapping(value = {"/total"})
     public Callable<ResponseEntity<?>> getStatementTotal(@RequestHeader("partyName") String partyName) {
         return () -> {
+            logger.info(" Get statement total with partymaker = " + partyName);
             StatementTotal statementTotal;
-
             try {
                 UserEntity userEntity = userService.findUserByEmail(getPrincipal());
 
@@ -274,9 +261,31 @@ public class EventRESTMaker {
                 ));
             } catch (Exception e) {
                 e.printStackTrace();
+                logger.info(" Statement total failure due to " + e);
                 return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<Object>(statementTotal, HttpStatus.OK);
+        };
+    }
+
+    @PostMapping(value = {"/image"})
+    public Callable<ResponseEntity<?>> saveigame(@RequestParam("file") MultipartFile file) {
+        return () -> {
+            try {
+                logger.info("Saving image ");
+                // save image and return its path.
+                ImageMessage imageMessage = new ImageMessage();
+                UUID name = UUID.randomUUID();
+                imageMessage.setPath(saveImage(String.valueOf(Objects.hashCode(name)), file));
+                return new ResponseEntity<ImageMessage>(imageMessage, HttpStatus.CREATED);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("Failed to save image " + e);
+                if (Objects.isNull(file)) {
+                    return new ResponseEntity<Object>("Image cannot be null ", HttpStatus.CONFLICT);
+                }
+                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+            }
         };
     }
 
@@ -296,24 +305,17 @@ public class EventRESTMaker {
     }
 
     /**
-     * save photo and return its the path
+     * save photo to local storage and return its the path
      */
-    public String saveImage(String nameFile, byte[] image) throws IOException {
-
-        /*System.out.println(image);
-        String[] byteValues = image.substring(1, image.length() - 1).split(",");
-        byte[] bytes = new byte[byteValues.length];
-
-        for (int i = 0, len = bytes.length; i < len; i++) {
-            bytes[i] = Byte.parseByte(byteValues[i].trim());
+    private String saveImage(String nameFile, MultipartFile image) {
+        String localPath = "/opt/apache-tomcat-8.5.6/webapps/static/images/";
+        File imageFile = new File(localPath + nameFile);
+        try {
+            image.transferTo(imageFile);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-*/
-        InputStream in = new ByteArrayInputStream(image);
-        BufferedImage bImageFromConvert = ImageIO.read(in);
 
-        File imageFile = new File("/home/anton/deploy/" + nameFile + ".jpg");
-        ImageIO.write(bImageFromConvert, "jpg", imageFile);
-        return imageFile.getAbsolutePath();
+        return imageStoreFULLPAth + imageFile.getName();
     }
-
 }

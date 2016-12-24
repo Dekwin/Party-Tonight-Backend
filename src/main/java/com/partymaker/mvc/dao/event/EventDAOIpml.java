@@ -43,6 +43,21 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
         return (List<event>) query.list();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<event> getAllCode(String code) {
+        Query query = null;
+        try {
+            query = getSession().createSQLQuery("SELECT * from partymaker2.event where partymaker2.event.zip_code = :code")
+                    .addEntity(event.class)
+                    .setParameter("code", code);
+            return (List<event>) query.list();
+        } catch (Exception e) {
+            //ignore
+        }
+        return (List<event>) query;
+    }
+
     @Override
     public void save(event eventEntity) {
         persist(eventEntity);

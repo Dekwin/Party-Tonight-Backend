@@ -27,4 +27,9 @@ public class BottleServiceImpl implements BottleService {
     public List<BottleEntity> findAllBottlesByEventAndUser(int id_user, String party_name) {
         return bottleDAO.findAllByEventAndUser(id_user, party_name);
     }
+
+    @Override
+    public List<BottleEntity> findAllBottlesByEventID(int id_event) {
+        return bottleDAO.findAllByEventId(id_event);
+    }
 }
