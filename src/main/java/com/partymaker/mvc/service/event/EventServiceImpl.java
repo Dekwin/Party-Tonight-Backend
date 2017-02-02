@@ -87,10 +87,6 @@ public class EventServiceImpl implements EventService {
         return events;
     }
 
-    @Override
-    public List<event> findAllByCode(String code) {
-        return eventDAO.getAllCode(code);
-    }
 
     @Override
     public List<event> findAllByCode(String code) {

@@ -42,8 +42,4 @@ public class TicketServiceImpl implements TicketService {
         return ticketDAO.findAllByEventId(id_event);
     }
 
-    @Override
-    public List<TicketEntity> findAllTicketsByEventId(int id_event) {
-        return ticketDAO.findAllByEventId(id_event);
-    }
 }
