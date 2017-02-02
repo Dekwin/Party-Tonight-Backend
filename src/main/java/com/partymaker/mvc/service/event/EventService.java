@@ -1,6 +1,10 @@
 package com.partymaker.mvc.service.event;
 
+import com.partymaker.mvc.model.business.DoorRevenue;
+import com.partymaker.mvc.model.business.StatementTotal;
+import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -21,7 +25,13 @@ public interface EventService {
 
     void delete(event eventEntity);
 
-    void save(event eventEntity);
+    void save(event eventEntity, String user_email);
 
     boolean isExist(String party_name);
+
+    ResponseEntity validation(event event);
+
+    StatementTotal getTotal(String partyName,UserEntity user);
+
+    DoorRevenue getRevenue(String partyName,UserEntity user);
 }

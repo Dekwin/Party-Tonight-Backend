@@ -32,6 +32,7 @@ public class MainUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
         UserEntity user = (UserEntity) userService.findUserByEmail(s);
+        logger.info("Auth user " + user);
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 true, true, true, true, getGrantedAuthorities(user));
     }
@@ -40,7 +41,7 @@ public class MainUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> setAuths = new ArrayList<GrantedAuthority>();
 
         setAuths.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getUserRole()));
-        setAuths.forEach(System.out::println);
+        logger.info("Grants = " + setAuths);
         return setAuths;
     }
 

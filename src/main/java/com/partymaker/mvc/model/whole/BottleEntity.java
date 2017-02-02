@@ -18,7 +18,7 @@ public class BottleEntity implements Serializable {
     private int id_bottle;
     @Column(name = "name")
     private String name;
-    @Column(name = "prise")
+    @Column(name = "price")
     private String price;
     @Column(name = "type")
     private String type;

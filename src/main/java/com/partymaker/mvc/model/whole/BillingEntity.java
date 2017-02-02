@@ -1,9 +1,10 @@
 package com.partymaker.mvc.model.whole;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by anton on 01/11/16.

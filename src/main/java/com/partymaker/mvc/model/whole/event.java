@@ -2,23 +2,10 @@ package com.partymaker.mvc.model.whole;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.sun.glass.ui.View;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import javax.persistence.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -195,7 +182,6 @@ public class event implements Serializable {
         if (tables != null ? !tables.equals(event.tables) : event.tables != null) return false;
         if (photos != null ? !photos.equals(event.photos) : event.photos != null) return false;
         return users != null ? users.equals(event.users) : event.users == null;
-
     }
 
     @Override

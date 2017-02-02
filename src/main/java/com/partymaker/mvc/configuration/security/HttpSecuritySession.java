@@ -17,7 +17,7 @@ import java.io.IOException;
  * Created by anton on 10/10/16.
  */
 @Configuration
-@EnableRedisHttpSession // add servlet filter that replay HttpSession to SpringSession
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 999999999) // add servlet filter that replay HttpSession to SpringSession
 public class HttpSecuritySession {
 
     /* integration to use HTTP headers */

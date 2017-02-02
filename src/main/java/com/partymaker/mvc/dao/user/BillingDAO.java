@@ -11,7 +11,6 @@ public interface BillingDAO<T, V> {
 
     T getBillingByCard(String card);
 
-
     void save(T billing);
 
     void detele(T billing);

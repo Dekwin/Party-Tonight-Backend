@@ -1,7 +1,6 @@
 package com.partymaker.mvc.dao.event.table;
 
 import com.partymaker.mvc.dao.AbstractDao;
-import com.partymaker.mvc.model.whole.BottleEntity;
 import com.partymaker.mvc.model.whole.TableEntity;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
@@ -21,10 +20,14 @@ public class TableDAOImpl extends AbstractDao<Integer, TableEntity> implements T
     @SuppressWarnings("unchecked")
     @Override
     public List<TableEntity> findAllByEventAndUser(int id_user, String party_name) {
-        Query query = getSession().createSQLQuery("SELECT * FROM `table` LEFT JOIN event ON `table`.id_event = event.id_event and event.party_name =:partyName LEFT JOIN user_has_event ON event.id_event = user_has_event.id_event LEFT JOIN user ON event.id_event = user_has_event.id_user WHERE user.id_user = :idUser")
+        Query query = getSession().createSQLQuery("SELECT *\n" +
+                "FROM `table`\n" +
+                "  JOIN event ON `table`.id_event = event.id_event AND event.party_name =:party_name\n" +
+                "  JOIN user_has_event ON event.id_event = user_has_event.id_event\n" +
+                "WHERE user_has_event.id_user =:user_id\n")
                 .addEntity(TableEntity.class)
-                .setParameter("partyName", party_name)
-                .setParameter("idUser", id_user);
+                .setParameter("party_name", party_name)
+                .setParameter("user_id", id_user);
         return (List<TableEntity>) query.list();
     }
 

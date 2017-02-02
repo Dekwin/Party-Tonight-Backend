@@ -1,7 +1,6 @@
 package com.partymaker.mvc.dao.event.bottle;
 
 import com.partymaker.mvc.model.whole.BottleEntity;
-import com.partymaker.mvc.model.whole.PhotoEntity;
 
 import java.util.List;
 

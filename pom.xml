@@ -8,7 +8,7 @@
     <artifactId>partymaker</artifactId>
     <packaging>war</packaging>
     <version>1.0</version>
-    <name>parent</name>
+    <name>partymaker</name>
 
     <properties>
         <spring.version>4.3.1.RELEASE</spring.version>
@@ -131,11 +131,13 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client</artifactId>
             <version>1.21.0</version>
         </dependency>
+
         <dependency>
             <groupId>javax.transaction</groupId>
             <artifactId>javax.transaction-api</artifactId>
@@ -149,36 +151,33 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>3.2.3.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <version>0.8.1</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
             <version>0.8.1</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>4.3.2.RELEASE</version>
         </dependency>
-
 
         <dependency>
             <groupId>commons-fileupload</groupId>

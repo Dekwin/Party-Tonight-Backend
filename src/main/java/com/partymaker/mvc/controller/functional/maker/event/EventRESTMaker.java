@@ -13,8 +13,7 @@ import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,8 +41,6 @@ public class EventRESTMaker {
 
     private static Date date;
 
-    //    private String imageStorePath = "/static/images";
-    private String imageStoreFULLPAth = "http://45.55.226.134:8080/static/images/";
 
     @Autowired
     @Qualifier("userService")
@@ -64,50 +61,27 @@ public class EventRESTMaker {
     @Autowired
     PhotoService photoService;
 
+    @Value("${image.local.path}")
+    private String localPath;
+
+    @Value("${image.url}")
+    private String imageUrl;
+
     @PostMapping(value = {"/create"})
     public Callable<ResponseEntity<?>> createEvent(@RequestBody event eventEntity) {
         return () -> {
             try {
                 logger.info("Creating event " + eventEntity);
+                ResponseEntity responseEntity = eventService.validation(eventEntity);
+                if (responseEntity != null) {
+                    return responseEntity;
+                }
 
-                List<BottleEntity> bottles = eventEntity.getBottles();
-                List<TableEntity> tables = eventEntity.getTables();
-                TicketEntity ticketEntity = eventEntity.getTickets().get(0);
-                List<PhotoEntity> photoEntity = eventEntity.getPhotos();
-
-                eventEntity.setTables(null);
-                eventEntity.setTickets(null);
-                eventEntity.setBottles(null);
-                eventEntity.setPhotos(null);
-
-                /* generate hash */
-                date = new Date();
-                String hash = String.valueOf(Objects.hash(dateFormat.format(date)));
-                eventEntity.setTime(hash);
-
-                // save event
-                eventService.save(eventEntity);
-                userService.addEvent(getPrincipal(), eventEntity);
-
-                // get event by unique value which stored in time dbFiled from db to add tickets, ...
-                event event = eventService.findByHash(eventEntity.getTime());
-                logger.info("Fetched event = " + event);
-
-                // add ...
-                bottles.forEach(v -> v.setEvent(event));
-                tables.forEach(v -> v.setEventEntity(event));
-                ticketEntity.setEventEntity(event);
-                // add image
-                photoEntity.forEach(v -> v.setEventEntity(event));
-
-                bottles.forEach(v -> bottleService.save(v));
-                ticketService.save(ticketEntity);
-                tables.forEach(v -> tableService.save(v));
-                photoEntity.forEach(v -> photoService.save(v));
+                eventService.save(eventEntity, getPrincipal());
 
                 logger.info("Event has been added to user with email " + getPrincipal());
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.info("Error creating event due to ", e);
                 return new ResponseEntity<Object>(HttpStatus.CONFLICT);
             }
             return new ResponseEntity<Object>(HttpStatus.CREATED);
@@ -125,16 +99,6 @@ public class EventRESTMaker {
                 UserEntity user = userService.findUserByEmail(getPrincipal());
                 logger.info("Get events with user " + user);
                 List<event> events = eventService.findAllByUserId(user.getId_user());
-                events.forEach(v -> {
-                    List<BottleEntity> bottles = bottleService.findAllBottlesByEventID(v.getId_event());
-                    v.setBottles(bottles);
-                    List<TableEntity> tables = tableService.findAllTablesByEventId(v.getId_event());
-                    v.setTables(tables);
-                    List<TicketEntity> tickets = ticketService.findAllTicketsByEventId(v.getId_event());
-                    v.setTickets(tickets);
-                    List<PhotoEntity> photoEntities = photoService.findAllPhotosByEventId(v.getId_event());
-                    v.setPhotos(photoEntities);
-                });
                 return new ResponseEntity<List>(events, HttpStatus.OK);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -147,130 +111,119 @@ public class EventRESTMaker {
      * calculate door revenue basing on ticket booked and prise fields
      */
     @GetMapping(value = {"/revenue"})
-    public Callable<ResponseEntity<?>> getDoorRevenue(@RequestHeader("partyName") String partyName) {
+    public Callable<ResponseEntity<?>> getDoorRevenue(@RequestHeader("party_name") String partyName) {
         return () -> {
-            DoorRevenue doorRevenue;
-            try {
-                UserEntity userEntity = userService.findUserByEmail(getPrincipal());
-                doorRevenue = new DoorRevenue();
-                ticketService.findAllTicketsByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
-                    doorRevenue.setRevenue(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
-                });
-            } catch (Exception e) {
-                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+            logger.info("Get revenue by event = " + partyName + " and user " + getPrincipal());
+
+            if (partyName == null || getPrincipal() == null || partyName.equals("")) {
+                logger.info("Bad request with party name = " + partyName + " and user " + getPrincipal());
+                return new ResponseEntity<Object>("Bad request ", HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<Object>(doorRevenue, HttpStatus.OK);
+            try {
+                UserEntity user = userService.findUserByEmail(getPrincipal());
+
+                if (user == null) {
+                    logger.info("user = " + user);
+                    return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+                }
+
+                logger.info("Get event revenue by user " + user);
+                DoorRevenue doorRevenue = eventService.getRevenue(partyName, user);
+
+                if (doorRevenue == null) {
+                    logger.info("Revenue = " + doorRevenue);
+                    return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+
+                return new ResponseEntity<Object>(doorRevenue, HttpStatus.OK);
+            } catch (Exception e) {
+                logger.info("Error calculating revenue due to ", e);
+                return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         };
     }
 
     @GetMapping(value = {"/bottles"})
-    public Callable<ResponseEntity<?>> getEventBottle(@RequestHeader("partyName") String partyName) {
+    public Callable<ResponseEntity<?>> getEventBottle(@RequestHeader("party_name") String partyName) {
         return () -> {
+            logger.info(" Get statement total with partymaker = " + partyName);
+            if (partyName == null || getPrincipal() == null || partyName.equals("")) {
+                logger.info("Bad request with party name = " + partyName + " and user " + getPrincipal());
+                return new ResponseEntity<Object>("Bad request ", HttpStatus.BAD_REQUEST);
+            }
             List<BottleEntity> foundBottles;
             try {
                 UserEntity userEntity = userService.findUserByEmail(getPrincipal());
                 foundBottles = new ArrayList<>();
                 bottleService.findAllBottlesByEventAndUser(userEntity.getId_user(), partyName).forEach(foundBottles::add);
+                return new ResponseEntity<Object>(foundBottles, HttpStatus.OK);
             } catch (Exception e) {
+                logger.info("Error getting bottles due to ", e);
                 return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<Object>(foundBottles, HttpStatus.OK);
         };
     }
 
     @GetMapping(value = {"/tables"})
-    public Callable<ResponseEntity<?>> getEventTables(@RequestHeader("partyName") String partyName) {
+    public Callable<ResponseEntity<?>> getEventTables(@RequestHeader("party_name") String partyName) {
         return () -> {
+            logger.info(" Get statement total with partymaker = " + partyName);
+            if (partyName == null || getPrincipal() == null || partyName.equals("")) {
+                logger.info("Bad request with party name = " + partyName + " and user " + getPrincipal());
+                return new ResponseEntity<Object>("Bad request ", HttpStatus.BAD_REQUEST);
+            }
             List<TableEntity> foundTabbles;
             try {
                 UserEntity userEntity = userService.findUserByEmail(getPrincipal());
                 foundTabbles = new ArrayList<>();
                 tableService.findAllTablesByEventAndUser(userEntity.getId_user(), partyName).forEach(foundTabbles::add);
+                return new ResponseEntity<Object>(foundTabbles, HttpStatus.OK);
             } catch (Exception e) {
+                logger.info("Error getting tables due to ", e);
                 return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<Object>(foundTabbles, HttpStatus.OK);
         };
     }
 
     @GetMapping(value = {"/total"})
-    public Callable<ResponseEntity<?>> getStatementTotal(@RequestHeader("partyName") String partyName) {
+    public Callable<ResponseEntity<?>> getStatementTotal(@RequestHeader("party_name") String partyName) {
         return () -> {
             logger.info(" Get statement total with partymaker = " + partyName);
-            StatementTotal statementTotal;
+            if (partyName == null || getPrincipal() == null || partyName.equals("")) {
+                logger.info("Bad request with party name = " + partyName + " and user " + getPrincipal());
+                return new ResponseEntity<Object>("Bad request ", HttpStatus.BAD_REQUEST);
+            }
             try {
                 UserEntity userEntity = userService.findUserByEmail(getPrincipal());
+                logger.info("Get event total with user = " + userEntity);
 
-                statementTotal = new StatementTotal();
+                if (userEntity == null) {
+                    logger.info("user = " + userEntity);
+                    return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+                }
+                StatementTotal statementTotal = eventService.getTotal(partyName, userEntity);
+                logger.info("Return total = " + statementTotal);
 
-                ticketService.findAllTicketsByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
-                    /**
-                     * calculate the unbooked tickets
-                     * */
-                    statementTotal.setRefunds(String.valueOf(
-                            (Double.parseDouble(statementTotal.getRefunds()))
-                                    - (
-                                    Double.parseDouble(v.getAvailable()) - Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())
-                            )
-                    ));
-                    /**
-                     * calculate the booked tickets
-                     * */
-                    statementTotal.setTicketsSales(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
-                });
+                if (statementTotal == null) {
+                    logger.info("Got nullable total " + statementTotal);
+                    return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
 
-                tableService.findAllTablesByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
-                    /**
-                     * calculate the unbooked tables
-                     * */
-                    statementTotal.setRefunds(String.valueOf(
-                            (Double.parseDouble(statementTotal.getRefunds()))
-                                    - (
-                                    Double.parseDouble(v.getAvailable()) - Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())
-                            )
-                    ));
-                    /**
-                     * calculate the booked tables
-                     * */
-                    statementTotal.setTableSales(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
-                });
-                bottleService.findAllBottlesByEventAndUser(userEntity.getId_user(), partyName).forEach(v -> {
-                    /**
-                     * calculate the unbooked bottles
-                     * */
-                    statementTotal.setRefunds(String.valueOf(
-                            (Double.parseDouble(statementTotal.getRefunds()))
-                                    - (
-                                    Double.parseDouble(v.getAvailable()) - Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())
-                            )
-                    ));
-                    /**
-                     * calculate the booked tables
-                     * */
-                    statementTotal.setBottleSales(String.valueOf(Double.parseDouble(v.getBooked()) * Double.parseDouble(v.getPrice())));
-                });
-
-                /**
-                 * add withdrawn summary of all above components
-                 * */
-                statementTotal.setWithdrawn(String.valueOf(
-                        Double.parseDouble(statementTotal.getBottleSales())
-                                + Double.parseDouble(statementTotal.getTableSales())
-                                + Double.parseDouble(statementTotal.getTicketsSales())
-                                - Double.parseDouble(statementTotal.getRefunds())
-                ));
+                return new ResponseEntity<Object>(statementTotal, HttpStatus.OK);
             } catch (Exception e) {
-                e.printStackTrace();
-                logger.info(" Statement total failure due to " + e);
+                logger.info(" Statement total failure due to", e);
                 return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<Object>(statementTotal, HttpStatus.OK);
         };
     }
 
     @PostMapping(value = {"/image"})
     public Callable<ResponseEntity<?>> saveigame(@RequestParam("file") MultipartFile file) {
         return () -> {
+            if (file == null || getPrincipal() == null) {
+                logger.info("Bad request with file = " + file + " and user " + getPrincipal());
+                return new ResponseEntity<Object>("Bad request ", HttpStatus.BAD_REQUEST);
+            }
             try {
                 logger.info("Saving image ");
                 // save image and return its path.
@@ -308,7 +261,6 @@ public class EventRESTMaker {
      * save photo to local storage and return its the path
      */
     private String saveImage(String nameFile, MultipartFile image) {
-        String localPath = "/opt/apache-tomcat-8.5.6/webapps/static/images/";
         File imageFile = new File(localPath + nameFile);
         try {
             image.transferTo(imageFile);
@@ -316,6 +268,6 @@ public class EventRESTMaker {
             e.printStackTrace();
         }
 
-        return imageStoreFULLPAth + imageFile.getName();
+        return imageUrl + imageFile.getName();
     }
 }

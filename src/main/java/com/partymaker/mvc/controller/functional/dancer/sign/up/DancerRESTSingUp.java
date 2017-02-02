@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 /**
@@ -46,45 +45,33 @@ public class DancerRESTSingUp {
         return () -> {
             logger.info("Sing up dancer = " + user);
             try {
-                try {
-                    if (userService.isExist(user.getEmail())) {
-                        return new ResponseEntity<Object>("Goer with current email has already exist", HttpStatus.FORBIDDEN);
-                    }
-                    if (userService.isExistByName(user.getUserName())) {
-                        return new ResponseEntity<Object>("Goer with current name has already exist", HttpStatus.FORBIDDEN);
-                    }
-                    /**
-                     *
-                     * it will be uncommented with PayPal needs
-                     * */
-                   /* if (billingService.isExist(user.getBilling())) {
-                        return new ResponseEntity<Object>("Goer with current billing info has already exist", HttpStatus.FORBIDDEN);
-                    }*/
-                } catch (Exception e) {
-                    logger.info("Checking failed" + e);
-                    return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);
+
+                if (user == null) {
+                    return new ResponseEntity<Object>("User cannot be null", HttpStatus.BAD_REQUEST);
+                } else if (user.getPassword() == null || user.getEmail() == null) {
+                    return new ResponseEntity<Object>("User fields cannot be null.", HttpStatus.BAD_REQUEST);
                 }
 
-                date = new Date();
-                user.setCreatedDate(dateFormat.format(date));
+                /* a little  hard code it will be replaced */
+                BillingEntity billing = new BillingEntity("dancer" + System.currentTimeMillis());
+                user.setBilling(billing);
+
+                ResponseEntity responseEntity = userService.isExistUserRequiredFields(user);
+                if (responseEntity != null) {
+                    logger.info("Bad user data");
+                    return responseEntity;
+                }
+                logger.info("Saving user ");
                 // hard code
-                user.setRole(new RoleEntity(1, "STREET_DANCER"));
-
-                /* a little  hard code */
-                BillingEntity billing = new BillingEntity("dancer" + UUID.randomUUID().toString());
-                billingService.saveBilling(billing);
-
-                // sent enable without confirmation
-                user.setEnable(true);
-
-                user.setBilling(billingService.findByCard(billing.getCard_number()));
+                user.setRole(new RoleEntity(2, "STREET_DANCER"));
 
                 userService.saveUser(user);
+
                 logger.info("User has been saved");
+
                 return new ResponseEntity<String>("Successful registration!", HttpStatus.CREATED);
             } catch (Exception e) {
-                e.printStackTrace();
-                logger.info("Failed to create dancer = " + user + ", due to: " + e);
+                logger.info("Failed to create dancer = " + user + ", due to: ", e);
                 return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
             }
         };
