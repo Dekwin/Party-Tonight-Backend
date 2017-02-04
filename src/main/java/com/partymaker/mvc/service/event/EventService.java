@@ -4,7 +4,6 @@ import com.partymaker.mvc.model.business.DoorRevenue;
 import com.partymaker.mvc.model.business.StatementTotal;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public interface EventService {
 
     boolean isExist(String party_name);
 
-    ResponseEntity validation(event event);
+    void validation(event event);
 
     StatementTotal getTotal(String partyName,UserEntity user);
 

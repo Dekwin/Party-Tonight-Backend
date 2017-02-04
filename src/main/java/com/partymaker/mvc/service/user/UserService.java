@@ -2,7 +2,6 @@ package com.partymaker.mvc.service.user;
 
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -25,9 +24,11 @@ public interface UserService<T> {
 
     T findUserByEmail(String value);
 
-    boolean isExist(String email);
+    boolean isExistByEmail(String email);
 
     boolean isExistByName(String string);
 
-    ResponseEntity isExistUserRequiredFields(UserEntity user);
+    void isExistUserRequiredFields(UserEntity user);
+
+    void validationUser(T user);
 }

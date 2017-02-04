@@ -7,8 +7,6 @@ import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.service.billing.BillingService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,14 +61,12 @@ public class UserServiceImpl implements UserService<UserEntity> {
         logger.info("saving billing");
         billingService.saveBilling(user.getBilling());
         logger.info("saved billing");
+
         user.setEnable(true);
 
-        try {
-            logger.info("try to get  billing");
-            user.setBilling(billingService.findByCard(user.getBilling().getCard_number()));
-        } catch (Exception e) {
-            logger.info("Failed to fetch billing due to ", e);
-        }
+        logger.info("Getting billing");
+        user.setBilling(billingService.findByCard(user.getBilling().getCard_number()));
+
         userDao.save(user);
     }
 
@@ -99,8 +95,7 @@ public class UserServiceImpl implements UserService<UserEntity> {
     }
 
     @Override
-    public boolean isExist(String email) {
-
+    public boolean isExistByEmail(String email) {
         return Objects.nonNull(userDao.findByField(email, email));
     }
 
@@ -109,21 +104,33 @@ public class UserServiceImpl implements UserService<UserEntity> {
         return Objects.nonNull(userDao.findByName(string));
     }
 
-    public ResponseEntity<?> isExistUserRequiredFields(UserEntity user) {
-        try {
-            if (isExist(user.getEmail())) {
-                return new ResponseEntity<Object>("User with such email is already exist", HttpStatus.IM_USED);
-            }
-            if (isExistByName(user.getUserName())) {
-                return new ResponseEntity<Object>("User with such username is already exist", HttpStatus.IM_USED);
-            }
-            if (billingService.isExist(user.getBilling())) {
-                return new ResponseEntity<Object>("User with current billing info is already exist", HttpStatus.IM_USED);
-            }
-            return null;
-        } catch (Exception e) {
-            logger.info("Error checking user due to ", e);
-            return null;
+    @Override
+    public void isExistUserRequiredFields(UserEntity user) {
+
+        validationUser(user);
+
+        if (isExistByEmail(user.getEmail())) {
+            throw new RuntimeException("User with such email is already exist!");
         }
+        if (isExistByName(user.getUserName())) {
+            throw new RuntimeException("Bad user name!");
+        }
+        if (billingService.isExist(user.getBilling())) {
+            throw new RuntimeException("User with current billing info is already exist!");
+        }
+    }
+
+    @Override
+    public void validationUser(UserEntity user) {
+        if (user == null)
+            throw new RuntimeException("User cannot be null");
+        if (user.getEmail() == null || user.getEmail().isEmpty())
+            throw new RuntimeException("User email is required!");
+        if (user.getPassword() == null || user.getPassword().isEmpty())
+            throw new RuntimeException("User password is required!");
+        if (user.getUserName() == null || user.getUserName().isEmpty())
+            throw new RuntimeException("User name is required!");
+        if (user.getBilling() == null)
+            throw new RuntimeException("User billing info is required!");
     }
 }

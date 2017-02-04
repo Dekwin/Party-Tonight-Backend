@@ -7,6 +7,7 @@ import com.partymaker.mvc.service.event.EventService;
 import com.partymaker.mvc.service.photo.PhotoService;
 import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,9 @@ import java.util.concurrent.Callable;
  */
 @RestController
 @RequestMapping(value = {"/dancer/event"})
-public class EventRESTDancer {
+public class EventDancer {
+
+    private static final Logger logger = Logger.getLogger(EventDancer.class);
 
     @Autowired
     EventService eventService;
@@ -43,18 +46,17 @@ public class EventRESTDancer {
     @GetMapping(value = {"/get"})
     public Callable<ResponseEntity<?>> search(@RequestHeader("zip_code") String zip_code) {
         return () -> {
+            logger.info("Getting event by zip code = " + zip_code);
             try {
+                if (zip_code == null || zip_code.isEmpty())
+                    throw new RuntimeException("Invalid zip code");
+
                 List<event> events = eventService.findAllByCode(zip_code);
-                events.get(0);// assert on empty
-                events.forEach(v -> {
-                    v.setBottles(bottleService.findAllBottlesByEventID(v.getId_event()));
-                    v.setTables(tableService.findAllTablesByEventId(v.getId_event()));
-                    v.setTickets(ticketService.findAllTicketsByEventId(v.getId_event()));
-                    v.setPhotos(photoService.findAllPhotosByEventId(v.getId_event()));
-                });
+
                 return new ResponseEntity<List>(events, HttpStatus.OK);
             } catch (Exception e) {
-                return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+                logger.info("Error getting events due to ", e);
+                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
         };
     }

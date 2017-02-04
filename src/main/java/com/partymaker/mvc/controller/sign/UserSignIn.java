@@ -27,9 +27,9 @@ import java.util.logging.Logger;
  * Created by anton on 10/10/16.
  */
 @RestController
-public class UserRESTful {
+public class UserSignIn {
 
-    private static Logger logger = Logger.getLogger(UserRESTful.class.getName());
+    private static Logger logger = Logger.getLogger(UserSignIn.class.getName());
 
     @Autowired
     UserService userService;

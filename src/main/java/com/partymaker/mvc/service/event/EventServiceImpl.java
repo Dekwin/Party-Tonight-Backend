@@ -12,8 +12,6 @@ import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,7 +88,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<event> findAllByCode(String code) {
-        return eventDAO.getAllCode(code);
+        List<event> events = eventDAO.getAllCode(code);
+
+        events.forEach(v -> {
+            v.setBottles(bottleService.findAllBottlesByEventID(v.getId_event()));
+            v.setTables(tableService.findAllTablesByEventId(v.getId_event()));
+            v.setTickets(ticketService.findAllTicketsByEventId(v.getId_event()));
+            v.setPhotos(photoService.findAllPhotosByEventId(v.getId_event()));
+        });
+        return events;
     }
 
     @Override
@@ -100,6 +106,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void save(event eventEntity, String user_email) {
+        // the hardest hardcode
         List<BottleEntity> bottles = eventEntity.getBottles();
         List<TableEntity> tables = eventEntity.getTables();
         TicketEntity ticketEntity = eventEntity.getTickets().get(0);
@@ -110,7 +117,7 @@ public class EventServiceImpl implements EventService {
         eventEntity.setBottles(null);
         eventEntity.setPhotos(null);
 
-                /* generate hash */
+        /* generate hash */
         date = new Date();
         String hash = String.valueOf(Objects.hash(dateFormat.format(date)));
         eventEntity.setTime(hash);
@@ -142,31 +149,25 @@ public class EventServiceImpl implements EventService {
         return Objects.nonNull(eventDAO.getByCode(timeHash));
     }
 
-    public ResponseEntity<?> validation(event event) {
-        try {
-            if (event == null
-                    ||
-                    event.getBottles().isEmpty()
-                    ||
-                    event.getTables().isEmpty()
-                    ||
-                    event.getTickets().isEmpty()) {
-                logger.info("Bad event");
-                return new ResponseEntity<Object>("Bad data to create event", HttpStatus.BAD_REQUEST);
-            } else if (event.getClub_name() == null
-                    ||
-                    event.getClub_capacity() == null
-                    ||
-                    event.getZip_code() == null
-                    ||
-                    event.getLocation() == null) {
-                logger.info("Bad event");
-                return new ResponseEntity<Object>("Bad data to create event", HttpStatus.BAD_REQUEST);
-            }
-            return null;
-        } catch (Exception e) {
-            logger.info("Error checking user due to ", e);
-            return null;
+    public void validation(event event) {
+        if (event == null
+                ||
+                (event.getBottles() == null || event.getBottles().isEmpty())
+                ||
+                (event.getTables() == null || event.getTables().isEmpty())
+                ||
+                (event.getTickets() == null || event.getTickets().isEmpty())) {
+            logger.info("Bad event");
+            throw new RuntimeException("Bad data to create event");
+        } else if ((event.getClub_name() == null || event.getClub_name().isEmpty())
+                ||
+                event.getClub_capacity() == null
+                ||
+                (event.getZip_code() == null || event.getZip_code().isEmpty())
+                ||
+                (event.getLocation() == null || event.getLocation().isEmpty())) {
+            logger.info("Bad event");
+            throw new RuntimeException("Bad data to create event");
         }
     }
 
@@ -178,7 +179,6 @@ public class EventServiceImpl implements EventService {
         statementTotal.setTicketsSales("0");
         statementTotal.setTableSales("0");
         statementTotal.setRefunds("0");
-
 
         ticketService.findAllTicketsByEventAndUser(user.getId_user(), partyName).forEach(v -> {
             if (Objects.isNull(v.getBooked()) || v.getBooked().equals("")) {

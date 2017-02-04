@@ -3,7 +3,10 @@ package com.partymaker.mvc.controller.functional.maker.event;
 import com.partymaker.mvc.model.business.DoorRevenue;
 import com.partymaker.mvc.model.business.ImageMessage;
 import com.partymaker.mvc.model.business.StatementTotal;
-import com.partymaker.mvc.model.whole.*;
+import com.partymaker.mvc.model.whole.BottleEntity;
+import com.partymaker.mvc.model.whole.TableEntity;
+import com.partymaker.mvc.model.whole.UserEntity;
+import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.service.bottle.BottleService;
 import com.partymaker.mvc.service.event.EventService;
 import com.partymaker.mvc.service.photo.PhotoService;
@@ -12,7 +15,6 @@ import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 /**
@@ -33,17 +36,11 @@ import java.util.concurrent.Callable;
  */
 @RestController
 @RequestMapping(value = {"/maker/event"})
-public class EventRESTMaker {
+public class EventMaker {
 
-    private static final Logger logger = Logger.getLogger(EventRESTMaker.class);
-
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-    private static Date date;
-
+    private static final Logger logger = Logger.getLogger(EventMaker.class);
 
     @Autowired
-    @Qualifier("userService")
     UserService<UserEntity> userService;
 
     @Autowired
@@ -72,36 +69,37 @@ public class EventRESTMaker {
         return () -> {
             try {
                 logger.info("Creating event " + eventEntity);
-                ResponseEntity responseEntity = eventService.validation(eventEntity);
-                if (responseEntity != null) {
-                    return responseEntity;
-                }
+
+                eventService.validation(eventEntity);
 
                 eventService.save(eventEntity, getPrincipal());
 
                 logger.info("Event has been added to user with email " + getPrincipal());
+                return new ResponseEntity<Object>(HttpStatus.CREATED);
             } catch (Exception e) {
                 logger.info("Error creating event due to ", e);
-                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.CONFLICT);
             }
-            return new ResponseEntity<Object>(HttpStatus.CREATED);
         };
     }
 
     /**
-     * get all events by party name
+     * get all events by user credentials
      */
     @GetMapping(value = {"/get"})
     public Callable<ResponseEntity<?>> getAllEvents() {
         return () -> {
             try {
                 logger.info("Get events");
+
                 UserEntity user = userService.findUserByEmail(getPrincipal());
+
                 logger.info("Get events with user " + user);
                 List<event> events = eventService.findAllByUserId(user.getId_user());
+
                 return new ResponseEntity<List>(events, HttpStatus.OK);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.info("Error getting all event due to ", e);
                 return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
             }
         };
@@ -123,7 +121,7 @@ public class EventRESTMaker {
                 UserEntity user = userService.findUserByEmail(getPrincipal());
 
                 if (user == null) {
-                    logger.info("user = " + user);
+                    logger.info("Bad user = " + user);
                     return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
                 }
 
@@ -131,7 +129,7 @@ public class EventRESTMaker {
                 DoorRevenue doorRevenue = eventService.getRevenue(partyName, user);
 
                 if (doorRevenue == null) {
-                    logger.info("Revenue = " + doorRevenue);
+                    logger.info("Bad revenue = " + doorRevenue);
                     return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
 
@@ -154,12 +152,15 @@ public class EventRESTMaker {
             List<BottleEntity> foundBottles;
             try {
                 UserEntity userEntity = userService.findUserByEmail(getPrincipal());
+
                 foundBottles = new ArrayList<>();
+
                 bottleService.findAllBottlesByEventAndUser(userEntity.getId_user(), partyName).forEach(foundBottles::add);
+
                 return new ResponseEntity<Object>(foundBottles, HttpStatus.OK);
             } catch (Exception e) {
                 logger.info("Error getting bottles due to ", e);
-                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.NO_CONTENT);
             }
         };
     }
@@ -175,12 +176,14 @@ public class EventRESTMaker {
             List<TableEntity> foundTabbles;
             try {
                 UserEntity userEntity = userService.findUserByEmail(getPrincipal());
+
                 foundTabbles = new ArrayList<>();
+
                 tableService.findAllTablesByEventAndUser(userEntity.getId_user(), partyName).forEach(foundTabbles::add);
                 return new ResponseEntity<Object>(foundTabbles, HttpStatus.OK);
             } catch (Exception e) {
                 logger.info("Error getting tables due to ", e);
-                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.NO_CONTENT);
             }
         };
     }
@@ -206,13 +209,13 @@ public class EventRESTMaker {
 
                 if (statementTotal == null) {
                     logger.info("Got nullable total " + statementTotal);
-                    return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
                 }
 
                 return new ResponseEntity<Object>(statementTotal, HttpStatus.OK);
             } catch (Exception e) {
                 logger.info(" Statement total failure due to", e);
-                return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+                return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         };
     }
@@ -228,15 +231,14 @@ public class EventRESTMaker {
                 logger.info("Saving image ");
                 // save image and return its path.
                 ImageMessage imageMessage = new ImageMessage();
+
                 UUID name = UUID.randomUUID();
+
                 imageMessage.setPath(saveImage(String.valueOf(Objects.hashCode(name)), file));
+
                 return new ResponseEntity<ImageMessage>(imageMessage, HttpStatus.CREATED);
             } catch (Exception e) {
-                e.printStackTrace();
-                logger.info("Failed to save image " + e);
-                if (Objects.isNull(file)) {
-                    return new ResponseEntity<Object>("Image cannot be null ", HttpStatus.CONFLICT);
-                }
+                logger.info("Failed to save image ", e);
                 return new ResponseEntity<Object>(HttpStatus.CONFLICT);
             }
         };
