@@ -13,4 +13,5 @@ public interface UserRoleDao<T, PK extends Serializable> {
     T findById(PK id);
 
     T findByField(String nameField, Object value);
+
 }

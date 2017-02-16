@@ -36,10 +36,11 @@ public class Security extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http
                 .authorizeRequests()
-                .antMatchers("/maker/signup", "/dancer/signup", "/user", "/event","/maker/event/photo").permitAll()
+                .antMatchers("/maker/signup", "/dancer/signup", "/user", "/event","/maker/event/photo","/user/confirm").permitAll()
                 .antMatchers("/signin").access("hasRole('ROLE_STREET_DANCER') or hasRole('ROLE_PARTY_MAKER')")
                 .antMatchers("/maker/event/**").access("hasRole('ROLE_PARTY_MAKER')")
                 .antMatchers("/dancer/event/**").access("hasRole('ROLE_STREET_DANCER')")
+                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
                 .anyRequest().authenticated()
 
                 /*.and().formLogin().defaultSuccessUrl("/token")*/

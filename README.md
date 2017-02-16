@@ -59,11 +59,11 @@ type: application/json
 header: Authorization = Basic bS5jb206MTIz
 
 
-Create event
+Create id_event
 =============
 
 
-uri: /partymaker/maker/event/create
+uri: /partymaker/maker/id_event/create
 
 method: POST
 
@@ -79,7 +79,7 @@ body:
     "date": "cannot be null",
     "location": "cannot be null",
     "club_capacity": "cannot be null",
-    "party_name": "event",
+    "party_name": "id_event",
     "zip_code": "231",
     
     "bottles": [
@@ -115,11 +115,11 @@ body:
   }
 
   
-Get event(for maker)
+Get id_event(for maker)
 ====================
 
 
-uri: /partymaker/maker/event/get
+uri: /partymaker/maker/id_event/get
 
 method: GET
 
@@ -130,11 +130,11 @@ header: x-auth-token = signInMakerToken
 response: array(list) of events
 
 
-Get event(for dancer)
+Get id_event(for dancer)
 =====================
 
 
-uri: /partymaker/dancer/event/get
+uri: /partymaker/dancer/id_event/get
 
 method: GET
 
@@ -150,7 +150,7 @@ response: array(list) of events
 Revenue (tickets booked * ticket_price)
 ========
 
-uri: /maker/event/revenue
+uri: /maker/id_event/revenue
 
 method: GET
 
@@ -169,7 +169,7 @@ response:
 Bottles
 =======
 
-uri: /maker/event/bottles
+uri: /maker/id_event/bottles
 
 method: GET
 
@@ -196,7 +196,7 @@ response:
 Tables
 =======
 
-uri: /maker/event/tables
+uri: /maker/id_event/tables
 
 method: GET
 
@@ -221,7 +221,7 @@ response:
 Total
 =======
 
-uri: /maker/event/total
+uri: /maker/id_event/total
 
 method: GET
 

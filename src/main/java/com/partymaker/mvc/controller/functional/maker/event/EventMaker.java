@@ -13,7 +13,8 @@ import com.partymaker.mvc.service.photo.PhotoService;
 import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,8 @@ import java.util.concurrent.Callable;
 @RequestMapping(value = {"/maker/event"})
 public class EventMaker {
 
-    private static final Logger logger = Logger.getLogger(EventMaker.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventMaker.class);
+
 
     @Autowired
     UserService<UserEntity> userService;

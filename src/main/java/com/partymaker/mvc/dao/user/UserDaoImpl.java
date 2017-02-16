@@ -3,18 +3,18 @@ package com.partymaker.mvc.dao.user;
 import com.partymaker.mvc.dao.AbstractDao;
 import com.partymaker.mvc.model.whole.UserEntity;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 
 /**
  * Created by anton on 10/10/16.
  */
 @Repository("userDao")
-public class UserDaoImpl extends AbstractDao<Integer,UserEntity> implements UserDao<UserEntity, Integer> {
+public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements UserDao<UserEntity, Integer> {
 
     @Override
     public UserEntity findById(Integer id) {
@@ -56,5 +56,12 @@ public class UserDaoImpl extends AbstractDao<Integer,UserEntity> implements User
         criteria.add(Restrictions.eq("userName", name));
 
         return (UserEntity) criteria.uniqueResult();
+    }
+
+    @Override
+    public void lock(int id) {
+        Query q = getSession().createSQLQuery("UPDATE user SET enable = FALSE WHERE id_user =:user_id")
+                .setParameter("user_id", id);
+        q.executeUpdate();
     }
 }

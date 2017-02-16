@@ -1,7 +1,5 @@
 package com.partymaker.mvc.model.whole;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -29,10 +27,8 @@ public class BottleEntity implements Serializable {
     @Column(name = "created_date")
     private String createdDate;
 
-    @JsonIgnore
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_event")
-    private event event;
+    @Column(name = "id_event")
+    private int id_event;
 
 
     public int getId_bottle() {
@@ -95,18 +91,17 @@ public class BottleEntity implements Serializable {
         this.createdDate = createdDate;
     }
 
-
-    public event getEvent() {
-        return event;
+    public int getId_event() {
+        return id_event;
     }
 
-    public void setEvent(event event) {
-        this.event = event;
+    public void setId_event(int id_event) {
+        this.id_event = id_event;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("BottleEntity{");
+        final StringBuilder sb = new StringBuilder("BottleEntity{");
         sb.append("id_bottle=").append(id_bottle);
         sb.append(", name='").append(name).append('\'');
         sb.append(", price='").append(price).append('\'');
@@ -114,6 +109,7 @@ public class BottleEntity implements Serializable {
         sb.append(", available='").append(available).append('\'');
         sb.append(", booked='").append(booked).append('\'');
         sb.append(", createdDate='").append(createdDate).append('\'');
+        sb.append(", id_event=").append(id_event);
         sb.append('}');
         return sb.toString();
     }

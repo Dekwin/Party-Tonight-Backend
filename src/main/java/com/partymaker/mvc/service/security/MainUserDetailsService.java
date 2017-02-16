@@ -2,7 +2,8 @@ package com.partymaker.mvc.service.security;
 
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.user.UserService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,7 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -22,7 +24,7 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class MainUserDetailsService implements UserDetailsService {
 
-    private static final Logger logger = Logger.getLogger(MainUserDetailsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MainUserDetailsService.class);
 
     @Autowired
     private UserService userService;

@@ -1,6 +1,6 @@
 package com.partymaker.mvc.model.whole;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,13 +24,13 @@ public class TableEntity implements Serializable {
 
     @Column(name = "available", nullable = true, length = 45)
     private String available;
+
     @Column(name = "booked", nullable = true, length = 45)
     private String booked;
 
-    @JsonIgnore
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_event")
-    private event eventEntity;
+    @JsonProperty("id_event")
+    @Column(name = "id_event")
+    private int id_event;
 
 
     public int getId_table() {
@@ -74,12 +74,12 @@ public class TableEntity implements Serializable {
         this.type = type;
     }
 
-    public event getEventEntity() {
-        return eventEntity;
+    public int getId_event() {
+        return id_event;
     }
 
-    public void setEventEntity(event eventEntity) {
-        this.eventEntity = eventEntity;
+    public void setId_event(int id_event) {
+        this.id_event = id_event;
     }
 
     @Override
@@ -90,30 +90,33 @@ public class TableEntity implements Serializable {
         TableEntity that = (TableEntity) o;
 
         if (id_table != that.id_table) return false;
+        if (id_event != that.id_event) return false;
         if (price != null ? !price.equals(that.price) : that.price != null) return false;
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (available != null ? !available.equals(that.available) : that.available != null) return false;
-        if (booked != null ? !booked.equals(that.booked) : that.booked != null) return false;
-        return true;
-
+        return booked != null ? booked.equals(that.booked) : that.booked == null;
     }
 
     @Override
     public int hashCode() {
         int result = id_table;
         result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (available != null ? available.hashCode() : 0);
         result = 31 * result + (booked != null ? booked.hashCode() : 0);
+        result = 31 * result + id_event;
         return result;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TableEntity{");
+        final StringBuilder sb = new StringBuilder("TableEntity{");
         sb.append("id_table=").append(id_table);
         sb.append(", price='").append(price).append('\'');
+        sb.append(", type='").append(type).append('\'');
         sb.append(", available='").append(available).append('\'');
         sb.append(", booked='").append(booked).append('\'');
+        sb.append(", id_event=").append(id_event);
         sb.append('}');
         return sb.toString();
     }

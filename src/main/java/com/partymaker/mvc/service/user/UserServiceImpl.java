@@ -5,7 +5,8 @@ import com.partymaker.mvc.dao.user.UserDao;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.service.billing.BillingService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,8 @@ public class UserServiceImpl implements UserService<UserEntity> {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private static Date date;
 
-    private static final Logger logger = Logger.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
 
     @Autowired
     private UserDao userDao;
@@ -61,8 +63,6 @@ public class UserServiceImpl implements UserService<UserEntity> {
         logger.info("saving billing");
         billingService.saveBilling(user.getBilling());
         logger.info("saved billing");
-
-        user.setEnable(true);
 
         logger.info("Getting billing");
         user.setBilling(billingService.findByCard(user.getBilling().getCard_number()));
@@ -132,5 +132,17 @@ public class UserServiceImpl implements UserService<UserEntity> {
             throw new RuntimeException("User name is required!");
         if (user.getBilling() == null)
             throw new RuntimeException("User billing info is required!");
+    }
+
+    @Override
+    public void userLock(long id_user) {
+        logger.info("Locking user with id = " + id_user);
+        findUserBuId(id_user).setEnable(false);
+    }
+
+    @Override
+    public void userUnLock(long id_user) {
+        logger.info("Locking user with id = " + id_user);
+        findUserBuId(id_user).setEnable(true);
     }
 }

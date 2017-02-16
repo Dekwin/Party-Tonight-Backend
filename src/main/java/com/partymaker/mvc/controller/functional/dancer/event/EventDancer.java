@@ -2,12 +2,14 @@ package com.partymaker.mvc.controller.functional.dancer.event;
 
 import com.partymaker.mvc.model.business.Book;
 import com.partymaker.mvc.model.whole.event;
+import com.partymaker.mvc.service.book.BookService;
 import com.partymaker.mvc.service.bottle.BottleService;
 import com.partymaker.mvc.service.event.EventService;
 import com.partymaker.mvc.service.photo.PhotoService;
 import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,8 @@ import java.util.concurrent.Callable;
 @RequestMapping(value = {"/dancer/event"})
 public class EventDancer {
 
-    private static final Logger logger = Logger.getLogger(EventDancer.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventDancer.class);
+
 
     @Autowired
     EventService eventService;
@@ -39,6 +42,9 @@ public class EventDancer {
 
     @Autowired
     PhotoService photoService;
+
+    @Autowired
+    BookService bookService;
 
     /**
      * retrieve events by zip_code
@@ -64,7 +70,17 @@ public class EventDancer {
     @PostMapping(value = {"/book"})
     public Callable<ResponseEntity<?>> book(@RequestBody Book book) {
         return () -> {
-            return new ResponseEntity<Object>(HttpStatus.OK);
+            logger.info("Book  = " + book);
+            if (book == null || book.getTables().isEmpty() || book.getBottles().isEmpty()) {
+                return new ResponseEntity<Object>("Cannot be null or empty.", HttpStatus.BAD_REQUEST);
+            }
+            try {
+                bookService.book(book);
+                return new ResponseEntity<Object>(HttpStatus.OK);
+            } catch (Exception e) {
+                logger.error("Error during create book due to ", e);
+                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
         };
     }
 }

@@ -34,4 +34,6 @@ public class UserRoleDaoImpl extends AbstractDao<Integer,RoleEntity> implements 
         criteria.add(Restrictions.eq(nameField, value));
         return (RoleEntity) criteria.uniqueResult();
     }
+
+
 }

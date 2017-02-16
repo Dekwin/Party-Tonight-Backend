@@ -31,4 +31,7 @@ public interface UserService<T> {
     void isExistUserRequiredFields(UserEntity user);
 
     void validationUser(T user);
+
+    void userLock(long id_user);
+    void userUnLock(long id_user);
 }

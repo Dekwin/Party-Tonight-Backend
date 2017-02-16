@@ -38,13 +38,13 @@ public class event implements Serializable {
     @Column(name = "zip_code")
     private String zip_code;
 
-    @OneToMany(mappedBy = "event")
+    @Transient
     private List<BottleEntity> bottles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity")
+    @Transient
     private List<TicketEntity> tickets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity")
+    @Transient
     private List<TableEntity> tables = new ArrayList<>();
 
     @OneToMany(mappedBy = "eventEntity")

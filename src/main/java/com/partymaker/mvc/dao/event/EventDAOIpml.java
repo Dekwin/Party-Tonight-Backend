@@ -61,4 +61,11 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
     public void delete(event eventEntity) {
         delete(eventEntity);
     }
+
+    @Override
+    public event getEventByName(String name) {
+        Criteria criteria = createEntityCriteria();
+        criteria.add(Restrictions.eq("party_name", name));
+        return (event) criteria.list().get(0);
+    }
 }

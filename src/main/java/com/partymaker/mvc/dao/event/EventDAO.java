@@ -7,6 +7,7 @@ import java.util.List;
  * Created by anton on 04/11/16.
  */
 public interface EventDAO<T> {
+
     T getByID(int id);
 
     T getByCode(String time);
@@ -20,4 +21,6 @@ public interface EventDAO<T> {
     void save(T eventEntity);
 
     void delete(T eventEntity);
+
+    T getEventByName(String name);
 }

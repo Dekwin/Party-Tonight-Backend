@@ -17,4 +17,7 @@ public interface UserDao<T, PK extends Serializable> {
     T findByField(String nameField, String value);
 
     T findByName(String name);
+
+    void lock(int id);
+
 }

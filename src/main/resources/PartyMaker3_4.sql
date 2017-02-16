@@ -69,9 +69,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`event`
+-- Table `mydb`.`id_event`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS partymaker2.`event` (
+CREATE TABLE IF NOT EXISTS partymaker2.`id_event` (
   `id_event` INT NOT NULL AUTO_INCREMENT,
   `club_name` VARCHAR(45) NULL DEFAULT NULL,
   `date` VARCHAR(45) NULL DEFAULT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS partymaker2.`user_has_event` (
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_event_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (`id_event`)
+    REFERENCES partymaker2.`id_event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS partymaker2.`table` (
   INDEX `fk_table_event1_idx` (`id_event` ASC),
   CONSTRAINT `fk_table_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (`id_event`)
+    REFERENCES partymaker2.`id_event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS partymaker2.`bottle` (
   INDEX `fk_bottle_event1_idx` (`id_event` ASC),
   CONSTRAINT `fk_bottle_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (`id_event`)
+    REFERENCES partymaker2.`id_event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS partymaker2.`ticket` (
   INDEX `fk_ticket_event1_idx` (`id_event` ASC),
   CONSTRAINT `fk_ticket_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (`id_event`)
+    REFERENCES partymaker2.`id_event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS partymaker2.`photo` (
   INDEX `fk_photo_event1_idx` (`id_event` ASC),
   CONSTRAINT `fk_photo_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (`id_event`)
+    REFERENCES partymaker2.`id_event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS partymaker2.`ranting` (
   INDEX `fk_ranting_user1_idx` (`id_user` ASC, `id_role` ASC),
   CONSTRAINT `fk_ranting_event1`
     FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (`id_event`)
+    REFERENCES partymaker2.`id_event` (`id_event`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ranting_user1`

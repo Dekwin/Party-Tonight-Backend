@@ -1,6 +1,6 @@
 package com.partymaker.mvc.model.whole;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,10 +24,9 @@ public class TicketEntity implements Serializable {
     @Column(name = "created_date", nullable = true, length = 45)
     private String created_date;
 
-    @JsonIgnore
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_event")
-    private event eventEntity;
+    @JsonProperty("id_event")
+    @Column(name = "id_event")
+    private int id_event;
 
 
     public int getIdTicket() {
@@ -72,12 +71,12 @@ public class TicketEntity implements Serializable {
         this.created_date = created_date;
     }
 
-    public event getEventEntity() {
-        return eventEntity;
+    public int getId_event() {
+        return id_event;
     }
 
-    public void setEventEntity(event eventEntity) {
-        this.eventEntity = eventEntity;
+    public void setId_event(int id_event) {
+        this.id_event = id_event;
     }
 
     @Override

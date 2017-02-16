@@ -5,7 +5,8 @@ import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.billing.BillingService;
 import com.partymaker.mvc.service.user.UserService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ import java.util.concurrent.Callable;
 @RestController
 public class UserSignUp {
 
-    private static final Logger logger = Logger.getLogger(UserSignUp.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserSignUp.class);
 
     @Autowired
     UserService userService;
@@ -48,6 +49,7 @@ public class UserSignUp {
 
                 logger.info("Creating user ");
                 user.setRole(new RoleEntity(1, "PARTY_MAKER"));
+                user.setUser_role("PARTY_MAKER");
 
                 userService.saveUser(user);
 
@@ -74,6 +76,10 @@ public class UserSignUp {
                 logger.info("Saving user ");
                 // hard code
                 user.setRole(new RoleEntity(2, "STREET_DANCER"));
+
+                user.setEnable(true);
+
+                user.setUser_role("STREET_DANCER");
 
                 userService.saveUser(user);
 

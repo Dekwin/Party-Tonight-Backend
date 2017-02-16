@@ -14,4 +14,7 @@ public interface TicketDAO {
     List<TicketEntity> findAllByEventAndUser(int id_user, String party_name);
 
     List<TicketEntity> findAllByEventId(int id_event);
+
+    TicketEntity getTicketByEventId(int id);
+
 }

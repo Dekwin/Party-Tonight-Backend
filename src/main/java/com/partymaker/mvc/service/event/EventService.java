@@ -30,7 +30,8 @@ public interface EventService {
 
     void validation(event event);
 
-    StatementTotal getTotal(String partyName,UserEntity user);
+    StatementTotal getTotal(String partyName, UserEntity user);
 
-    DoorRevenue getRevenue(String partyName,UserEntity user);
+    DoorRevenue getRevenue(String partyName, UserEntity user);
+
 }

@@ -10,7 +10,7 @@ import com.partymaker.mvc.service.photo.PhotoService;
 import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +27,9 @@ import java.util.Objects;
 @Transactional
 @Service("eventService")
 public class EventServiceImpl implements EventService {
-    private static final Logger logger = Logger.getLogger(EventServiceImpl.class);
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
+
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
@@ -132,9 +134,9 @@ public class EventServiceImpl implements EventService {
         logger.info("Fetched event = " + event);
 
         // add ...
-        bottles.forEach(v -> v.setEvent(event));
-        tables.forEach(v -> v.setEventEntity(event));
-        ticketEntity.setEventEntity(event);
+        bottles.forEach(v -> v.setId_event(event.getId_event()));
+        tables.forEach(v -> v.setId_event(event.getId_event()));
+        ticketEntity.setId_event(event.getId_event());
         // add image
         photoEntity.forEach(v -> v.setEventEntity(event));
 
