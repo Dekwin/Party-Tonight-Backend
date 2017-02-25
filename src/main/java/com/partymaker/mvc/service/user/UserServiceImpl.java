@@ -29,7 +29,6 @@ public class UserServiceImpl implements UserService<UserEntity> {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-
     @Autowired
     private UserDao userDao;
 

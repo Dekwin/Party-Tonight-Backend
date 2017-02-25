@@ -46,5 +46,4 @@ public class MainUserDetailsService implements UserDetailsService {
         logger.info("Grants = " + setAuths);
         return setAuths;
     }
-
 }

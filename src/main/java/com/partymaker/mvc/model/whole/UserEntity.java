@@ -56,7 +56,7 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "id_billing", nullable = false)
     private BillingEntity billing;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_has_event",
             joinColumns = {@JoinColumn(name = "id_user")},
             inverseJoinColumns = {@JoinColumn(name = "id_event")})
@@ -243,7 +243,7 @@ public class UserEntity implements Serializable {
         sb.append(", address='").append(address).append('\'');
         sb.append(", role=").append(role);
         sb.append(", billing=").append(billing);
-        sb.append(", events=").append(events);
+//        sb.append(", events=").append(events);
         sb.append('}');
         return sb.toString();
     }
