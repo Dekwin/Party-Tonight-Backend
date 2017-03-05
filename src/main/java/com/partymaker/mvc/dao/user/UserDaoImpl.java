@@ -4,7 +4,6 @@ import com.partymaker.mvc.dao.AbstractDao;
 import com.partymaker.mvc.model.whole.UserEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -18,16 +17,16 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
 
     @Override
     public UserEntity findById(Integer id) {
-        return findById(id);
+        UserEntity userEntity = getByKey(id);
+        return userEntity;
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public List<UserEntity> findAll() {
-        Criteria crit = createEntityCriteria();
-        crit.addOrder(Order.asc("user_name"));
-        return (List<UserEntity>) crit.list();
+
+        return getSession().createCriteria(UserEntity.class).list();
     }
 
     @Override
@@ -41,8 +40,7 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
     }
 
 
-    @Override
-    public UserEntity findByField(String nameField, String value) {
+    public UserEntity findByEmail(String nameField, String value) {
         Criteria criteria = createEntityCriteria();
         criteria.add(Restrictions.eq("email", value));
         /*System.out.println("value= " + value);

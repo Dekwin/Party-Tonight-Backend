@@ -1,7 +1,7 @@
-package com.partymaker.mvc.service.confirmation.opt;
+package com.partymaker.mvc.admin.confirmation.opt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.partymaker.mvc.service.confirmation.opt.model.Secret;
+import com.partymaker.mvc.admin.confirmation.opt.model.Secret;
 import org.jboss.aerogear.security.otp.Totp;
 import org.jboss.aerogear.security.otp.api.Base32;
 import org.jboss.aerogear.security.otp.api.Clock;

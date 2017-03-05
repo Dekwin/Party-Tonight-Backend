@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService<UserEntity> {
     BillingService billingService;
 
     @Override
-    public UserEntity findUserBuId(Long id) {
+    public UserEntity findUserBuId(int id) {
         return (UserEntity) userDao.findById(id);
     }
 
@@ -50,12 +50,12 @@ public class UserServiceImpl implements UserService<UserEntity> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void deleteUser(Long id) {
-        userDao.deleteUser(id);
+    public void deleteUser(int id) {
+        userDao.deleteUser(userDao.findById(id));
     }
 
     @Override
-    public void saveUser(UserEntity user) {
+    public void createUser(UserEntity user) {
         date = new Date();
         user.setCreatedDate(dateFormat.format(date));
 
@@ -74,12 +74,16 @@ public class UserServiceImpl implements UserService<UserEntity> {
     @Override
     public void updateUser(UserEntity user) {
         UserEntity user1 = (UserEntity) userDao.findById(user.getId_user());
-
+        if (user1 != null) {
+            user1.setEnable(user.isEnable());
+            user1.setEmail(user.getEmail());
+            user.setPassword(user.getPassword());
+        }
     }
 
     @Override
     public void addEvent(String userEmail, event event) {
-        UserEntity entity = (UserEntity) userDao.findByField(userEmail, userEmail);
+        UserEntity entity = (UserEntity) userDao.findByEmail(userEmail, userEmail);
 
         event eventEntity = (event) eventDAO.getByCode(event.getTime());
 
@@ -90,12 +94,12 @@ public class UserServiceImpl implements UserService<UserEntity> {
 
     @Override
     public UserEntity findUserByEmail(String value) {
-        return (UserEntity) userDao.findByField("email", value);
+        return (UserEntity) userDao.findByEmail("email", value);
     }
 
     @Override
     public boolean isExistByEmail(String email) {
-        return Objects.nonNull(userDao.findByField(email, email));
+        return Objects.nonNull(userDao.findByEmail(email, email));
     }
 
     @Override
@@ -134,14 +138,16 @@ public class UserServiceImpl implements UserService<UserEntity> {
     }
 
     @Override
-    public void userLock(long id_user) {
+    public void userLock(int id_user) {
         logger.info("Locking user with id = " + id_user);
-        findUserBuId(id_user).setEnable(false);
+        UserEntity userEntity = (UserEntity) userDao.findById(id_user);
+        userEntity.setEnable(false);
     }
 
     @Override
-    public void userUnLock(long id_user) {
+    public void userUnLock(int id_user) {
         logger.info("Locking user with id = " + id_user);
-        findUserBuId(id_user).setEnable(true);
+        UserEntity userEntity = (UserEntity) userDao.findById(id_user);
+        userEntity.setEnable(true);
     }
 }

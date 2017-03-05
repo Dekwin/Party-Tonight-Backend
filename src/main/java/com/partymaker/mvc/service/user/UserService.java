@@ -10,13 +10,13 @@ import java.util.List;
  */
 public interface UserService<T> {
 
-    T findUserBuId(Long id);
+    T findUserBuId(int id);
 
     List<T> findAllUsers();
 
-    void deleteUser(Long id);
+    void deleteUser(int id);
 
-    void saveUser(T user);
+    void createUser(T user);
 
     void updateUser(T user);
 
@@ -32,7 +32,7 @@ public interface UserService<T> {
 
     void validationUser(T user);
 
-    void userLock(long id_user);
+    void userLock(int id_user);
 
-    void userUnLock(long id_user);
+    void userUnLock(int id_user);
 }

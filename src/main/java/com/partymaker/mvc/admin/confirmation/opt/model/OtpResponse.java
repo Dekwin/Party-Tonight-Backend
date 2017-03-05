@@ -1,4 +1,4 @@
-package com.partymaker.mvc.service.confirmation.opt.model;
+package com.partymaker.mvc.admin.confirmation.opt.model;
 
 /**
  * Created by anton on 25.01.17.

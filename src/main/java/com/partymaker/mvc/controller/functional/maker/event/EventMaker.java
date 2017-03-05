@@ -223,7 +223,7 @@ public class EventMaker {
     }
 
     @PostMapping(value = {"/image"})
-    public Callable<ResponseEntity<?>> saveigame(@RequestParam("file") MultipartFile file) {
+    public Callable<ResponseEntity<?>> saveIgame(@RequestParam("file") MultipartFile file) {
         return () -> {
             if (file == null || getPrincipal() == null) {
                 logger.info("Bad request with file = " + file + " and user " + getPrincipal());

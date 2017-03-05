@@ -14,7 +14,7 @@ public interface UserDao<T, PK extends Serializable> {
 
     void save(T user);
 
-    T findByField(String nameField, String value);
+    T findByEmail(String nameField, String value);
 
     T findByName(String name);
 

@@ -51,7 +51,9 @@ public class UserSignUp {
                 user.setRole(new RoleEntity(1, "PARTY_MAKER"));
                 user.setUser_role("PARTY_MAKER");
 
-                userService.saveUser(user);
+                user.setEnable(false);
+
+                userService.createUser(user);
 
                 return new ResponseEntity<String>("", HttpStatus.CREATED);
             } catch (Exception e) {
@@ -81,7 +83,7 @@ public class UserSignUp {
 
                 user.setUser_role("STREET_DANCER");
 
-                userService.saveUser(user);
+                userService.createUser(user);
 
                 logger.info("User has been saved");
 

@@ -1,10 +1,10 @@
-package com.partymaker.mvc.service.confirmation;
+package com.partymaker.mvc.admin.confirmation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.partymaker.mvc.model.whole.UserEntity;
-import com.partymaker.mvc.service.confirmation.mail.MailService;
-import com.partymaker.mvc.service.confirmation.opt.Otp;
-import com.partymaker.mvc.service.confirmation.opt.model.Secret;
+import com.partymaker.mvc.admin.confirmation.mail.AdminService;
+import com.partymaker.mvc.admin.confirmation.opt.Otp;
+import com.partymaker.mvc.admin.confirmation.opt.model.Secret;
 import com.partymaker.mvc.service.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class ConfirmationService {
     private static final Logger logger = LoggerFactory.getLogger(ConfirmationService.class);
 
     @Autowired
-    MailService mailService;
+    AdminService mailService;
 
     @Autowired
     UserService userService;
@@ -37,10 +37,12 @@ public class ConfirmationService {
 
     public void verify(String user_id) {
         logger.info("Verify user with id " + user_id);
-        UserEntity e = (UserEntity) userService.findUserBuId(Long.parseLong(user_id));
+
+        UserEntity e = (UserEntity) userService.findUserBuId(Integer.parseInt(user_id));
+
         if (e == null || e.getEmail() == null || e.getEmail().equals(""))
             throw new RuntimeException("Bad user to verify");
 
-        mailService.gmail(e.getEmail(), (String) otpService.generate(new Secret(user_id)));
+        mailService.send(e, (String) otpService.generate(new Secret(user_id)));
     }
 }

@@ -4,7 +4,7 @@ import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
-import com.partymaker.mvc.service.confirmation.ConfirmationService;
+import com.partymaker.mvc.admin.confirmation.ConfirmationService;
 import com.partymaker.mvc.service.user.UserService;
 import com.partymaker.mvc.service.user.role.UserRoleService;
 import org.slf4j.Logger;

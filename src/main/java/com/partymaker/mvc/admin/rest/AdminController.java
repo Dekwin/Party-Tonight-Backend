@@ -1,5 +1,9 @@
-package com.partymaker.mvc.admin;
+package com.partymaker.mvc.admin.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.partymaker.mvc.admin.confirmation.mail.AdminService;
+import com.partymaker.mvc.model.admin.Admin;
+import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.event.EventService;
 import com.partymaker.mvc.service.user.UserService;
 import org.slf4j.Logger;
@@ -28,6 +32,9 @@ public class AdminController {
     @Autowired
     EventService eventService;
 
+    @Autowired
+    AdminService adminService;
+
 
     @GetMapping(value = {"/event/all"})
     public Callable<ResponseEntity<?>> getAllEvents() {
@@ -50,10 +57,14 @@ public class AdminController {
     public Callable<ResponseEntity<?>> holdUser(@RequestHeader("user_id") String user_id) {
         return () -> {
             logger.info("Hold user with id " + user_id);
+
             if (user_id == null || user_id.equals(""))
                 return new ResponseEntity<Object>("User data cannot be null", HttpStatus.BAD_REQUEST);
+
             try {
+
                 userService.userLock(Integer.parseInt(user_id));
+
                 return new ResponseEntity<Object>("User is locked.", HttpStatus.OK);
             } catch (Exception e) {
                 logger.error("Error locking user ", e);
@@ -66,10 +77,14 @@ public class AdminController {
     public Callable<ResponseEntity<?>> deleteUser(@RequestHeader("user_id") String user_id) {
         return () -> {
             logger.info("Delete user with id ");
+
             if (user_id == null || user_id.equals(""))
                 return new ResponseEntity<Object>("User data cannot be null", HttpStatus.BAD_REQUEST);
+
             try {
-                userService.deleteUser(Long.parseLong(user_id));
+
+                userService.deleteUser(Integer.parseInt(user_id));
+
                 return new ResponseEntity<Object>("Deleted", HttpStatus.OK);
             } catch (Exception e) {
                 logger.error("Error deleting user due to ", e);
@@ -79,8 +94,10 @@ public class AdminController {
     }
 
     @PostMapping(value = {"/user/verify"})
-    public Callable<ResponseEntity<?>> verifyUser() {
-        return () -> new ResponseEntity<Object>(HttpStatus.OK);
+    public Callable<ResponseEntity<?>> verifyUser(@RequestHeader("user_id") String user_id) {
+        return () -> {
+            return new ResponseEntity<Object>(HttpStatus.OK);
+        };
     }
 
     /**
@@ -97,4 +114,40 @@ public class AdminController {
         }
         return userName;
     }
+
+    @PostMapping(value = "/credentals/change")
+    public Callable<ResponseEntity<?>> changeAdminCredentials(@RequestBody JsonNode requestBody) {
+        return () -> {
+            logger.info("Changing admin credentials by " + getPrincipal());
+            try {
+
+                UserEntity entity = (UserEntity) userService.findUserByEmail(getPrincipal());
+                entity.setEmail(requestBody.get("new_login").textValue());
+                entity.setEmail(requestBody.get("new_password").textValue());
+
+                logger.info("Updated user " + entity);
+                userService.updateUser(entity);
+
+                return new ResponseEntity<Object>(HttpStatus.OK);
+            } catch (Exception e) {
+                logger.error("Error during change admin credentials due to ", e);
+                return new ResponseEntity<Object>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        };
+    }
+
+    @PostMapping(value = "/create")
+    public Callable<ResponseEntity<?>> createAdmin(@RequestBody Admin admin) {
+        return () -> {
+            logger.info("Creating admin  data " + admin);
+            try {
+                adminService.saveAdminEntity(admin);
+                return new ResponseEntity<Object>(HttpStatus.OK);
+            } catch (Exception e) {
+                logger.info("Error creating admin due to ", e);
+                return new ResponseEntity<Object>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        };
+    }
+
 }

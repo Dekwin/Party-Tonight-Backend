@@ -32,11 +32,11 @@ public class MainUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-
+        logger.info("Get user by email " + s);
         UserEntity user = (UserEntity) userService.findUserByEmail(s);
         logger.info("Auth user " + user);
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
-                true, true, true, true, getGrantedAuthorities(user));
+                user.isEnable(), true, true, true, getGrantedAuthorities(user));
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(UserEntity user) {

@@ -1,4 +1,4 @@
-package com.partymaker.mvc.service.confirmation.opt;
+package com.partymaker.mvc.admin.confirmation.opt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
