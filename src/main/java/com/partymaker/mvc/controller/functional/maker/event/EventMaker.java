@@ -24,6 +24,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -223,8 +225,9 @@ public class EventMaker {
     }
 
     @PostMapping(value = {"/image"})
-    public Callable<ResponseEntity<?>> saveIgame(@RequestParam("file") MultipartFile file) {
+    public Callable<ResponseEntity<?>> saveIgame(@RequestParam("file") MultipartFile file,  HttpServletRequest request,  HttpServletResponse response) {
         return () -> {
+            System.out.println(request.getLocalAddr()+"###");
             if (file == null || getPrincipal() == null) {
                 logger.info("Bad request with file = " + file + " and user " + getPrincipal());
                 return new ResponseEntity<Object>("Bad request ", HttpStatus.BAD_REQUEST);
@@ -259,6 +262,8 @@ public class EventMaker {
             userName = principal.toString();
         }
         return userName;
+
+
     }
 
     /**

@@ -33,6 +33,8 @@ public class DataConfig {
         return sessionFactory;
     }
 
+
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -52,6 +54,10 @@ public class DataConfig {
         return properties;
     }
 
+
+
+
+
     @Bean
     @Autowired
     public HibernateTransactionManager transactionManager(SessionFactory s) {
@@ -59,4 +65,7 @@ public class DataConfig {
         transactionManager.setSessionFactory(s);
         return transactionManager;
     }
+
+
+
 }

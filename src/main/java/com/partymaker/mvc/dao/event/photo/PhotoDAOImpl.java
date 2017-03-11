@@ -21,7 +21,10 @@ public class PhotoDAOImpl extends AbstractDao<Integer, PhotoEntity> implements P
     @SuppressWarnings("unchecked")
     @Override
     public List<PhotoEntity> findAllByEventAndUser(int id_user, String party_name) {
-        Query query = getSession().createSQLQuery("SELECT * FROM photo LEFT JOIN event ON photo.id_event = event.id_event and event.party_name =:partyName LEFT JOIN user_has_event ON event.id_event = user_has_event.id_event LEFT JOIN user ON event.id_event = user_has_event.id_user WHERE user.id_user = :idUser")
+        Query query = getSession().createSQLQuery("SELECT * FROM photo LEFT JOIN event ON photo.id_event = event.id_event" +
+                " and event.party_name =:partyName" +
+                " LEFT JOIN user_has_event ON event.id_event = user_has_event.id_event" +
+                " LEFT JOIN user ON event.id_event = user_has_event.id_user WHERE user.id_user = :idUser")
                 .addEntity(PhotoEntity.class)
                 .setParameter("partyName", party_name)
                 .setParameter("idUser", id_user);
