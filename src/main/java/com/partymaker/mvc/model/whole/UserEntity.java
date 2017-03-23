@@ -1,5 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,13 +41,24 @@ public class UserEntity implements Serializable {
     @Column(name = "created_date", nullable = true, length = 45)
     private String createdDate;
 
+    @Column(name = "billing_email", nullable = true, length = 45)
+    private String billingEmail;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_role")
     private RoleEntity role;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_billing", nullable = false)
-    private BillingEntity billing;
+    public BillingEntity getBillingEntity() {
+        return billingEntity;
+    }
+
+    public void setBillingEntity(BillingEntity billingEntity) {
+        this.billingEntity = billingEntity;
+    }
+
+    @JsonProperty("billing")
+    @Transient
+    private BillingEntity billingEntity;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_has_event",
@@ -54,8 +67,17 @@ public class UserEntity implements Serializable {
     private List<event> events = new ArrayList<>();
 
 
+    public String getBillingEmail() {
+        return billingEmail;
+    }
+
+    public void setBillingEmail(String billingEmail) {
+        this.billingEmail = billingEmail;
+    }
+
     public int getId_user() {
         return id_user;
+
     }
 
     public void setId_user(int id_user) {
@@ -131,15 +153,6 @@ public class UserEntity implements Serializable {
         this.role = role;
     }
 
-
-    public BillingEntity getBilling() {
-        return billing;
-    }
-
-    public void setBilling(BillingEntity billing) {
-        this.billing = billing;
-    }
-
     public boolean isEnable() {
         return enable;
     }
@@ -165,7 +178,6 @@ public class UserEntity implements Serializable {
         sb.append(", updatedDate='").append(updatedDate).append('\'');
         sb.append(", createdDate='").append(createdDate).append('\'');
         sb.append(", role=").append(role);
-        sb.append(", billing=").append(billing);
         sb.append('}');
         return sb.toString();
     }

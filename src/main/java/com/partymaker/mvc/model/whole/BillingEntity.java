@@ -6,26 +6,17 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
-/**
- * Created by anton on 01/11/16.
- */
-@Entity
-@Table(name = "billing")
 public class BillingEntity implements Serializable {
 
-    @Id
-    @Column(name = "id_billing")
     private int idBilling;
 
-    @Column(name = "card_number")
-    private String card_number;
-
+    private String billing_email;
 
     public BillingEntity() {
     }
 
-    public BillingEntity(String cardNumber) {
-        this.card_number = cardNumber;
+    public BillingEntity(String billing_email) {
+        this.billing_email = billing_email;
     }
 
     public int getIdBilling() {
@@ -36,12 +27,12 @@ public class BillingEntity implements Serializable {
         this.idBilling = idBilling;
     }
 
-    public String getCard_number() {
-        return card_number;
+    public String getBilling_email() {
+        return billing_email;
     }
 
-    public void setCard_number(String card_number) {
-        this.card_number = card_number;
+    public void setBillingEmail(String billingEmail) {
+        this.billing_email = billingEmail;
     }
 
     @Override
@@ -52,7 +43,8 @@ public class BillingEntity implements Serializable {
         BillingEntity that = (BillingEntity) o;
 
         if (idBilling != that.idBilling) return false;
-        if (card_number != null ? !card_number.equals(that.card_number) : that.card_number != null) return false;
+        if (billing_email != null ? !billing_email.equals(that.billing_email) : that.billing_email != null)
+            return false;
 
         return true;
     }
@@ -60,7 +52,7 @@ public class BillingEntity implements Serializable {
     @Override
     public int hashCode() {
         int result = idBilling;
-        result = 31 * result + (card_number != null ? card_number.hashCode() : 0);
+        result = 31 * result + (billing_email != null ? billing_email.hashCode() : 0);
         return result;
     }
 
@@ -68,7 +60,7 @@ public class BillingEntity implements Serializable {
     public String toString() {
         final StringBuffer sb = new StringBuffer("BillingEntity{");
         sb.append("idBilling=").append(idBilling);
-        sb.append(", card_number='").append(card_number).append('\'');
+        sb.append(", billing_email='").append(billing_email).append('\'');
         /*sb.append(", users=").append(users);*/
         sb.append('}');
         return sb.toString();

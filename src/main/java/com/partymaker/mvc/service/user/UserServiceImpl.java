@@ -4,7 +4,6 @@ import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.dao.user.UserDao;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
-import com.partymaker.mvc.service.billing.BillingService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,9 +33,6 @@ public class UserServiceImpl implements UserService<UserEntity> {
     @Autowired
     private EventDAO eventDAO;
 
-    @Autowired
-    BillingService billingService;
-
     @Override
     public UserEntity findUserBuId(Long id) {
         return (UserEntity) userDao.findById(id);
@@ -58,14 +54,8 @@ public class UserServiceImpl implements UserService<UserEntity> {
         date = new Date();
         user.setCreatedDate(dateFormat.format(date));
 
-        logger.info("saving billing");
-        billingService.saveBilling(user.getBilling());
-        logger.info("saved billing");
-
         user.setEnable(true);
-
-        logger.info("Getting billing");
-        user.setBilling(billingService.findByCard(user.getBilling().getCard_number()));
+        user.setBillingEmail(user.getBillingEntity().getBilling_email());
 
         userDao.save(user);
     }
@@ -115,9 +105,9 @@ public class UserServiceImpl implements UserService<UserEntity> {
         if (isExistByName(user.getUserName())) {
             throw new RuntimeException("Bad user name!");
         }
-        if (billingService.isExist(user.getBilling())) {
-            throw new RuntimeException("User with current billing info is already exist!");
-        }
+//        if (billingService.isExist(user.getBilling())) {
+//            throw new RuntimeException("User with current billing info is already exist!");
+//        }
     }
 
     @Override
@@ -130,7 +120,5 @@ public class UserServiceImpl implements UserService<UserEntity> {
             throw new RuntimeException("User password is required!");
         if (user.getUserName() == null || user.getUserName().isEmpty())
             throw new RuntimeException("User name is required!");
-        if (user.getBilling() == null)
-            throw new RuntimeException("User billing info is required!");
     }
 }

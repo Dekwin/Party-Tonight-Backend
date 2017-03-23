@@ -3,7 +3,6 @@ package com.partymaker.mvc.controller.sign;
 import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
-import com.partymaker.mvc.service.billing.BillingService;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +30,6 @@ public class UserSignUp {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    @Qualifier("BillingService")
-    BillingService billingService;
 
 
     @PostMapping(value = {"/maker/signup"})
@@ -64,10 +59,6 @@ public class UserSignUp {
         return () -> {
             logger.info("Sing up dancer = " + user);
             try {
-
-                /* a little  hard code it will be uncommented */
-                BillingEntity billing = new BillingEntity("dancer" + System.currentTimeMillis());
-                user.setBilling(billing);
 
                 userService.isExistUserRequiredFields(user);
 
