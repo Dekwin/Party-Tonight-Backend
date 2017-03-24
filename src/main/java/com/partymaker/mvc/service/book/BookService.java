@@ -110,7 +110,7 @@ public class BookService {
     public TicketEntity getTicket(Book book) {
         event e = eventDAO.getEventByName(book.getPartyName());
 
-        return ticketDAO.getTicketByEventId(e.getId_event());
+        return ticketDAO.findAllByEventId(e.getId_event()).get(0);
     }
 
     public void validateTickets(TicketEntity t, Book book) {

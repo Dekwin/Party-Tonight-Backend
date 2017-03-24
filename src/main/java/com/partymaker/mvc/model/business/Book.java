@@ -19,7 +19,7 @@ public class Book {
     @JsonProperty("tickets")
     private int tickets;
 
-    @JsonProperty("table")
+    @JsonProperty("tables")
     private List<TableEntity> tables;
 
     @JsonProperty("bottles")

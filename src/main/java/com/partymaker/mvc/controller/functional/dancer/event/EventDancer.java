@@ -100,10 +100,14 @@ public class EventDancer {
                     if (partyCreator != null) {
                         Transaction current = new Transaction();
 
+                        current.setId_event(eventService.findByName(bookItem.getPartyName()).getId_event());
                         current.setSellerEmail(partyCreator.getEmail());
                         current.setBillingEmail(partyCreator.getBillingEmail());
                         current.setSubtotal(bookItem.getTotalSum(bookService.getTicket(bookItem)));
                         current.setCustomerEmail(userService.getCurrentUser().getEmail());
+
+                        logger.info(bookItem.toString());
+                        logger.info(current.toString());
 
                         transactions.add(current);
                     }

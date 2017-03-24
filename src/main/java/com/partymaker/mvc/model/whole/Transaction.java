@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "table", schema = "partymaker2", catalog = "")
+@Table(name = "transactions", schema = "partymaker2", catalog = "")
 public class Transaction implements Serializable {
 
     @Id
@@ -14,21 +14,28 @@ public class Transaction implements Serializable {
     @Column(name = "id_transaction")
     private int id_transaction;
 
+    @JsonProperty("billing_email")
     @Column(name = "billing_email")
     private String billingEmail;
 
+    @JsonProperty("subtotal")
     @Column(name = "subtotal")
     private double subtotal;
 
+    @JsonProperty("customer_email")
     @Column(name = "customer_email")
     private String customerEmail;
 
+    @JsonProperty("seller_email")
     @Column(name = "seller_email")
     private String sellerEmail;
 
     @JsonProperty("id_event")
     @Column(name = "id_event")
     private int id_event;
+
+    @Column(name = "completed", columnDefinition = "0")
+    private int completed;
 
 
     public int getId_event() {
@@ -41,7 +48,7 @@ public class Transaction implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("TableEntity{");
+        final StringBuilder sb = new StringBuilder("Transaction{");
         sb.append("id_transaction=").append(id_transaction);
         sb.append(", seller_email='").append(sellerEmail).append('\'');
         sb.append(", customer_email='").append(customerEmail).append('\'');
