@@ -145,6 +145,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public event findByName(String name) {
+        return (event) eventDAO.getEventByName(name);
+    }
+
+    @Override
     public boolean isExist(String timeHash) {
         return Objects.nonNull(eventDAO.getByCode(timeHash));
     }

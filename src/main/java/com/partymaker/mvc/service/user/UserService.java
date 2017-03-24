@@ -31,4 +31,10 @@ public interface UserService<T> {
     void isExistUserRequiredFields(UserEntity user);
 
     void validationUser(T user);
+
+    String getPrincipal();
+
+    UserEntity findByName(String name);
+
+    UserEntity getCurrentUser();
 }

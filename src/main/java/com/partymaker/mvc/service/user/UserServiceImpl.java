@@ -6,6 +6,8 @@ import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +57,9 @@ public class UserServiceImpl implements UserService<UserEntity> {
         user.setCreatedDate(dateFormat.format(date));
 
         user.setEnable(true);
-        user.setBillingEmail(user.getBillingEntity().getBilling_email());
+        if (user.getBillingEmail() != null) {
+            user.setBillingEmail(user.getBillingEntity().getBilling_email());
+        }
 
         userDao.save(user);
     }
@@ -76,6 +80,9 @@ public class UserServiceImpl implements UserService<UserEntity> {
 
         if (Objects.nonNull(entity) && Objects.nonNull(eventEntity)) {
             entity.getEvents().add(eventEntity);
+
+            //fixme
+            eventEntity.getUsers().add(entity);
         }
     }
 
@@ -120,5 +127,29 @@ public class UserServiceImpl implements UserService<UserEntity> {
             throw new RuntimeException("User password is required!");
         if (user.getUserName() == null || user.getUserName().isEmpty())
             throw new RuntimeException("User name is required!");
+    }
+
+    public UserEntity findByName(String name) {
+        return (UserEntity) userDao.findByName(name);
+    }
+
+    @Override
+    public UserEntity getCurrentUser() {
+        return findByName(getPrincipal());
+    }
+
+    /**
+     * This method returns the principal[user-name] of logged-in user.
+     */
+    public String getPrincipal() {
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails) principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
     }
 }

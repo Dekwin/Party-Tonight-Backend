@@ -60,7 +60,7 @@ public class UserEntity implements Serializable {
     @Transient
     private BillingEntity billingEntity;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_has_event",
             joinColumns = {@JoinColumn(name = "id_user")},
             inverseJoinColumns = {@JoinColumn(name = "id_event")})

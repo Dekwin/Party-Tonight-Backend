@@ -28,6 +28,8 @@ public interface EventService {
 
     boolean isExist(String party_name);
 
+    event findByName(String name);
+
     void validation(event event);
 
     StatementTotal getTotal(String partyName,UserEntity user);
