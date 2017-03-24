@@ -117,4 +117,8 @@ public class BottleEntity implements Serializable {
         sb.append('}');
         return sb.toString();
     }
+
+    public int getId_event() {
+        return event.getId_event();
+    }
 }

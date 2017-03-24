@@ -13,4 +13,6 @@ public interface BottleDAO {
     List<BottleEntity> findAllByEventAndUser(int id_user, String party_name);
 
     List<BottleEntity> findAllByEventId(int id_event);
+
+    List<BottleEntity> getBottleByEventId(int id);
 }

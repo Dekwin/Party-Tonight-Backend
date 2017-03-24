@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService<UserEntity> {
      * This method returns the principal[user-name] of logged-in user.
      */
     public String getPrincipal() {
-        String userName = null;
+        String userName;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserDetails) {

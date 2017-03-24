@@ -2,7 +2,9 @@ package com.partymaker.mvc.dao.event.ticket;
 
 import com.partymaker.mvc.dao.AbstractDao;
 import com.partymaker.mvc.model.whole.TicketEntity;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -44,5 +46,13 @@ public class TicketDAOImpl extends AbstractDao<Integer, TicketEntity> implements
             // ignore
         }
         return (List<TicketEntity>) query;
+    }
+
+
+    @Override
+    public TicketEntity getTicketByEventId(int id) {
+        Criteria criteria = createEntityCriteria();
+        criteria.add(Restrictions.eq("id_event", id));
+        return (TicketEntity) criteria.list().get(0);
     }
 }

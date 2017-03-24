@@ -4,6 +4,7 @@ import com.partymaker.mvc.model.business.Book;
 import com.partymaker.mvc.model.whole.Transaction;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
+import com.partymaker.mvc.service.book.BookService;
 import com.partymaker.mvc.service.bottle.BottleService;
 import com.partymaker.mvc.service.event.EventService;
 import com.partymaker.mvc.service.photo.PhotoService;
@@ -47,6 +48,9 @@ public class EventDancer {
 
     @Autowired
     PhotoService photoService;
+
+    @Autowired
+    BookService bookService;
 
     /**
      * retrieve events by zip_code
@@ -98,12 +102,8 @@ public class EventDancer {
 
                         current.setSellerEmail(partyCreator.getEmail());
                         current.setBillingEmail(partyCreator.getBillingEmail());
-
-//                        current.setSubtotal(bookItem.getTotalSum(bookService.getTicket(bookItem)));
-                        current.setSubtotal(0.0);
-
+                        current.setSubtotal(bookItem.getTotalSum(bookService.getTicket(bookItem)));
                         current.setCustomerEmail(userService.getCurrentUser().getEmail());
-                        logger.info("customer email is " + userService.getCurrentUser().getEmail());
 
                         transactions.add(current);
                     }
