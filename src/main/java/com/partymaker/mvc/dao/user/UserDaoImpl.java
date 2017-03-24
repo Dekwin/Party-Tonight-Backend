@@ -18,7 +18,9 @@ public class UserDaoImpl extends AbstractDao<Integer,UserEntity> implements User
 
     @Override
     public UserEntity findById(Integer id) {
-        return findById(id);
+        Criteria criteria = createEntityCriteria();
+        criteria.add(Restrictions.eq("id_user", id));
+        return (UserEntity) criteria.uniqueResult();
     }
 
 

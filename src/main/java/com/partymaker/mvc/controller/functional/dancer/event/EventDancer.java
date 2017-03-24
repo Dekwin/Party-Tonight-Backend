@@ -87,21 +87,23 @@ public class EventDancer {
                     UserEntity partyCreator = null;
 
                     if (mEvent != null) {
-                        for (UserEntity user : mEvent.getUsers()) {
-                            if (user.getRole().getIdRole() == 1) {
-                                partyCreator = user;
-                            }
-                        }
+                        int eventId = mEvent.getId_event();
+                        int userId = userService.getUserIdByEventId(eventId);
+
+                        partyCreator = (UserEntity) userService.findUserBuId(userId);
                     }
 
-                    if (partyCreator == null) {
+                    if (partyCreator != null) {
                         Transaction current = new Transaction();
 
                         current.setSellerEmail(partyCreator.getEmail());
                         current.setBillingEmail(partyCreator.getBillingEmail());
+
 //                        current.setSubtotal(bookItem.getTotalSum(bookService.getTicket(bookItem)));
                         current.setSubtotal(0.0);
+
                         current.setCustomerEmail(userService.getCurrentUser().getEmail());
+                        logger.info("customer email is " + userService.getCurrentUser().getEmail());
 
                         transactions.add(current);
                     }

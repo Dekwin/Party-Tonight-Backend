@@ -2,6 +2,7 @@ package com.partymaker.mvc.service.user;
 
 import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.dao.user.UserDao;
+import com.partymaker.mvc.dao.user.UserToEventDAO;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 import org.apache.log4j.Logger;
@@ -35,8 +36,11 @@ public class UserServiceImpl implements UserService<UserEntity> {
     @Autowired
     private EventDAO eventDAO;
 
+    @Autowired
+    private UserToEventDAO userToEventDAO;
+
     @Override
-    public UserEntity findUserBuId(Long id) {
+    public UserEntity findUserBuId(int id) {
         return (UserEntity) userDao.findById(id);
     }
 
@@ -84,6 +88,11 @@ public class UserServiceImpl implements UserService<UserEntity> {
             //fixme
             eventEntity.getUsers().add(entity);
         }
+    }
+
+    @Override
+    public int getUserIdByEventId(int id) {
+        return userToEventDAO.getUserIdByEventId(id);
     }
 
     @Override
@@ -135,7 +144,7 @@ public class UserServiceImpl implements UserService<UserEntity> {
 
     @Override
     public UserEntity getCurrentUser() {
-        return findByName(getPrincipal());
+        return findUserByEmail(getPrincipal());
     }
 
     /**

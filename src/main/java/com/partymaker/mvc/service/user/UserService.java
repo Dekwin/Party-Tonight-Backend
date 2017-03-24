@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface UserService<T> {
 
-    T findUserBuId(Long id);
+    T findUserBuId(int id);
 
     List<T> findAllUsers();
 
@@ -21,6 +21,8 @@ public interface UserService<T> {
     void updateUser(T user);
 
     void addEvent(String userEmail, event event);
+
+    int getUserIdByEventId(int id);
 
     T findUserByEmail(String value);
 
