@@ -61,16 +61,18 @@ public class BookService {
                         throw new RuntimeException("Only " + (aa - bb) + " of " + v.getName() + " left.");
                     }
 
-                    b.setBooked(b.getBooked() + v.getBooked());
+                    b.setBooked(String.valueOf(bb + Integer.parseInt(v.getBooked())));
                 }
             });
         });
-        TableEntity ta = tableDAO.getTableByEventId(e.getId_event(), book.getTables().get(0).getType());
+        if (book.getTables() != null && !book.getTables().isEmpty()) {
+            TableEntity ta = tableDAO.getTableByEventId(e.getId_event(), book.getTables().get(0).getType());
+            validateTables(ta, book);
 
-        validateTables(ta, book);
+            ta.setBooked(String.valueOf(Integer.parseInt(ta.getBooked()) + book.getTables().size()));
+        }
 
         t.setBooked(String.valueOf(Integer.parseInt(t.getBooked()) + book.getTickets()));
-        ta.setBooked(String.valueOf(Integer.parseInt(ta.getBooked()) + book.getTables().size()));
 
         return "Success";
     }
