@@ -32,27 +32,20 @@ public class EventServiceImpl implements EventService {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     private static Date date;
-
-    @Autowired
-    private EventDAO eventDAO;
-
     @Autowired
     EventService eventService;
-
     @Autowired
     PhotoService photoService;
-
     @Autowired
     UserService userService;
-
     @Autowired
     TicketService ticketService;
-
     @Autowired
     BottleService bottleService;
-
     @Autowired
     TableService tableService;
+    @Autowired
+    private EventDAO eventDAO;
 
     @Override
     public event findById(int id) {
@@ -173,6 +166,18 @@ public class EventServiceImpl implements EventService {
                 (event.getLocation() == null || event.getLocation().isEmpty())) {
             logger.info("Bad event");
             throw new RuntimeException("Bad data to create event");
+        }
+
+        for (BottleEntity b : event.getBottles()) {
+            b.setBooked("0");
+        }
+
+        for (TableEntity t : event.getTables()) {
+            t.setBooked("0");
+        }
+
+        for (TicketEntity t : event.getTickets()) {
+            t.setBooked("0");
         }
     }
 

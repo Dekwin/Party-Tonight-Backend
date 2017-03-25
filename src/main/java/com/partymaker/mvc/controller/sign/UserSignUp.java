@@ -1,12 +1,10 @@
 package com.partymaker.mvc.controller.sign;
 
-import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +41,7 @@ public class UserSignUp {
 
                 logger.info("Creating user ");
                 user.setRole(new RoleEntity(1, "PARTY_MAKER"));
+                user.setBillingEmail(user.getBillingEntity().getBilling_email());
 
                 userService.saveUser(user);
 

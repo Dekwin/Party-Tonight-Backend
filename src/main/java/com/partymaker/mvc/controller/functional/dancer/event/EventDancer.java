@@ -16,7 +16,6 @@ import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +23,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Created by anton on 17/11/16.
@@ -36,29 +32,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EventDancer {
 
     private static final Logger logger = Logger.getLogger(EventDancer.class);
-
+    private static final double OWNER_FEE = 0.05;
+    private static final String OWNER_EMAIL = "owner@owner.owner";
+    private static final String OWNER_BILLING_EMAIL = "owner_billing@owner.owner";
     @Autowired
     EventService eventService;
-
     @Autowired
     UserService userService;
-
-
     @Autowired
     BottleService bottleService;
-
     @Autowired
     TicketService ticketService;
-
     @Autowired
     TableService tableService;
-
     @Autowired
     PhotoService photoService;
-
     @Autowired
     BookService bookService;
-
     @Autowired
     TransactionService transactionService;
 
@@ -90,8 +80,10 @@ public class EventDancer {
                 return new ResponseEntity<Object>("Cannot be null or empty.", HttpStatus.BAD_REQUEST);
             }
 
+            double feeSum = 0;
+
             try {
-                List<Transaction> transactions = new ArrayList<>();
+                List<Transaction> transactions = new ArrayList<>(bookings.length + 1);
 
                 for (Book bookItem : bookings) {
                     logger.info("searching for " + bookItem.getPartyName() + " party");
@@ -113,15 +105,26 @@ public class EventDancer {
                         current.setId_event(eventService.findByName(bookItem.getPartyName()).getId_event());
                         current.setSellerEmail(partyCreator.getEmail());
                         current.setBillingEmail(partyCreator.getBillingEmail());
-                        current.setSubtotal(bookItem.getTotalSum(bookService.getTicket(bookItem)));
                         current.setCustomerEmail(userService.getCurrentUser().getEmail());
 
-                        logger.info(bookItem.toString());
-                        logger.info(current.toString());
+                        // now we divide sum onto fee and real payment
+
+                        double subtotal = bookItem.getTotalSum(bookService.getTicket(bookItem));
+
+                        current.setSubtotal((1 - OWNER_FEE) * subtotal);
+                        feeSum += OWNER_FEE * subtotal;
 
                         transactions.add(current);
                     }
                 }
+
+                Transaction transactionForOwner = new Transaction();
+                transactionForOwner.setSellerEmail(OWNER_EMAIL);
+                transactionForOwner.setBillingEmail(OWNER_BILLING_EMAIL);
+                transactionForOwner.setCustomerEmail(userService.getCurrentUser().getEmail());
+                transactionForOwner.setSubtotal(feeSum);
+
+                transactions.add(transactionForOwner);
 
                 return new ResponseEntity<List>(transactions, HttpStatus.OK);
             } catch (Exception e) {
@@ -145,16 +148,16 @@ public class EventDancer {
             // fixme need to store or handle in any way "booking" param
 
             for (Book b : bookings) {
-                bookService.book(b);
-
                 logger.info("booked " + b.toString());
+                bookService.book(b);
             }
 
             for (Transaction t : transactions) {
+                logger.info("transacted" + t.toString());
                 t.setCompleted(1);
-                transactionService.save(t);
-
-                logger.info("transaction " + t.toString());
+                if (t.getId_event() != 0) {
+                    transactionService.save(t);
+                }
             }
 
             return new ResponseEntity<Object>(HttpStatus.OK);

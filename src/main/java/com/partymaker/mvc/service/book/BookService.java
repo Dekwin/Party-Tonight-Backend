@@ -69,8 +69,8 @@ public class BookService {
 
         validateTables(ta, book);
 
-        t.setBooked(t.getBooked() + book.getTickets());
-        ta.setBooked(ta.getBooked() + book.getTables().size());
+        t.setBooked(String.valueOf(Integer.parseInt(t.getBooked()) + book.getTickets()));
+        ta.setBooked(String.valueOf(Integer.parseInt(ta.getBooked()) + book.getTables().size()));
 
         return "Success";
     }
