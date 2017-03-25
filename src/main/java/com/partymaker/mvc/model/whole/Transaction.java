@@ -98,4 +98,12 @@ public class Transaction implements Serializable {
     public void setSellerEmail(String sellerEmail) {
         this.sellerEmail = sellerEmail;
     }
+
+    public int getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(int completed) {
+        this.completed = completed;
+    }
 }
