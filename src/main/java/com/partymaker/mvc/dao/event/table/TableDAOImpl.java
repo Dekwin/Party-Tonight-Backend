@@ -2,9 +2,7 @@ package com.partymaker.mvc.dao.event.table;
 
 import com.partymaker.mvc.dao.AbstractDao;
 import com.partymaker.mvc.model.whole.TableEntity;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -50,10 +48,10 @@ public class TableDAOImpl extends AbstractDao<Integer, TableEntity> implements T
 
     @Override
     public TableEntity getTableByEventId(int id, String type) {
-
-        Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("id_event", id));
-        criteria.add(Restrictions.eq("type", type));
-        return (TableEntity) criteria.list().get(0);
+        Query query = getSession().createSQLQuery("SELECT * FROM `table` WHERE (`table`.id_event =:id AND `table`.type = :given_type)")
+                .addEntity(TableEntity.class)
+                .setParameter("id", id)
+                .setParameter("given_type", type);
+        return (TableEntity) query.list().get(0);
     }
 }

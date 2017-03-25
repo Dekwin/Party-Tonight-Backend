@@ -47,7 +47,7 @@ public class BookService {
 
         bottleEntity.forEach(b -> {
             book.getBottles().forEach(v -> {
-                if (b.getId_event() == v.getId_event()) {
+                if (b.getType().equals(v.getType())) {
                     int aa = Integer.parseInt(b.getAvailable());
                     int bb = Integer.parseInt(b.getBooked());
 

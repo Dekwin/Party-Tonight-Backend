@@ -77,9 +77,9 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
 
     @Override
     public List<BottleEntity> getBottleByEventId(int id) {
-
-        Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("id_event", id));
-        return criteria.list();
+        Query query = getSession().createSQLQuery("SELECT * FROM bottle WHERE bottle.id_event =:id")
+                .addEntity(BottleEntity.class)
+                .setParameter("id", id);
+        return (List<BottleEntity>) query.list();
     }
 }
