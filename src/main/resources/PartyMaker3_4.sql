@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS partymaker2.`table` (
   `id_table`  INT         NOT NULL AUTO_INCREMENT,
   `price`     VARCHAR(45) NULL     DEFAULT 0,
   `available` VARCHAR(45) NULL     DEFAULT 0,
-  `type`      VARCHAR(45) NULL DEFAULT NULL,
+  `type`      VARCHAR(45) NULL     DEFAULT NULL,
   `booked`    VARCHAR(45) NULL     DEFAULT 0,
   `id_event`  INT         NOT NULL,
   PRIMARY KEY (`id_table`, `id_event`),
@@ -107,9 +107,9 @@ CREATE TABLE IF NOT EXISTS partymaker2.`table` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS partymaker2.`bottle` (
   `id_bottle`    INT         NOT NULL AUTO_INCREMENT,
-  `name`         VARCHAR(45) NULL DEFAULT NULL,
+  `name`         VARCHAR(45) NULL     DEFAULT NULL,
   `price`        VARCHAR(45) NULL     DEFAULT 0,
-  `type`         VARCHAR(45) NULL DEFAULT NULL,
+  `type`         VARCHAR(45) NULL     DEFAULT NULL,
   `available`    VARCHAR(45) NULL     DEFAULT 0,
   `booked`       VARCHAR(45) NULL     DEFAULT 0,
   `created_date` VARCHAR(45) NULL DEFAULT NULL,
@@ -186,10 +186,11 @@ CREATE TABLE IF NOT EXISTS partymaker2.`ranting` (
     ON UPDATE NO ACTION)
   ENGINE = InnoDB;
 
+
 -- -----------------------------------------------------
 -- Table `mydb`.`transactions`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS partymaker2.`transactions` (
+CREATE TABLE IF NOT EXISTS partymaker2.`transaction` (
   `id_transaction` INT          NOT NULL AUTO_INCREMENT,
   `billing_email`  VARCHAR(256) NULL     DEFAULT NULL,
   `seller_email`   VARCHAR(256) NULL     DEFAULT NULL,
@@ -198,10 +199,81 @@ CREATE TABLE IF NOT EXISTS partymaker2.`transactions` (
   `completed`      TINYINT(1)   NULL     DEFAULT 0,
   `id_event`       INT          NOT NULL,
   PRIMARY KEY (`id_transaction`),
-  INDEX `fk_transactions_idx` (`id_event` ASC),
-  CONSTRAINT `fk_transactions_event_id`
+  INDEX `fk_transaction_idx` (`id_event` ASC),
+  CONSTRAINT `fk_transaction_event_id`
   FOREIGN KEY (`id_event`)
   REFERENCES partymaker2.`event` (id_event)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+)
+  ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`order`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS partymaker2.`order` (
+  `id_order`       INT          NOT NULL AUTO_INCREMENT,
+  `customer`       VARCHAR(256) NULL     DEFAULT NULL,
+  `date_created`   TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+  `id_transaction` INT          NOT NULL,
+  PRIMARY KEY (`id_order`, `id_transaction`),
+  INDEX `fk_order_transaction_idx` (`id_transaction` ASC),
+  CONSTRAINT `fk_order_transaction`
+  FOREIGN KEY (`id_transaction`)
+  REFERENCES partymaker2.`transaction` (`id_transaction`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+)
+  ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ordered_bottle`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS partymaker2.`ordered_bottle` (
+  `id_bottle` INT          NOT NULL AUTO_INCREMENT,
+  `title`     VARCHAR(256) NULL     DEFAULT NULL,
+  `amount`    INT(10)      NULL     DEFAULT 0,
+  `id_order`  INT          NOT NULL,
+  PRIMARY KEY (`id_bottle`, `id_order`),
+  INDEX `fk_ordered_bottle_order_idx` (`id_order` ASC),
+  CONSTRAINT `fk_ordered_bottle_order`
+  FOREIGN KEY (`id_order`)
+  REFERENCES partymaker2.`order` (`id_order`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+)
+  ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ordered_table`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS partymaker2.`ordered_table` (
+  `id_table` INT          NOT NULL AUTO_INCREMENT,
+  `type`     VARCHAR(256) NULL     DEFAULT NULL,
+  `number`   INT(10)      NULL     DEFAULT 0,
+  `id_order` INT          NOT NULL,
+  PRIMARY KEY (`id_table`, `id_order`),
+  INDEX `fk_ordered_table_order_idx` (`id_order` ASC),
+  CONSTRAINT `fk_ordered_table_order`
+  FOREIGN KEY (`id_order`)
+  REFERENCES partymaker2.`order` (`id_order`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+)
+  ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ordered_ticket`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS partymaker2.`ordered_ticket` (
+  `id_ticket` INT          NOT NULL AUTO_INCREMENT,
+  `type`      VARCHAR(256) NULL     DEFAULT NULL,
+  `id_order`  INT          NOT NULL,
+  PRIMARY KEY (`id_ticket`, `id_order`),
+  INDEX `fk_ordered_ticket_order_idx` (`id_order` ASC),
+  CONSTRAINT `fk_ordered_ticket_order`
+  FOREIGN KEY (`id_order`)
+  REFERENCES partymaker2.`order` (`id_order`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 )
