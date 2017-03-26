@@ -1,6 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;

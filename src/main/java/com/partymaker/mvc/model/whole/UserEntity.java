@@ -1,6 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -47,6 +48,14 @@ public class UserEntity implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_role")
     private RoleEntity role;
+    @JsonProperty("billing")
+    @Transient
+    private BillingEntity billingEntity;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_has_event",
+            joinColumns = {@JoinColumn(name = "id_user")},
+            inverseJoinColumns = {@JoinColumn(name = "id_event")})
+    private List<event> events = new ArrayList<>();
 
     public BillingEntity getBillingEntity() {
         return billingEntity;
@@ -55,17 +64,6 @@ public class UserEntity implements Serializable {
     public void setBillingEntity(BillingEntity billingEntity) {
         this.billingEntity = billingEntity;
     }
-
-    @JsonProperty("billing")
-    @Transient
-    private BillingEntity billingEntity;
-
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_has_event",
-            joinColumns = {@JoinColumn(name = "id_user")},
-            inverseJoinColumns = {@JoinColumn(name = "id_event")})
-    private List<event> events = new ArrayList<>();
-
 
     public String getBillingEmail() {
         return billingEmail;
@@ -124,10 +122,6 @@ public class UserEntity implements Serializable {
         this.password = password;
     }
 
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
     public String getUpdatedDate() {
         return updatedDate;
     }
@@ -144,7 +138,6 @@ public class UserEntity implements Serializable {
         this.createdDate = createdDate;
     }
 
-
     public RoleEntity getRole() {
         return role;
     }
@@ -155,6 +148,10 @@ public class UserEntity implements Serializable {
 
     public boolean isEnable() {
         return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     public List<event> getEvents() {

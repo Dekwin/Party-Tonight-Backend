@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -127,5 +128,47 @@ public class BookService {
             logger.info("Only " + (a - b) + " tickets left.");
             throw new RuntimeException("Only " + (a - b) + " tickets left.");
         }
+    }
+
+
+    public List<Book> validateOrder(Book[] orderOld) {
+        List<Book> order = Arrays.asList(orderOld);
+
+        for (Book booking : order) {
+            event e = eventDAO.getEventByName(booking.getPartyName());
+
+            List<BottleEntity> bottles = bottleDAO.getBottleByEventId(e.getId_event());
+            List<TableEntity> tables = tableDAO.findAllByEventId(e.getId_event());
+
+            for (BottleEntity bottleOrdered : booking.getBottles()) {
+                for (BottleEntity bottleStored : bottles) {
+                    if (bottleOrdered.getType().equals(bottleStored.getType())) {
+                        int storedAvailable = Integer.parseInt(bottleStored.getAvailable());
+                        int storedBooked = Integer.parseInt(bottleStored.getBooked());
+                        int orderedBooked = Integer.parseInt(bottleOrdered.getBooked());
+
+                        if (orderedBooked > storedAvailable - storedBooked) {
+                            bottleOrdered.setBooked(String.valueOf(storedAvailable - storedBooked));
+                        }
+                    }
+                }
+            }
+
+            for (TableEntity tableOrdered : booking.getTables()) {
+                for (TableEntity tableStored : tables) {
+                    if (tableOrdered.getType().equals(tableStored.getType())) {
+                        int storedAvailable = Integer.parseInt(tableStored.getAvailable());
+                        int storedBooked = Integer.parseInt(tableStored.getBooked());
+                        int orderedBooked = Integer.parseInt(tableOrdered.getBooked());
+
+                        if (orderedBooked > storedAvailable - storedBooked) {
+                            tableOrdered.setBooked(String.valueOf(storedAvailable - storedBooked));
+                        }
+                    }
+                }
+            }
+        }
+
+        return order;
     }
 }

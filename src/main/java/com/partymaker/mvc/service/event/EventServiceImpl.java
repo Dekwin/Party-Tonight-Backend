@@ -85,6 +85,11 @@ public class EventServiceImpl implements EventService {
 
         events.forEach(v -> {
             v.setBottles(bottleService.findAllBottlesByEventID(v.getId_event()));
+
+            for (BottleEntity b : bottleService.findAllBottlesByEventID(v.getId_event())) {
+                logger.info(b.toString());
+            }
+
             v.setTables(tableService.findAllTablesByEventId(v.getId_event()));
             v.setTickets(ticketService.findAllTicketsByEventId(v.getId_event()));
             v.setPhotos(photoService.findAllPhotosByEventId(v.getId_event()));
