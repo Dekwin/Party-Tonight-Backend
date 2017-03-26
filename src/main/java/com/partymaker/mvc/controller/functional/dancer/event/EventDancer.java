@@ -2,7 +2,7 @@ package com.partymaker.mvc.controller.functional.dancer.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partymaker.mvc.model.business.Book;
-import com.partymaker.mvc.model.whole.Transaction;
+import com.partymaker.mvc.model.business.order.Transaction;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.service.book.BookService;

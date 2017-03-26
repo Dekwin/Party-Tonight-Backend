@@ -1,8 +1,7 @@
 package com.partymaker.mvc.dao.user;
 
 import com.partymaker.mvc.dao.AbstractDao;
-import com.partymaker.mvc.model.whole.Transaction;
-import com.partymaker.mvc.model.whole.event;
+import com.partymaker.mvc.model.business.order.Transaction;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;

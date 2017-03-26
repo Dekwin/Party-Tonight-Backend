@@ -1,6 +1,6 @@
 package com.partymaker.mvc.dao.user;
 
-import com.partymaker.mvc.model.whole.Transaction;
+import com.partymaker.mvc.model.business.order.Transaction;
 
 public interface TransactionDAO {
 

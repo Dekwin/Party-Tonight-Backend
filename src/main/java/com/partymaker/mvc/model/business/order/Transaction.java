@@ -1,4 +1,4 @@
-package com.partymaker.mvc.model.whole;
+package com.partymaker.mvc.model.business.order;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
