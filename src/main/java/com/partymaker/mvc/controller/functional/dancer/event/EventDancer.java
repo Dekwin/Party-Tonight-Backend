@@ -1,6 +1,5 @@
 package com.partymaker.mvc.controller.functional.dancer.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partymaker.mvc.model.business.booking.Booking;
 import com.partymaker.mvc.model.business.order.Transaction;
 import com.partymaker.mvc.model.whole.UserEntity;
@@ -13,13 +12,13 @@ import com.partymaker.mvc.service.photo.PhotoService;
 import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
+import com.partymaker.mvc.util.Utils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -35,6 +34,7 @@ public class EventDancer {
     private static final double OWNER_FEE = 0.05;
     private static final String OWNER_EMAIL = "owner@owner.owner";
     private static final String OWNER_BILLING_EMAIL = "owner_billing@owner.owner";
+
     @Autowired
     EventService eventService;
     @Autowired
@@ -77,17 +77,13 @@ public class EventDancer {
     public Callable<ResponseEntity<?>> book(@RequestParam("bookings[]") String
                                                     bookingsJson, @RequestParam("transactions[]") String transactionsJson) {
         return () -> {
-            ObjectMapper mapper = new ObjectMapper();
-
-            String bookingsString = URLDecoder.decode(bookingsJson, "UTF-8");
-            String transactionString = URLDecoder.decode(transactionsJson, "UTF-8");
-
-            List<Booking> bookings = mapper.readValue(bookingsString, mapper.getTypeFactory().constructCollectionType(List.class, Booking.class));
-            List<Transaction> transactions = mapper.readValue(transactionString, mapper.getTypeFactory().constructCollectionType(List.class, Transaction.class));
+            List<Booking> bookings = Utils.parseEncodedCollection(bookingsJson, Booking.class);
+            List<Transaction> transactions = Utils.parseEncodedCollection(transactionsJson, Transaction.class);
 
             transactionService.save(transactions, bookings);
+            bookService.book(bookings);
 
-            return new ResponseEntity<Object>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         };
     }
 

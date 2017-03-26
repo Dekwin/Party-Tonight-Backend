@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "transactions", schema = "partymaker2", catalog = "")
+@Table(name = "transaction", schema = "partymaker2", catalog = "")
 public class Transaction implements Serializable {
 
     @Id

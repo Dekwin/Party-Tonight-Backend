@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import javax.annotation.Nullable;
 
 @Service
 @Transactional
@@ -19,11 +19,16 @@ public class OrderedTableService {
         dao.save(table);
     }
 
-    public OrderedTable getTable(int id_event, String type, int number) {
-        List<OrderedTable> results = dao.getTableByIdEventTypeNumber(id_event, type, number);
-
-        if (results != null && results.size() > 0) {
-            return results.get(0);
-        } else return null;
+    /**
+     * Because according to files every table in event has unique number
+     * we have find it in repo via id of the event and number of it.
+     *
+     * @param id_event id of the event
+     * @param number   number of the table
+     * @return ordered table if exist. Null if not.
+     */
+    @Nullable
+    public OrderedTable getTable(int id_event, int number) {
+        return dao.getTableByIdEventAndNumber(id_event, number);
     }
 }

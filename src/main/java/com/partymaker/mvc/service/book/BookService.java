@@ -4,19 +4,17 @@ import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.dao.event.bottle.BottleDAO;
 import com.partymaker.mvc.dao.event.table.TableDAO;
 import com.partymaker.mvc.dao.event.ticket.TicketDAO;
-import com.partymaker.mvc.model.business.Book;
 import com.partymaker.mvc.model.business.booking.BookedBottle;
+import com.partymaker.mvc.model.business.booking.BookedTable;
+import com.partymaker.mvc.model.business.booking.BookedTicket;
 import com.partymaker.mvc.model.business.booking.Booking;
 import com.partymaker.mvc.model.business.order.OrderedTable;
 import com.partymaker.mvc.model.business.order.OrderedTicket;
 import com.partymaker.mvc.model.whole.BottleEntity;
 import com.partymaker.mvc.model.whole.TableEntity;
-import com.partymaker.mvc.model.whole.TicketEntity;
 import com.partymaker.mvc.model.whole.event;
-import com.partymaker.mvc.service.order.OrderedBottleService;
 import com.partymaker.mvc.service.order.OrderedTableService;
 import com.partymaker.mvc.service.order.OrderedTicketService;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +25,6 @@ import java.util.List;
 @Service
 @Transactional
 public class BookService {
-
-    private static final Logger logger = Logger.getLogger(BookService.class);
-
 
     @Autowired
     private EventDAO<event> eventDAO;
@@ -44,84 +39,54 @@ public class BookService {
     private TableDAO tableDAO;
 
     @Autowired
-    private OrderedBottleService orderedBottleService;
-
-    @Autowired
     private OrderedTableService orderedTableService;
 
     @Autowired
     private OrderedTicketService orderedTicketService;
 
+    public void book(List<Booking> bookings) {
+        for (Booking bookingItem : bookings) {
+            event event = eventDAO.getByID(bookingItem.getId_event());
 
+            // bottles
+            // we store it old repo
+            for (BookedBottle bookedBottle : bookingItem.getBottles()) {
+                for (BottleEntity storedBottle : bottleDAO.getBottleByEventId(
+                        bookingItem.getId_event())) {
 
+                    if (bookedBottle.getTitle().equals(storedBottle.getType())) {
+                        int bookedAlready = Integer.parseInt(storedBottle.getBooked());
 
-    public String book(Book book) {
-        logger.info("Received book = " + book);
-        event e = eventDAO.getEventByName(book.getPartyName());
+                        bookedAlready += bookedBottle.getAmount();
 
-        TicketEntity t = ticketDAO.getTicketByEventId(e.getId_event());
-
-        validateTickets(t, book);
-
-        List<BottleEntity> bottleEntity = bottleDAO.getBottleByEventId(e.getId_event());
-
-        bottleEntity.forEach(b -> {
-            book.getBottles().forEach(v -> {
-                if (b.getType().equals(v.getType())) {
-                    int aa = Integer.parseInt(b.getAvailable());
-                    int bb = Integer.parseInt(b.getBooked());
-
-                    if (aa == bb) {
-                        logger.info("No more bottles left.");
-                        throw new RuntimeException("No more bottles of " + v.getName() + "left.");
+                        storedBottle.setBooked(String.valueOf(bookedAlready));
                     }
-
-                    if (aa - bb < Integer.parseInt(v.getBooked())) {
-                        logger.info("Only " + (aa - bb) + " bottles left.");
-                        throw new RuntimeException("Only " + (aa - bb) + " of " + v.getName() + " left.");
-                    }
-
-                    b.setBooked(String.valueOf(bb + Integer.parseInt(v.getBooked())));
                 }
-            });
-        });
+            }
 
-        if (book.getTables() != null && !book.getTables().isEmpty()) {
-            TableEntity ta = tableDAO.getTableByEventId(e.getId_event(), book.getTables().get(0).getType());
-            ta.setBooked(String.valueOf(Integer.parseInt(ta.getBooked()) + book.getTables().size()));
-        }
+            // table
+            // check whether table is exist in current booking
+            if (bookingItem.getTable() != null) {
+                BookedTable bookedTable = bookingItem.getTable();
 
-        t.setBooked(String.valueOf(Integer.parseInt(t.getBooked()) + book.getTickets()));
+                // we store in old repo
+                // storing in the new one -> in the "confirm invoices" method
+                // we can order just one table at once
+                TableEntity t = tableDAO.getTableByEventId(
+                        bookingItem.getId_event(), bookedTable.getType());
+                t.setBooked(String.valueOf(Integer.parseInt(t.getBooked()) + 1));
 
-        return "Success";
-    }
+            }
 
-    private void validateTables(TableEntity ta, Book book) {
-        int a = Integer.parseInt(ta.getAvailable());
-        int b = Integer.parseInt(ta.getBooked());
+            if (bookingItem.getTicket() != null) {
+                // we don't have type of ticket in the old repo
+                // so just getting first instance of it
+                int ticketsAlreadyBooked = Integer.valueOf(event.getTickets().get(0).getBooked());
 
-        if (a == b) {
-            logger.info("No more tables left.");
-            throw new RuntimeException("No more tables left.");
-        }
-
-        if (a - b < book.getBottles().size()) {
-            logger.info("Only " + (a - b) + " tables left.");
-            throw new RuntimeException("Only " + (a - b) + " tables left.");
-        }
-    }
-
-    public void validateTickets(TicketEntity t, Book book) {
-        int a = Integer.parseInt(t.getAvailable());
-        int b = Integer.parseInt(t.getBooked());
-
-        if (a == b) {
-            logger.info("No more tickets left.");
-            throw new RuntimeException("No more tickets left.");
-        }
-        if (a - b < book.getTickets()) {
-            logger.info("Only " + (a - b) + " tickets left.");
-            throw new RuntimeException("Only " + (a - b) + " tickets left.");
+                // we can buy one ticket at once. yes, as it described in files.
+                ticketDAO.getTicketByEventId(bookingItem.getId_event())
+                        .setBooked(String.valueOf(ticketsAlreadyBooked + 1));
+            }
         }
     }
 
@@ -129,45 +94,56 @@ public class BookService {
         List<Booking> order = Arrays.asList(bookings);
 
         for (Booking booking : order) {
-            List<BottleEntity> bottles = bottleDAO.getBottleByEventId(booking.getId_event());
-
             for (BookedBottle bookedBottle : booking.getBottles()) {
-                BottleEntity storedEntity = bottleDAO.getBottleByEventIdAndType(booking.getId_event(), bookedBottle.getTitle());
 
-                int stored = Integer.parseInt(storedEntity.getAvailable());
-                int ordered = Integer.parseInt(storedEntity.getBooked());
+                // we may use new repo, but it must be slower
+                BottleEntity bottleEntity = bottleDAO.getBottleByEventIdAndType(
+                        booking.getId_event(), bookedBottle.getTitle());
 
-                if (bookedBottle.getAmount() > stored - ordered) {
-                    bookedBottle.setAmount(stored - ordered);
+                int bottlesBooked = Integer.parseInt(bottleEntity.getBooked());
+                int bottlesTotal = Integer.parseInt(bottleEntity.getAvailable());
+
+                if (bottlesTotal - bottlesBooked <= bookedBottle.getAmount()) {
+                    bookedBottle.setAmount(bottlesTotal - bottlesBooked);
                 }
             }
 
             if (booking.getTable() != null) {
-                OrderedTable orderedTable = orderedTableService.getTable(booking.getId_event(),
-                        booking.getTable().getType(),
-                        booking.getTable().getNumber());
+                BookedTable bookedTable = booking.getTable();
 
+                // getting one from ordered table's repo
+                OrderedTable orderedTable = orderedTableService.getTable(
+                        booking.getId_event(), bookedTable.getNumber());
+
+                // if we can find one ordered table with the same number and type
                 if (orderedTable != null) {
                     booking.setTable(null);
                 }
             }
 
             if (booking.getTicket() != null) {
+                BookedTicket bookedTicket = booking.getTicket();
 
-                // todo: tickets
-                List<OrderedTicket> orderedTickets = orderedTicketService.getTickets(booking.getId_event(), booking.getTicket().getType());
+                // we can't find any unique ticket
+                // so we find everyone of one type
+                List<OrderedTicket> orderedTickets = orderedTicketService.getTickets(
+                        booking.getId_event(), bookedTicket.getType());
 
+                // ticket entity for getting total amount of ticket
+                // in old repo we have just only type
+                int ticketsAvailable = Integer.parseInt(ticketDAO.getTicketByEventId(booking.getId_event()).getAvailable());
+
+
+                // if we don't have any ordered tickets we cool
                 if (orderedTickets != null) {
-                    int available = Integer.parseInt(ticketDAO.getTicketByEventId(booking.getId_event()).getAvailable());
-                    int ordered = Integer.parseInt(orderedTickets.get(0).getType());
 
-                    if (available - ordered < 0) {
-
+                    // if we already have sold all the tickets
+                    // just make ticket null
+                    if (orderedTickets.size() >= ticketsAvailable) {
+                        booking.setTicket(null);
                     }
-
                 }
             }
-
         }
         return order;
     }

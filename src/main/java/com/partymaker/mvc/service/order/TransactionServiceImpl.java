@@ -36,7 +36,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void save(List<Transaction> transactions, List<Booking> bookings) {
         for (Transaction transaction : transactions) {
-
             if (transaction.getId_event() != 0) {
                 List<event> events = eventDAO.getAllByUserId(userDao.findByEmail(transaction.getBillingEmail()).getId_user());
                 List<Booking> bookingsOfOne = new ArrayList<>();
