@@ -13,14 +13,20 @@ public class TransactionToOrderFactory {
         for (Booking booking : order) {
             OrderEntity entity = new OrderEntity();
 
-            entity.setId_transaction(transaction.getId_transaction());
+            entity.setId_transaction(transaction);
+            entity.setCustomer(transaction.getCustomerEmail());
 
             booking.getBottles().forEach(b -> {
                 entity.getBottles().add(new OrderedBottle(entity, b));
             });
 
-            entity.setTicket(new OrderedTicket(entity, booking.getTicket()));
-            entity.setTable(new OrderedTable(entity, booking.getTable()));
+            if (booking.getTicket() != null) {
+                entity.setTicket(new OrderedTicket(entity, booking.getTicket()));
+            }
+
+            if (booking.getTable() != null) {
+                entity.setTable(new OrderedTable(entity, booking.getTable()));
+            }
 
             orderedEntities.add(entity);
         }

@@ -1,7 +1,6 @@
 package com.partymaker.mvc.controller.functional.dancer.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.partymaker.mvc.model.business.Book;
 import com.partymaker.mvc.model.business.booking.Booking;
 import com.partymaker.mvc.model.business.order.Transaction;
 import com.partymaker.mvc.model.whole.UserEntity;
@@ -74,62 +73,37 @@ public class EventDancer {
         };
     }
 
-    @PostMapping(value = {"/get_transactions"})
-    public Callable<ResponseEntity<?>> getTransactions(@RequestBody Book[] bookings) {
+    @PostMapping(value = {"/confirm_invoices"})
+    public Callable<ResponseEntity<?>> book(@RequestParam("bookings[]") String
+                                                    bookingsJson, @RequestParam("transactions[]") String transactionsJson) {
         return () -> {
-            if (bookings == null) {
+            ObjectMapper mapper = new ObjectMapper();
+
+            String bookingsString = URLDecoder.decode(bookingsJson, "UTF-8");
+            String transactionString = URLDecoder.decode(transactionsJson, "UTF-8");
+
+            List<Booking> bookings = mapper.readValue(bookingsString, mapper.getTypeFactory().constructCollectionType(List.class, Booking.class));
+            List<Transaction> transactions = mapper.readValue(transactionString, mapper.getTypeFactory().constructCollectionType(List.class, Transaction.class));
+
+            transactionService.save(transactions, bookings);
+
+            return new ResponseEntity<Object>(HttpStatus.OK);
+        };
+    }
+
+    @PostMapping(value = {"/validate_booking"})
+    public Callable<ResponseEntity<?>> validateOrder(@RequestBody Booking[] order) {
+        return () -> {
+            if (order == null) {
                 return new ResponseEntity<Object>("Cannot be null or empty.", HttpStatus.BAD_REQUEST);
             }
 
-            double feeSum = 0;
-
             try {
-                List<Transaction> transactions = new ArrayList<>(bookings.length + 1);
+                List<Booking> newOrder = bookService.validateBookings(order);
 
-                for (Book bookItem : bookings) {
-                    logger.info("searching for " + bookItem.getPartyName() + " party");
-
-                    event mEvent = eventService.findByName(bookItem.getPartyName());
-
-                    UserEntity partyCreator = null;
-
-                    if (mEvent != null) {
-                        int eventId = mEvent.getId_event();
-                        int userId = userService.getUserIdByEventId(eventId);
-
-                        partyCreator = (UserEntity) userService.findUserBuId(userId);
-                    }
-
-                    if (partyCreator != null) {
-                        Transaction current = new Transaction();
-
-                        current.setId_event(eventService.findByName(bookItem.getPartyName()).getId_event());
-                        current.setSellerEmail(partyCreator.getEmail());
-                        current.setBillingEmail(partyCreator.getBillingEmail());
-                        current.setCustomerEmail(userService.getCurrentUser().getEmail());
-
-                        // now we divide sum onto fee and real payment
-
-                        double subtotal = bookItem.getTotalSum(bookService.getTicket(bookItem));
-
-                        current.setSubtotal((1 - OWNER_FEE) * subtotal);
-                        feeSum += OWNER_FEE * subtotal;
-
-                        transactions.add(current);
-                    }
-                }
-
-                Transaction transactionForOwner = new Transaction();
-                transactionForOwner.setSellerEmail(OWNER_EMAIL);
-                transactionForOwner.setBillingEmail(OWNER_BILLING_EMAIL);
-                transactionForOwner.setCustomerEmail(userService.getCurrentUser().getEmail());
-                transactionForOwner.setSubtotal(feeSum);
-
-                transactions.add(transactionForOwner);
-
-                return new ResponseEntity<List>(transactions, HttpStatus.OK);
+                return new ResponseEntity<>(newOrder, HttpStatus.OK);
             } catch (Exception e) {
-                logger.error("Error during getting order (with commission) for book: ", e);
+                logger.error("Error during validation order: ", e);
                 return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         };
@@ -192,71 +166,7 @@ public class EventDancer {
                 return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         };
-    }
 
-    @PostMapping(value = {"/confirm_payments"})
-    public Callable<ResponseEntity<?>> book(@RequestParam("bookings[]") String
-                                                    bookingsJson, @RequestParam("transactions[]") String transactionsJson) {
-        return () -> {
-            ObjectMapper mapper = new ObjectMapper();
 
-            String bookingsString = URLDecoder.decode(bookingsJson, "UTF-8");
-            String transactionString = URLDecoder.decode(transactionsJson, "UTF-8");
-
-            List<Book> bookings = mapper.readValue(bookingsString, mapper.getTypeFactory().constructCollectionType(List.class, Book.class));
-            List<Transaction> transactions = mapper.readValue(transactionString, mapper.getTypeFactory().constructCollectionType(List.class, Transaction.class));
-
-            // fixme need to store or handle in any way "booking" param
-
-            for (Book b : bookings) {
-                logger.info("booked " + b.toString());
-                bookService.book(b);
-            }
-
-            for (Transaction t : transactions) {
-                logger.info("transacted" + t.toString());
-                t.setCompleted(1);
-                if (t.getId_event() != 0) {
-                    transactionService.save(t);
-                }
-            }
-
-            return new ResponseEntity<Object>(HttpStatus.OK);
-        };
-    }
-
-    @PostMapping(value = {"/validate_order"})
-    public Callable<ResponseEntity<?>> validateOrder(@RequestBody Book[] order) {
-        return () -> {
-            if (order == null) {
-                return new ResponseEntity<Object>("Cannot be null or empty.", HttpStatus.BAD_REQUEST);
-            }
-            try {
-                List<Book> newOrder = bookService.validateOrder(order);
-
-                return new ResponseEntity<>(newOrder, HttpStatus.OK);
-            } catch (Exception e) {
-                logger.error("Error during validation order: ", e);
-                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        };
-    }
-
-    @PostMapping(value = {"/validate_booking"})
-    public Callable<ResponseEntity<?>> validateOrder(@RequestBody Booking[] order) {
-        return () -> {
-            if (order == null) {
-                return new ResponseEntity<Object>("Cannot be null or empty.", HttpStatus.BAD_REQUEST);
-            }
-
-            try {
-                List<Booking> newOrder = bookService.validateBookings(order);
-
-                return new ResponseEntity<>(newOrder, HttpStatus.OK);
-            } catch (Exception e) {
-                logger.error("Error during validation order: ", e);
-                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        };
     }
 }

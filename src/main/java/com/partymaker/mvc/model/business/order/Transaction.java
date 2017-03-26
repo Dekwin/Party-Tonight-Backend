@@ -5,13 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "transactions", schema = "partymaker2", catalog = "")
 public class Transaction implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_transaction")
     private int id_transaction;
 
@@ -37,6 +39,10 @@ public class Transaction implements Serializable {
 
     @Column(name = "completed", columnDefinition = "0")
     private int completed;
+
+    @OneToMany(mappedBy = "id_transaction", cascade = {CascadeType.ALL})
+    @Column(name = "order")
+    private List<OrderEntity> order = new ArrayList<>();
 
 
     public int getId_event() {
@@ -106,5 +112,13 @@ public class Transaction implements Serializable {
 
     public void setCompleted(int completed) {
         this.completed = completed;
+    }
+
+    public List<OrderEntity> getOrder() {
+        return order;
+    }
+
+    public void setOrder(List<OrderEntity> order) {
+        this.order = order;
     }
 }

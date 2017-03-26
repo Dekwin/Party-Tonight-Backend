@@ -85,7 +85,7 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
 
     @Override
     public BottleEntity getBottleByEventIdAndType(int id, String type) {
-        Query query = getSession().createSQLQuery("SELECT * FROM bottle WHERE (bottle.id_event =:id AND bottle.`type` =:`type`)")
+        Query query = getSession().createSQLQuery("SELECT * FROM bottle WHERE (bottle.id_event =:id AND bottle.`type`=:type)")
                 .addEntity(BottleEntity.class)
                 .setParameter("id", id)
                 .setParameter("type", type);

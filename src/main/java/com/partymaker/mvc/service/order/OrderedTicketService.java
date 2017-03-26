@@ -2,6 +2,7 @@ package com.partymaker.mvc.service.order;
 
 import com.partymaker.mvc.dao.order.OrderedTicketDAO;
 import com.partymaker.mvc.model.business.order.OrderedTicket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Transactional
 public class OrderedTicketService {
 
+    @Autowired
     OrderedTicketDAO dao;
 
     public void save(OrderedTicket ticket) {

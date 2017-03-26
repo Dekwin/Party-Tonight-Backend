@@ -26,10 +26,8 @@ import java.util.Objects;
 public class UserServiceImpl implements UserService<UserEntity> {
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    private static Date date;
-
     private static final Logger logger = Logger.getLogger(UserServiceImpl.class);
-
+    private static Date date;
     @Autowired
     private UserDao userDao;
 
@@ -78,7 +76,7 @@ public class UserServiceImpl implements UserService<UserEntity> {
 
     @Override
     public void addEvent(String userEmail, event event) {
-        UserEntity entity = (UserEntity) userDao.findByField(userEmail, userEmail);
+        UserEntity entity = (UserEntity) userDao.findByEmail(userEmail);
 
         event eventEntity = (event) eventDAO.getByCode(event.getTime());
 
@@ -97,12 +95,12 @@ public class UserServiceImpl implements UserService<UserEntity> {
 
     @Override
     public UserEntity findUserByEmail(String value) {
-        return (UserEntity) userDao.findByField("email", value);
+        return (UserEntity) userDao.findByEmail(value);
     }
 
     @Override
     public boolean isExistByEmail(String email) {
-        return Objects.nonNull(userDao.findByField(email, email));
+        return Objects.nonNull(userDao.findByEmail(email));
     }
 
     @Override

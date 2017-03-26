@@ -21,7 +21,7 @@ public class OrderedTable {
     private int number;
 
     @JsonIgnore
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(name = "id_order")
     private OrderEntity order;
 
@@ -30,7 +30,10 @@ public class OrderedTable {
 
     public OrderedTable(OrderEntity order, BookedTable table) {
         this.order = order;
-        this.number = table.getNumber();
+        if (table != null) {
+            this.type = table.getType();
+            this.number = table.getNumber();
+        }
     }
 
     public int getId_table() {

@@ -19,8 +19,7 @@ public class OrderedTicketDAO extends AbstractDao<Integer, OrderedTicket> {
     public List<OrderedTicket> getTicketsByType(int id_event, String type) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
                 "`ordered_ticket` JOIN `order` ON `ordered_ticket`.`id_order` \n" +
-                "WHERE (`order`.`id_event`=:id_event AND `ordered_ticket`.`type`=:type AND \n" +
-                "`ordered_table`.`number`=:`number)`")
+                "WHERE (`order`.`id_event`=:id_event AND `ordered_ticket`.`type`=:type)")
                 .addEntity(OrderedTicket.class)
                 .setParameter("id_event", id_event)
                 .setParameter("type", type);

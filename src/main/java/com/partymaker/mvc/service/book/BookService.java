@@ -7,7 +7,6 @@ import com.partymaker.mvc.dao.event.ticket.TicketDAO;
 import com.partymaker.mvc.model.business.Book;
 import com.partymaker.mvc.model.business.booking.BookedBottle;
 import com.partymaker.mvc.model.business.booking.Booking;
-import com.partymaker.mvc.model.business.order.OrderedBottle;
 import com.partymaker.mvc.model.business.order.OrderedTable;
 import com.partymaker.mvc.model.business.order.OrderedTicket;
 import com.partymaker.mvc.model.whole.BottleEntity;
@@ -112,29 +111,6 @@ public class BookService {
         }
     }
 
-    public void validateBottles(List<BottleEntity> bottleEntity, List<BottleEntity> bottles, Book book) {
-        bottles.forEach(v -> {
-            int aa = Integer.parseInt(v.getAvailable());
-            int bb = Integer.parseInt(v.getBooked());
-
-            if (aa == bb) {
-                logger.info("No more bottles left.");
-                throw new RuntimeException("No more bottles of " + v.getName() + "left.");
-            }
-
-            if (aa - bb < book.getBottles().size()) {
-                logger.info("Only " + (aa - bb) + " bottles left.");
-                throw new RuntimeException("Only " + (aa - bb) + " of " + v.getName() + " left.");
-            }
-        });
-    }
-
-    public TicketEntity getTicket(Book book) {
-        event e = eventDAO.getEventByName(book.getPartyName());
-
-        return ticketDAO.findAllByEventId(e.getId_event()).get(0);
-    }
-
     public void validateTickets(TicketEntity t, Book book) {
         int a = Integer.parseInt(t.getAvailable());
         int b = Integer.parseInt(t.getBooked());
@@ -149,48 +125,6 @@ public class BookService {
         }
     }
 
-
-    public List<Book> validateOrder(Book[] orderOld) {
-        List<Book> order = Arrays.asList(orderOld);
-
-        for (Book booking : order) {
-            event e = eventDAO.getEventByName(booking.getPartyName());
-
-            List<BottleEntity> bottles = bottleDAO.getBottleByEventId(e.getId_event());
-            List<TableEntity> tables = tableDAO.findAllByEventId(e.getId_event());
-
-            for (BottleEntity bottleOrdered : booking.getBottles()) {
-                for (BottleEntity bottleStored : bottles) {
-                    if (bottleOrdered.getType().equals(bottleStored.getType())) {
-                        int storedAvailable = Integer.parseInt(bottleStored.getAvailable());
-                        int storedBooked = Integer.parseInt(bottleStored.getBooked());
-                        int orderedBooked = Integer.parseInt(bottleOrdered.getBooked());
-
-                        if (orderedBooked > storedAvailable - storedBooked) {
-                            bottleOrdered.setBooked(String.valueOf(storedAvailable - storedBooked));
-                        }
-                    }
-                }
-            }
-
-            for (TableEntity tableOrdered : booking.getTables()) {
-                for (TableEntity tableStored : tables) {
-                    if (tableOrdered.getType().equals(tableStored.getType())) {
-                        int storedAvailable = Integer.parseInt(tableStored.getAvailable());
-                        int storedBooked = Integer.parseInt(tableStored.getBooked());
-                        int orderedBooked = Integer.parseInt(tableOrdered.getBooked());
-
-                        if (orderedBooked > storedAvailable - storedBooked) {
-                            tableOrdered.setBooked(String.valueOf(storedAvailable - storedBooked));
-                        }
-                    }
-                }
-            }
-        }
-
-        return order;
-    }
-
     public List<Booking> validateBookings(Booking[] bookings) {
         List<Booking> order = Arrays.asList(bookings);
 
@@ -198,37 +132,43 @@ public class BookService {
             List<BottleEntity> bottles = bottleDAO.getBottleByEventId(booking.getId_event());
 
             for (BookedBottle bookedBottle : booking.getBottles()) {
-                OrderedBottle ordered = orderedBottleService.getBottleByEventIdAndTitle(booking.getId_event(), bookedBottle.getTitle());
                 BottleEntity storedEntity = bottleDAO.getBottleByEventIdAndType(booking.getId_event(), bookedBottle.getTitle());
 
                 int stored = Integer.parseInt(storedEntity.getAvailable());
+                int ordered = Integer.parseInt(storedEntity.getBooked());
 
-                if (bookedBottle.getAmount() > stored - ordered.getAmount()) {
-                    bookedBottle.setAmount(stored - ordered.getAmount());
+                if (bookedBottle.getAmount() > stored - ordered) {
+                    bookedBottle.setAmount(stored - ordered);
                 }
             }
 
-            OrderedTable orderedTable = orderedTableService.getTable(booking.getId_event(),
-                    booking.getTable().getType(),
-                    booking.getTable().getNumber());
+            if (booking.getTable() != null) {
+                OrderedTable orderedTable = orderedTableService.getTable(booking.getId_event(),
+                        booking.getTable().getType(),
+                        booking.getTable().getNumber());
 
-            if (orderedTable != null) {
-                booking.setTable(null);
+                if (orderedTable != null) {
+                    booking.setTable(null);
+                }
             }
 
-            List<OrderedTicket> orderedTickets = orderedTicketService.getTickets(booking.getId_event(), booking.getTicket().getType());
+            if (booking.getTicket() != null) {
 
-            if (orderedTickets != null) {
-                int available = Integer.parseInt(ticketDAO.getTicketByEventId(booking.getId_event()).getAvailable());
-                int ordered = Integer.parseInt(orderedTickets.get(0).getType());
+                // todo: tickets
+                List<OrderedTicket> orderedTickets = orderedTicketService.getTickets(booking.getId_event(), booking.getTicket().getType());
 
-                if (available - ordered < 0) {
+                if (orderedTickets != null) {
+                    int available = Integer.parseInt(ticketDAO.getTicketByEventId(booking.getId_event()).getAvailable());
+                    int ordered = Integer.parseInt(orderedTickets.get(0).getType());
+
+                    if (available - ordered < 0) {
+
+                    }
 
                 }
-
             }
 
         }
-        return null;
+        return order;
     }
 }

@@ -5,6 +5,8 @@ import com.partymaker.mvc.model.business.order.OrderedBottle;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository("orderedBottleDAO")
 public class OrderedBottleDAO extends AbstractDao<Integer, OrderedBottle> {
 
@@ -13,13 +15,13 @@ public class OrderedBottleDAO extends AbstractDao<Integer, OrderedBottle> {
     }
 
     @SuppressWarnings("unchecked")
-    public OrderedBottle getBottleByEventIdAndTitle(int id_event, String title) {
+    public List<OrderedBottle> getBottleByEventIdAndTitle(int id_event, String title) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
                 "`ordered_bottle` JOIN `order` ON `ordered_bottle`.`id_order` \n" +
-                "WHERE (`order`.`id_event`=:id_event AND `ordered_bottle`.`title`=:title")
+                "WHERE (`order`.`id_event`=:id_event AND `ordered_bottle`.`title`=:title)")
                 .addEntity(OrderedBottle.class)
                 .setParameter("id_event", id_event)
                 .setParameter("title", title);
-        return (OrderedBottle) query.list().get(0);
+        return (List<OrderedBottle>) query.list();
     }
 }

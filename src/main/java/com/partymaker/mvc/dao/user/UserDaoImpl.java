@@ -7,7 +7,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 
 /**
@@ -44,11 +43,9 @@ public class UserDaoImpl extends AbstractDao<Integer,UserEntity> implements User
 
 
     @Override
-    public UserEntity findByField(String nameField, String value) {
+    public UserEntity findByEmail(String value) {
         Criteria criteria = createEntityCriteria();
         criteria.add(Restrictions.eq("email", value));
-        /*System.out.println("value= " + value);
-        System.out.println("thi is-..............................."+criteria.uniqueResult());*/
         return (UserEntity) criteria.uniqueResult();
     }
 

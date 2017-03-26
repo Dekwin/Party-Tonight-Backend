@@ -20,7 +20,7 @@ public class OrderedTicket {
     private String type;
 
     @JsonIgnore
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(name = "id_order")
     private OrderEntity order;
 
@@ -29,7 +29,9 @@ public class OrderedTicket {
 
     public OrderedTicket(OrderEntity entity, BookedTicket ticket) {
         this.order = entity;
-        this.type = ticket.getType();
+        if (ticket != null) {
+            this.type = ticket.getType();
+        }
     }
 
     public int getId_ticket() {

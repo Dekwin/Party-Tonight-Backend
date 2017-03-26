@@ -11,30 +11,30 @@ public class OrderEntity implements Serializable {
 
     @Id
     @Column(name = "id_order")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id_order;
 
-    @Column(name = "customer", unique = true)
+    @Column(name = "customer")
     private String customer;
 
     @Column(name = "date_created")
     private String date_created;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "order")
     @Column(name = "bottles")
     private List<OrderedBottle> bottles = new ArrayList<>();
 
-    @OneToOne
-    @Column(name = "table")
+    @OneToOne(mappedBy = "order", cascade = {CascadeType.ALL})
+    @JoinColumn(name = "table")
     private OrderedTable table;
 
-    @OneToOne
-    @Column(name = "ticket")
+    @OneToOne(mappedBy = "order", cascade = {CascadeType.ALL})
+    @JoinColumn(name = "ticket")
     private OrderedTicket ticket;
 
     @ManyToOne
-    @Column(name = "id_transaction")
-    private int id_transaction;
+    @JoinColumn(name = "id_transaction")
+    private Transaction id_transaction;
 
     public int getId_order() {
         return id_order;
@@ -44,11 +44,11 @@ public class OrderEntity implements Serializable {
         this.id_order = id_order;
     }
 
-    public int getId_transaction() {
+    public Transaction getId_transaction() {
         return id_transaction;
     }
 
-    public void setId_transaction(int id_transaction) {
+    public void setId_transaction(Transaction id_transaction) {
         this.id_transaction = id_transaction;
     }
 
