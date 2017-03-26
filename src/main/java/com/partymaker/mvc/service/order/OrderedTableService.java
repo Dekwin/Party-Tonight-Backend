@@ -14,4 +14,8 @@ public class OrderedTableService {
     public void save(OrderedTable table) {
         dao.save(table);
     }
+
+    public OrderedTable getTable(int id_event, String type, int number) {
+        return dao.getTableByIdEventTypeNumber(id_event, type, number);
+    }
 }

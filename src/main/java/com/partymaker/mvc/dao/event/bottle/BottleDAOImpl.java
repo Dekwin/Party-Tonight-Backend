@@ -82,4 +82,13 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
                 .setParameter("id", id);
         return (List<BottleEntity>) query.list();
     }
+
+    @Override
+    public BottleEntity getBottleByEventIdAndType(int id, String type) {
+        Query query = getSession().createSQLQuery("SELECT * FROM bottle WHERE (bottle.id_event =:id AND bottle.`type` =:`type`)")
+                .addEntity(BottleEntity.class)
+                .setParameter("id", id)
+                .setParameter("type", type);
+        return (BottleEntity) query.list().get(0);
+    }
 }

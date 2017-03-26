@@ -15,4 +15,9 @@ public interface BottleDAO {
     List<BottleEntity> findAllByEventId(int id_event);
 
     List<BottleEntity> getBottleByEventId(int id);
+
+    BottleEntity getBottleByEventIdAndType(int id, String type);
+
+
+
 }

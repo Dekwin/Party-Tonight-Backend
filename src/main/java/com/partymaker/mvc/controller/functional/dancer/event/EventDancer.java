@@ -2,6 +2,7 @@ package com.partymaker.mvc.controller.functional.dancer.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partymaker.mvc.model.business.Book;
+import com.partymaker.mvc.model.business.booking.Booking;
 import com.partymaker.mvc.model.business.order.Transaction;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
@@ -134,8 +135,68 @@ public class EventDancer {
         };
     }
 
+    @PostMapping(value = {"/get_invoices"})
+    public Callable<ResponseEntity<?>> getInvoices(@RequestBody Booking[] bookings) {
+        return () -> {
+            if (bookings == null) {
+                return new ResponseEntity<Object>("Cannot be null or empty.", HttpStatus.BAD_REQUEST);
+            }
+
+            try {
+                List<Transaction> response = new ArrayList<>(bookings.length + 1);
+
+                double fee = 0;
+
+                for (Booking booking : bookings) {
+                    event mEvent = eventService.findById(booking.getId_event());
+
+                    UserEntity partyCreator;
+
+                    if (mEvent != null) {
+                        int eventId = mEvent.getId_event();
+                        int userId = userService.getUserIdByEventId(eventId);
+
+                        partyCreator = (UserEntity) userService.findUserBuId(userId);
+
+                        if (partyCreator != null) {
+                            Transaction current = new Transaction();
+
+                            current.setId_event(booking.getId_event());
+                            current.setSellerEmail(partyCreator.getEmail());
+                            current.setBillingEmail(partyCreator.getBillingEmail());
+                            current.setCustomerEmail(userService.getCurrentUser().getEmail());
+
+                            // now we divide sum onto fee and real payment
+
+                            double subtotal = Booking.getSubtotal(booking);
+
+                            current.setSubtotal((1 - OWNER_FEE) * subtotal);
+                            fee += OWNER_FEE * subtotal;
+
+                            response.add(current);
+
+                        }
+                    }
+
+                    Transaction transactionForOwner = new Transaction();
+                    transactionForOwner.setSellerEmail(OWNER_EMAIL);
+                    transactionForOwner.setBillingEmail(OWNER_BILLING_EMAIL);
+                    transactionForOwner.setCustomerEmail(userService.getCurrentUser().getEmail());
+                    transactionForOwner.setSubtotal(fee);
+
+                    response.add(transactionForOwner);
+                }
+                return new ResponseEntity<List>(response, HttpStatus.OK);
+            } catch (Exception e) {
+                logger.error("Error during getting order (with commission) for book: ", e);
+                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        };
+    }
+
     @PostMapping(value = {"/confirm_payments"})
-    public Callable<ResponseEntity<?>> book(@RequestParam("bookings[]") String bookingsJson, @RequestParam("transactions[]") String transactionsJson) {
+    public Callable<ResponseEntity<?>> book(@RequestParam("bookings[]") String
+                                                    bookingsJson, @RequestParam("transactions[]") String transactionsJson) {
         return () -> {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -172,6 +233,24 @@ public class EventDancer {
             }
             try {
                 List<Book> newOrder = bookService.validateOrder(order);
+
+                return new ResponseEntity<>(newOrder, HttpStatus.OK);
+            } catch (Exception e) {
+                logger.error("Error during validation order: ", e);
+                return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        };
+    }
+
+    @PostMapping(value = {"/validate_booking"})
+    public Callable<ResponseEntity<?>> validateOrder(@RequestBody Booking[] order) {
+        return () -> {
+            if (order == null) {
+                return new ResponseEntity<Object>("Cannot be null or empty.", HttpStatus.BAD_REQUEST);
+            }
+
+            try {
+                List<Booking> newOrder = bookService.validateBookings(order);
 
                 return new ResponseEntity<>(newOrder, HttpStatus.OK);
             } catch (Exception e) {

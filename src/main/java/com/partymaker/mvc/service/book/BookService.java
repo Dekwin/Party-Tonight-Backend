@@ -5,10 +5,18 @@ import com.partymaker.mvc.dao.event.bottle.BottleDAO;
 import com.partymaker.mvc.dao.event.table.TableDAO;
 import com.partymaker.mvc.dao.event.ticket.TicketDAO;
 import com.partymaker.mvc.model.business.Book;
+import com.partymaker.mvc.model.business.booking.BookedBottle;
+import com.partymaker.mvc.model.business.booking.Booking;
+import com.partymaker.mvc.model.business.order.OrderedBottle;
+import com.partymaker.mvc.model.business.order.OrderedTable;
+import com.partymaker.mvc.model.business.order.OrderedTicket;
 import com.partymaker.mvc.model.whole.BottleEntity;
 import com.partymaker.mvc.model.whole.TableEntity;
 import com.partymaker.mvc.model.whole.TicketEntity;
 import com.partymaker.mvc.model.whole.event;
+import com.partymaker.mvc.service.order.OrderedBottleService;
+import com.partymaker.mvc.service.order.OrderedTableService;
+import com.partymaker.mvc.service.order.OrderedTicketService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +43,18 @@ public class BookService {
 
     @Autowired
     private TableDAO tableDAO;
+
+    @Autowired
+    private OrderedBottleService orderedBottleService;
+
+    @Autowired
+    private OrderedTableService orderedTableService;
+
+    @Autowired
+    private OrderedTicketService orderedTicketService;
+
+
+
 
     public String book(Book book) {
         logger.info("Received book = " + book);
@@ -169,5 +189,46 @@ public class BookService {
         }
 
         return order;
+    }
+
+    public List<Booking> validateBookings(Booking[] bookings) {
+        List<Booking> order = Arrays.asList(bookings);
+
+        for (Booking booking : order) {
+            List<BottleEntity> bottles = bottleDAO.getBottleByEventId(booking.getId_event());
+
+            for (BookedBottle bookedBottle : booking.getBottles()) {
+                OrderedBottle ordered = orderedBottleService.getBottleByEventIdAndTitle(booking.getId_event(), bookedBottle.getTitle());
+                BottleEntity storedEntity = bottleDAO.getBottleByEventIdAndType(booking.getId_event(), bookedBottle.getTitle());
+
+                int stored = Integer.parseInt(storedEntity.getAvailable());
+
+                if (bookedBottle.getAmount() > stored - ordered.getAmount()) {
+                    bookedBottle.setAmount(stored - ordered.getAmount());
+                }
+            }
+
+            OrderedTable orderedTable = orderedTableService.getTable(booking.getId_event(),
+                    booking.getTable().getType(),
+                    booking.getTable().getNumber());
+
+            if (orderedTable != null) {
+                booking.setTable(null);
+            }
+
+            List<OrderedTicket> orderedTickets = orderedTicketService.getTickets(booking.getId_event(), booking.getTicket().getType());
+
+            if (orderedTickets != null) {
+                int available = Integer.parseInt(ticketDAO.getTicketByEventId(booking.getId_event()).getAvailable());
+                int ordered = Integer.parseInt(orderedTickets.get(0).getType());
+
+                if (available - ordered < 0) {
+
+                }
+
+            }
+
+        }
+        return null;
     }
 }

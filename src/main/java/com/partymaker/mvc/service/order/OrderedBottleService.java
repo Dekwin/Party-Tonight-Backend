@@ -15,4 +15,8 @@ public class OrderedBottleService {
     public void save(OrderedBottle bottle) {
         dao.save(bottle);
     }
+
+    public OrderedBottle getBottleByEventIdAndTitle(int id_event, String title) {
+        return dao.getBottleByEventIdAndTitle(id_event, title);
+    }
 }
