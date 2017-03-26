@@ -1,6 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.io.Serializable;
  * Created by anton on 01/11/16.
  */
 @Entity
+@JsonIgnoreProperties("id_event")
 @Table(name = "table", schema = "partymaker2", catalog = "")
 public class TableEntity implements Serializable {
 
