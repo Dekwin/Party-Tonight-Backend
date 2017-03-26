@@ -1,4 +1,4 @@
-package com.partymaker.mvc.dao.user;
+package com.partymaker.mvc.dao.order;
 
 import com.partymaker.mvc.dao.AbstractDao;
 import com.partymaker.mvc.model.business.order.Transaction;

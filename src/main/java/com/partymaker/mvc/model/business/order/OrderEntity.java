@@ -26,7 +26,7 @@ public class OrderEntity implements Serializable {
 
     @OneToMany
     @Column(name = "tables")
-    private List<OrderedBottle> tables = new ArrayList<>();
+    private List<OrderedTable> tables = new ArrayList<>();
 
     @OneToMany
     @Column(name = "tickets")
@@ -60,11 +60,11 @@ public class OrderEntity implements Serializable {
         this.bottles = bottles;
     }
 
-    public List<OrderedBottle> getTables() {
+    public List<OrderedTable> getTables() {
         return tables;
     }
 
-    public void setTables(List<OrderedBottle> tables) {
+    public void setTables(List<OrderedTable> tables) {
         this.tables = tables;
     }
 
