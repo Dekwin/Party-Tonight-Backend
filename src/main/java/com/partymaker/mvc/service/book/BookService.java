@@ -66,10 +66,9 @@ public class BookService {
                 }
             });
         });
+
         if (book.getTables() != null && !book.getTables().isEmpty()) {
             TableEntity ta = tableDAO.getTableByEventId(e.getId_event(), book.getTables().get(0).getType());
-            validateTables(ta, book);
-
             ta.setBooked(String.valueOf(Integer.parseInt(ta.getBooked()) + book.getTables().size()));
         }
 
