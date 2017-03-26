@@ -1,6 +1,7 @@
 package com.partymaker.mvc.model.business.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.partymaker.mvc.model.business.booking.BookedBottle;
 
 import javax.persistence.*;
 
@@ -12,8 +13,8 @@ public class OrderedBottle {
     @Column(name = "id_bottle")
     private int id_bottle;
 
-    @Column(name = "type", nullable = true, length = 45)
-    private String type;
+    @Column(name = "title", nullable = true, length = 45)
+    private String title;
 
     @Column(name = "amount")
     private int amount;
@@ -23,12 +24,21 @@ public class OrderedBottle {
     @JoinColumn(name = "id_order")
     private OrderEntity order;
 
-    public String getType() {
-        return type;
+    public OrderedBottle() {
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public OrderedBottle(OrderEntity order, BookedBottle bookedBottle) {
+        this.order = order;
+        this.title = bookedBottle.getTitle();
+        this.amount = bookedBottle.getAmount();
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getAmount() {

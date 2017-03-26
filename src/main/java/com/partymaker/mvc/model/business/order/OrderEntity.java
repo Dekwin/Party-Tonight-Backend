@@ -24,13 +24,13 @@ public class OrderEntity implements Serializable {
     @Column(name = "bottles")
     private List<OrderedBottle> bottles = new ArrayList<>();
 
-    @OneToMany
-    @Column(name = "tables")
-    private List<OrderedTable> tables = new ArrayList<>();
+    @OneToOne
+    @Column(name = "table")
+    private OrderedTable table;
 
-    @OneToMany
-    @Column(name = "tickets")
-    private List<OrderedTicket> tickets = new ArrayList<>();
+    @OneToOne
+    @Column(name = "ticket")
+    private OrderedTicket ticket;
 
     @ManyToOne
     @Column(name = "id_transaction")
@@ -60,22 +60,6 @@ public class OrderEntity implements Serializable {
         this.bottles = bottles;
     }
 
-    public List<OrderedTable> getTables() {
-        return tables;
-    }
-
-    public void setTables(List<OrderedTable> tables) {
-        this.tables = tables;
-    }
-
-    public List<OrderedTicket> getTickets() {
-        return tickets;
-    }
-
-    public void setTickets(List<OrderedTicket> tickets) {
-        this.tickets = tickets;
-    }
-
     public String getCustomer() {
         return customer;
     }
@@ -90,5 +74,21 @@ public class OrderEntity implements Serializable {
 
     public void setDate(String date) {
         this.date_created = date;
+    }
+
+    public OrderedTable getTable() {
+        return table;
+    }
+
+    public void setTable(OrderedTable table) {
+        this.table = table;
+    }
+
+    public OrderedTicket getTicket() {
+        return ticket;
+    }
+
+    public void setTicket(OrderedTicket ticket) {
+        this.ticket = ticket;
     }
 }

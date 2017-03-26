@@ -1,6 +1,7 @@
 package com.partymaker.mvc.model.business.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.partymaker.mvc.model.business.booking.BookedTable;
 
 import javax.persistence.*;
 
@@ -23,6 +24,14 @@ public class OrderedTable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_order")
     private OrderEntity order;
+
+    public OrderedTable() {
+    }
+
+    public OrderedTable(OrderEntity order, BookedTable table) {
+        this.order = order;
+        this.number = table.getNumber();
+    }
 
     public int getId_table() {
         return id_table;
