@@ -147,4 +147,8 @@ public class BookService {
         }
         return order;
     }
+
+    public List<BookedTable> getTables(int id_event) {
+        return orderedTableService.getFreeTables(id_event);
+    }
 }

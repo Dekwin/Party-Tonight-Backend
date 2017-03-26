@@ -87,6 +87,11 @@ public class EventDancer {
         };
     }
 
+    @PostMapping(value = {"/get_free_tables"})
+    public Callable<ResponseEntity<?>> getFreeTables(@RequestBody int id_event) {
+        return () -> new ResponseEntity<List>(bookService.getTables(id_event), HttpStatus.OK);
+    }
+
     @PostMapping(value = {"/validate_booking"})
     public Callable<ResponseEntity<?>> validateOrder(@RequestBody Booking[] order) {
         return () -> {
