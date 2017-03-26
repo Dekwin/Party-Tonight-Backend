@@ -1,8 +1,7 @@
 package com.partymaker.mvc.model.business.paypal;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Created by anton on 06.02.17.
  */

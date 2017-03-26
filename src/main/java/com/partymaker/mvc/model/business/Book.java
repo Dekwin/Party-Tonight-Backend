@@ -1,9 +1,9 @@
 package com.partymaker.mvc.model.business;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.partymaker.mvc.model.whole.BottleEntity;
 import com.partymaker.mvc.model.whole.TableEntity;
 import com.partymaker.mvc.model.whole.TicketEntity;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 
