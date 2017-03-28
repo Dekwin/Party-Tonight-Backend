@@ -61,6 +61,7 @@ public class OrderedTableService {
         // we generate list where all the tables are free
         int lastIndex = 1;
         for (TableEntity tableEntity : totalTables) {
+
             for (int i = 0; i < Integer.parseInt(tableEntity.getAvailable()); i++) {
                 BookedTable table = new BookedTable();
 

@@ -2,6 +2,7 @@ package com.partymaker.mvc.controller.functional.dancer.event;
 
 import com.partymaker.mvc.model.business.booking.Booking;
 import com.partymaker.mvc.model.business.order.Transaction;
+import com.partymaker.mvc.model.whole.ReviewEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 import com.partymaker.mvc.service.book.BookService;
@@ -9,6 +10,7 @@ import com.partymaker.mvc.service.bottle.BottleService;
 import com.partymaker.mvc.service.event.EventService;
 import com.partymaker.mvc.service.order.TransactionService;
 import com.partymaker.mvc.service.photo.PhotoService;
+import com.partymaker.mvc.service.review.ReviewService;
 import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
@@ -47,10 +49,23 @@ public class EventDancer {
     TableService tableService;
     @Autowired
     PhotoService photoService;
+
     @Autowired
     BookService bookService;
+
     @Autowired
     TransactionService transactionService;
+
+    @Autowired
+    ReviewService reviewService;
+
+    @PostMapping(value = {"/review_post"})
+    public Callable<ResponseEntity<?>> search(@RequestBody ReviewEntity reviewEntity) {
+        return () -> {
+            reviewService.save(reviewEntity);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        };
+    }
 
     /**
      * retrieve events by zip_code
