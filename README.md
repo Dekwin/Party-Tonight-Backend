@@ -241,15 +241,15 @@ response:
   "refunds": "-1126.0"
 }
 
-Getting free for order tables
-=======
+### Getting free for order tables
+
 Getting list of free tables (6 phase, appendix 2.0):
 
 uri: /dancer/event/get_free_tables
 
 method: POST
 
-header: x-auth-token = signInMakerToken
+header: x-auth-token = signInToken
 
 body: id of event
 
@@ -274,6 +274,30 @@ body: id of event
    }
  ]
  ```
+ 
+### Post a review about event
+ 
+Save review in database.
+
+uri: /dancer/event/review_post
+
+method: POST
+
+header: x-auth-token = signInToken
+
+body: review
+
+**Request**
+
+```json
+{
+	"id_event" : 3,
+	"content" : "Cool",
+	"rating" : 3
+}
+
+```
+ 
  # Purchases
  
  ### Validate order
