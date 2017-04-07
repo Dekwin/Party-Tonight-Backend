@@ -1,6 +1,7 @@
 package com.partymaker.mvc.dao.user;
 
 
+import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.UserEntity;
 
 import java.io.Serializable;
@@ -19,4 +20,6 @@ public interface UserDao<T, PK extends Serializable> {
     UserEntity findByEmail(String value);
 
     T findByName(String name);
+
+    List<UserEntity> findAll(int offset, int limit, Roles role);
 }

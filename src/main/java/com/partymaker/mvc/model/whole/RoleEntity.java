@@ -11,6 +11,9 @@ import java.util.List;
 @Entity
 @Table(name = "role", schema = "partymaker2", catalog = "")
 public class RoleEntity implements Serializable {
+
+
+
     @Id
     @Column(name = "id_role", nullable = false)
     private int idRole;

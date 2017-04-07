@@ -33,6 +33,9 @@ public class UserEntity implements Serializable {
     @Column(name = "password", nullable = true, length = 45)
     private String password;
 
+    @Column(name = "verified", nullable = true)
+    private boolean verified;
+
     @Column(name = "enable", nullable = true)
     private boolean enable;
 
@@ -146,6 +149,14 @@ public class UserEntity implements Serializable {
         this.role = role;
     }
 
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
     public boolean isEnable() {
         return enable;
     }
@@ -171,6 +182,7 @@ public class UserEntity implements Serializable {
         sb.append(", email='").append(email).append('\'');
         sb.append(", emergencyContact='").append(emergencyContact).append('\'');
         sb.append(", password='").append(password).append('\'');
+        sb.append(", verified=").append(verified);
         sb.append(", enable=").append(enable);
         sb.append(", updatedDate='").append(updatedDate).append('\'');
         sb.append(", createdDate='").append(createdDate).append('\'');

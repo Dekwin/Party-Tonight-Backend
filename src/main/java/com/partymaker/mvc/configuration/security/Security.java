@@ -40,6 +40,7 @@ public class Security extends WebSecurityConfigurerAdapter {
                 .antMatchers("/signin").access("hasRole('ROLE_STREET_DANCER') or hasRole('ROLE_PARTY_MAKER')")
                 .antMatchers("/maker/event/**").access("hasRole('ROLE_PARTY_MAKER')")
                 .antMatchers("/dancer/event/**").access("hasRole('ROLE_STREET_DANCER')")
+                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
                 .anyRequest().authenticated()
 
                 /*.and().formLogin().defaultSuccessUrl("/token")*/

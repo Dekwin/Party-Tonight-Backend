@@ -146,7 +146,7 @@ public class EventDancer {
                         int eventId = mEvent.getId_event();
                         int userId = userService.getUserIdByEventId(eventId);
 
-                        partyCreator = (UserEntity) userService.findUserBuId(userId);
+                        partyCreator = (UserEntity) userService.findUserById(userId);
 
                         if (partyCreator != null) {
                             Transaction current = new Transaction();

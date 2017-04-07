@@ -63,6 +63,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public List<event> findAll(int offset, int limit) {
+        return eventDAO.getAll(offset,limit);
+    }
+
+    @Override
     public List<event> findAllByUserId(int id_user) {
         List<event> events = eventDAO.getAllByUserId(id_user);
         events.forEach(v -> {

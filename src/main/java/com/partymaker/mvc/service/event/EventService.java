@@ -18,6 +18,8 @@ public interface EventService {
 
     List<event> findAll();
 
+    List<event> findAll(int offset,int limit);
+
     List<event> findAllByUserId(int id_user);
 
     List<event> findAllByCode(String code);

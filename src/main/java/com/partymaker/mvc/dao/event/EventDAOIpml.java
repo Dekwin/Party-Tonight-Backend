@@ -4,6 +4,7 @@ import com.partymaker.mvc.dao.AbstractDao;
 import com.partymaker.mvc.model.whole.event;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -32,6 +33,15 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
     @Override
     public List<event> getAll() {
         return createEntityCriteria().list();
+    }
+
+    @Override
+    public List<event> getAll(int offset, int limit) {
+        Criteria criteria =  createEntityCriteria();
+        criteria.setFirstResult(offset);
+        criteria.setMaxResults(limit);
+        criteria.addOrder(Order.desc("date"));
+        return criteria.list();
     }
 
     @SuppressWarnings("unchecked")

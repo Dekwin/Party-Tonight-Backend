@@ -3,6 +3,7 @@ package com.partymaker.mvc.service.user;
 import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.dao.user.UserDao;
 import com.partymaker.mvc.dao.user.UserToEventDAO;
+import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 import org.apache.log4j.Logger;
@@ -38,13 +39,28 @@ public class UserServiceImpl implements UserService<UserEntity> {
     private UserToEventDAO userToEventDAO;
 
     @Override
-    public UserEntity findUserBuId(int id) {
+    public UserEntity findUserById(int id) {
         return (UserEntity) userDao.findById(id);
     }
 
     @Override
     public List<UserEntity> findAllUsers() {
         return userDao.findAll();
+    }
+
+    @Override
+    public List<UserEntity> findByRole(int offset, int limit, String role){
+
+        if(Roles.ROLE_ADMIN.equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_ADMIN);
+        }
+        if(Roles.ROLE_PARTY_MAKER.equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_PARTY_MAKER);
+        }
+        if(Roles.ROLE_STREET_DANCER.equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER);
+        }
+        return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER);
     }
 
     @SuppressWarnings("unchecked")
@@ -158,5 +174,34 @@ public class UserServiceImpl implements UserService<UserEntity> {
             userName = principal.toString();
         }
         return userName;
+    }
+
+
+    @Override
+    public void disableUserById(int id_user) {
+        logger.info("Locking user with id = " + id_user);
+        UserEntity userEntity = (UserEntity) userDao.findById(id_user);
+        userEntity.setEnable(false);
+    }
+
+    @Override
+    public void enableUserById(int id_user) {
+        logger.info("Unlocking user with id = " + id_user);
+        UserEntity userEntity = (UserEntity) userDao.findById(id_user);
+        userEntity.setEnable(true);
+    }
+
+    @Override
+    public void setUserVerifiedById(int id_user) {
+        logger.info("Verified user with id = " + id_user);
+        UserEntity userEntity = (UserEntity) userDao.findById(id_user);
+        userEntity.setVerified(true);
+    }
+
+    @Override
+    public void setUserNotVerifiedById(int id_user) {
+        logger.info("Not verified user with id = " + id_user);
+        UserEntity userEntity = (UserEntity) userDao.findById(id_user);
+        userEntity.setVerified(false);
     }
 }

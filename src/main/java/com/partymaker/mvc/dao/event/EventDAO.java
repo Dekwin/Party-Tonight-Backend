@@ -1,6 +1,8 @@
 package com.partymaker.mvc.dao.event;
 
 
+import com.partymaker.mvc.model.whole.event;
+
 import java.util.List;
 
 /**
@@ -12,6 +14,8 @@ public interface EventDAO<T> {
     T getByCode(String time);
 
     List<T> getAll();
+
+    List<T> getAll(int offset, int limit);
 
     List<T> getAllByUserId(int id_user);
 

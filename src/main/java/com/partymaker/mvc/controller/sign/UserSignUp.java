@@ -2,14 +2,13 @@ package com.partymaker.mvc.controller.sign;
 
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
+import com.partymaker.mvc.service.admin.AdminService;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.Callable;
 
@@ -29,6 +28,8 @@ public class UserSignUp {
     @Autowired
     UserService userService;
 
+    @Autowired
+    AdminService adminService;
 
     @PostMapping(value = {"/maker/signup"})
     public Callable<ResponseEntity<?>> signUpMaker(@RequestBody UserEntity user) {
@@ -76,4 +77,69 @@ public class UserSignUp {
             }
         };
     }
+
+
+    @PostMapping(value = {"/admin/signup"})
+    public Callable<ResponseEntity<?>> signUpAdmin(@RequestBody UserEntity user) {
+        return () -> {
+            logger.info("Sign up admin = " + user);
+            try {
+                logger.info("Checking user data on existing ");
+
+                userService.isExistUserRequiredFields(user);
+
+                logger.info("Creating user ");
+                user.setRole(new RoleEntity(1, "ROLE_ADMIN"));
+                user.setBillingEmail(user.getBillingEntity().getBilling_email());
+
+                userService.saveUser(user);
+
+                return new ResponseEntity<String>("", HttpStatus.CREATED);
+            } catch (Exception e) {
+                logger.info("Failed to create admin = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        };
+    }
+
+    @GetMapping(value = {"/accounts/reset"})
+    public Callable<ResponseEntity<?>> verifyTokenToResetPassword(@RequestParam("token") String token) {
+        return () -> {
+            try {
+                adminService.verifyTokenToResetPassword(token);
+                return new ResponseEntity<Object>(HttpStatus.OK);
+            }catch (Exception e){
+                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+            }
+        };
+    }
+
+    @PostMapping(value = {"/accounts/reset"})
+    public Callable<ResponseEntity<?>> resetPassword(@RequestParam("email") String email) {
+        return () -> {
+            try {
+                adminService.sendTokenToResetPassword(email);
+                return new ResponseEntity<Object>(HttpStatus.OK);
+            }catch (Exception e){
+                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+            }
+        };
+    }
+
+
+    @GetMapping(value = {"/accounts/verify"})
+    public Callable<ResponseEntity<?>> verifyAccount(@RequestParam("token") String token) {
+        return () -> {
+            try {
+                adminService.verifyUserByToken(token);
+                return new ResponseEntity<Object>(HttpStatus.OK);
+            }catch (Exception e){
+                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+            }
+        };
+    }
+
+
+
+
 }

@@ -1,5 +1,6 @@
 package com.partymaker.mvc.service.user;
 
+import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 
@@ -10,9 +11,11 @@ import java.util.List;
  */
 public interface UserService<T> {
 
-    T findUserBuId(int id);
+    T findUserById(int id);
 
     List<T> findAllUsers();
+
+    List<UserEntity> findByRole(int offset, int limit, String role);
 
     void deleteUser(Long id);
 
@@ -39,4 +42,12 @@ public interface UserService<T> {
     UserEntity findByName(String name);
 
     UserEntity getCurrentUser();
+
+    void disableUserById(int id_user);
+
+    void enableUserById(int id_user);
+
+    void setUserVerifiedById(int id_user);
+
+    void setUserNotVerifiedById(int id_user);
 }
