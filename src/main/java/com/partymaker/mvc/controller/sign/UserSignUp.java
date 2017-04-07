@@ -1,9 +1,12 @@
 package com.partymaker.mvc.controller.sign;
 
+import com.partymaker.mvc.dao.user.UserRoleDao;
+import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.admin.AdminService;
 import com.partymaker.mvc.service.user.UserService;
+import com.partymaker.mvc.service.user.role.UserRoleService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -80,8 +83,24 @@ public class UserSignUp {
 
 
     @PostMapping(value = {"/admin/signup"})
-    public Callable<ResponseEntity<?>> signUpAdmin(@RequestBody UserEntity user) {
+    public Callable<ResponseEntity<?>> signUpAdmin(@RequestBody UserEntity user1) {
         return () -> {
+
+            //mock
+            UserEntity user = new UserEntity();
+            user.setUserName("test");
+            user.setPassword("a");
+            user.setVerified(true);
+            String email = "dekstersniper@gmail.com";
+            user.setEmail(email);
+            user.setBillingEmail(email);
+            BillingEntity billingEntity = new BillingEntity();
+            billingEntity.setBillingEmail(email);
+            user.setBillingEntity(billingEntity);
+
+
+
+
             logger.info("Sign up admin = " + user);
             try {
                 logger.info("Checking user data on existing ");
@@ -91,6 +110,7 @@ public class UserSignUp {
                 logger.info("Creating user ");
                 user.setRole(new RoleEntity(1, "ROLE_ADMIN"));
                 user.setBillingEmail(user.getBillingEntity().getBilling_email());
+
 
                 userService.saveUser(user);
 
@@ -109,7 +129,7 @@ public class UserSignUp {
                 adminService.verifyTokenToResetPassword(token);
                 return new ResponseEntity<Object>(HttpStatus.OK);
             }catch (Exception e){
-                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+                return new ResponseEntity<Object>(e,HttpStatus.CONFLICT);
             }
         };
     }
@@ -121,7 +141,8 @@ public class UserSignUp {
                 adminService.sendTokenToResetPassword(email);
                 return new ResponseEntity<Object>(HttpStatus.OK);
             }catch (Exception e){
-                return new ResponseEntity<Object>(HttpStatus.CONFLICT);
+                e.printStackTrace();
+                return new ResponseEntity<Object>(e,HttpStatus.CONFLICT);
             }
         };
     }

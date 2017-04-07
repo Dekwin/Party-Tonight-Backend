@@ -22,7 +22,7 @@ import java.util.Properties;
 public class SmtpMailServiceImpl implements MailService {
 
     private static final Logger logger = Logger.getLogger(AdminServiceImpl.class);
-    private final String MAIL_PROPERTIES_PATH = "";
+
     private final String MAIL_SMTP_HOST = "mail.smtp.host";
     private final String MAIL_SMTP_SOCKETFACTORY_PORT = "mail.smtp.socketFactory.port";
     private final String MAIL_SMTP_SOCKETFACTORY_CLASS = "mail.smtp.socketFactory.class";
@@ -31,6 +31,7 @@ public class SmtpMailServiceImpl implements MailService {
     private final String MAIL_SMTP_USERNAME = "mail.smtp.username";
     private final String MAIL_SMTP_PASSWORD = "mail.smtp.password";
 
+    private final String MAIL_PROPERTIES_PATH = "mail.properties";
 
     @Value("${email.account.confirmation}")
     private String verifyUserUrl;
@@ -43,7 +44,7 @@ public class SmtpMailServiceImpl implements MailService {
 
     private Properties getMailProps() throws IOException {
         Properties prop = new Properties();
-        InputStream in = new FileInputStream(MAIL_PROPERTIES_PATH);
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream(MAIL_PROPERTIES_PATH);//new FileInputStream(MAIL_PROPERTIES_PATH);
         prop.load(in);
         in.close();
         return prop;
@@ -51,6 +52,9 @@ public class SmtpMailServiceImpl implements MailService {
 
 
     private boolean saveMailProps(Properties properties) throws IOException {
+
+
+
         OutputStream out = new FileOutputStream(MAIL_PROPERTIES_PATH);
         properties.store(out, "");
         out.close();

@@ -1,6 +1,7 @@
 package com.partymaker.mvc.configuration.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -20,6 +21,7 @@ public class Security extends WebSecurityConfigurerAdapter {
 
 
     @Autowired
+    @Qualifier("userDetailsService")
     UserDetailsService userDetailsService;
 
     /* */
@@ -36,11 +38,15 @@ public class Security extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http
                 .authorizeRequests()
-                .antMatchers("/maker/signup", "/dancer/signup", "/user", "/event","/maker/event/photo").permitAll()
+                .antMatchers("/maker/signup", "/dancer/signup", "/user", "/event","/maker/event/photo",
+                        "/accounts/reset","/accounts/verify",
+                        "/admin/signup",
+                        "/admin/**"
+                        ).permitAll()
                 .antMatchers("/signin").access("hasRole('ROLE_STREET_DANCER') or hasRole('ROLE_PARTY_MAKER')")
                 .antMatchers("/maker/event/**").access("hasRole('ROLE_PARTY_MAKER')")
                 .antMatchers("/dancer/event/**").access("hasRole('ROLE_STREET_DANCER')")
-                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+               // .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
                 .anyRequest().authenticated()
 
                 /*.and().formLogin().defaultSuccessUrl("/token")*/

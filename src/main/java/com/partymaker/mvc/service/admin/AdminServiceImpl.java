@@ -23,11 +23,8 @@ import java.util.UUID;
 @Transactional
 public class AdminServiceImpl implements AdminService{
 
-
-
     @Autowired
     UserService userService;
-
     @Autowired
     JWTService jwtService;
     @Autowired
