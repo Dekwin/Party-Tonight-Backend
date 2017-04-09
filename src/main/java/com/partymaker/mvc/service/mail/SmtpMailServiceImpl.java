@@ -107,6 +107,7 @@ public class SmtpMailServiceImpl implements MailService {
         try {
             properties = getMailProps();
 
+
             MailConfigEntity mailConfigEntity = getMailConfig(properties);
 
             Session session = Session.getDefaultInstance(properties,

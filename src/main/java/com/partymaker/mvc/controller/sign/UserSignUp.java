@@ -100,7 +100,6 @@ public class UserSignUp {
 
 
 
-
             logger.info("Sign up admin = " + user);
             try {
                 logger.info("Checking user data on existing ");

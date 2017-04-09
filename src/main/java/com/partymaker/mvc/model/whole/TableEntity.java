@@ -1,7 +1,9 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -29,8 +31,10 @@ public class TableEntity implements Serializable {
     @Column(name = "booked", nullable = true, length = 45)
     private String booked;
 
+
     @JsonIgnore
     @ManyToOne(optional = false)
+    @JsonManagedReference(value = "event-table")
     @JoinColumn(name = "id_event")
     private event eventEntity;
 

@@ -1,0 +1,3 @@
+INSERT INTO partymaker2.role VALUES (1, 'ROLE_ADMIN');
+INSERT INTO partymaker2.role VALUES (2, 'ROLE_PARTY_MAKER');
+INSERT INTO partymaker2.role VALUES (3, 'ROLE_STREET_DANCER');

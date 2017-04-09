@@ -1,7 +1,11 @@
 package com.partymaker.mvc.model.whole;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,16 +42,25 @@ public class event implements Serializable {
     @Column(name = "zip_code")
     private String zip_code;
 
-    @OneToMany(mappedBy = "event")
+    @JsonBackReference(value = "event-bottle")
+    @OneToMany(mappedBy = "event",  fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<BottleEntity> bottles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity")
+    @JsonBackReference(value = "event-ticket")
+    @OneToMany(mappedBy = "eventEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<TicketEntity> tickets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity")
+    @JsonBackReference(value = "event-table")
+    @OneToMany(mappedBy = "eventEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<TableEntity> tables = new ArrayList<>();
 
-    @OneToMany(mappedBy = "eventEntity")
+    @JsonBackReference(value = "event-photo")
+    //@JsonManagedReference
+    @OneToMany(mappedBy = "eventEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<PhotoEntity> photos = new ArrayList<>();
 
     @JsonIgnore

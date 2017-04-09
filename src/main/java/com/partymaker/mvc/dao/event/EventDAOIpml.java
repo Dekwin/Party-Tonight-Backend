@@ -8,7 +8,9 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Persistence;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by anton on 04/11/16.
@@ -26,6 +28,8 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
         Criteria criteria = createEntityCriteria();
         criteria.add(Restrictions.eq("time", time));
         return (event) criteria.uniqueResult();
+
+
     }
 
 

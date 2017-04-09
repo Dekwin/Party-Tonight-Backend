@@ -1,7 +1,9 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -31,6 +33,7 @@ public class BottleEntity implements Serializable {
     @Column(name = "created_date")
     private String createdDate;
 
+    @JsonManagedReference(value = "event-bottle")
     @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")

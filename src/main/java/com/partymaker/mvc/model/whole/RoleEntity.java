@@ -1,5 +1,9 @@
 package com.partymaker.mvc.model.whole;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,7 +24,9 @@ public class RoleEntity implements Serializable {
     @Column(name = "user_role", nullable = true, length = 45)
     private String userRole;
 
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @JsonManagedReference(value="user-role")
+    @OneToMany(mappedBy = "role",  fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<UserEntity> users = new ArrayList<>();
 
     public RoleEntity() {

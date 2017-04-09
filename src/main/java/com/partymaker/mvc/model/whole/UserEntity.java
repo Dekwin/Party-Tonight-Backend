@@ -1,6 +1,7 @@
 package com.partymaker.mvc.model.whole;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -48,6 +49,7 @@ public class UserEntity implements Serializable {
     @Column(name = "billing_email", nullable = true, length = 45)
     private String billingEmail;
 
+    @JsonBackReference(value="user-role")
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_role")
     private RoleEntity role;

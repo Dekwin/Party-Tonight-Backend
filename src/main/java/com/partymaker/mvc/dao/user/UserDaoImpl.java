@@ -38,11 +38,11 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
     public List<UserEntity> findAll(int offset, int limit, Roles role) {
         Criteria crit = createEntityCriteria();
         crit.createCriteria("role")
-                .add(Restrictions.like("user_role", role))
+                .add(Restrictions.like("userRole", role.toString()))
                 .list();
         crit.setFirstResult(offset);
         crit.setMaxResults(limit);
-        crit.addOrder(Order.asc("user_name"));
+        crit.addOrder(Order.asc("userName"));
         return (List<UserEntity>) crit.list();
     }
 

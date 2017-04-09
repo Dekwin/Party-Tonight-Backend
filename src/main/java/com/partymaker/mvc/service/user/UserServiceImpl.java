@@ -51,13 +51,13 @@ public class UserServiceImpl implements UserService<UserEntity> {
     @Override
     public List<UserEntity> findByRole(int offset, int limit, String role){
 
-        if(Roles.ROLE_ADMIN.equals(role)) {
+        if(Roles.ROLE_ADMIN.toString().equals(role)) {
             return userDao.findAll(offset, limit, Roles.ROLE_ADMIN);
         }
-        if(Roles.ROLE_PARTY_MAKER.equals(role)) {
+        if(Roles.ROLE_PARTY_MAKER.toString().equals(role)) {
             return userDao.findAll(offset, limit, Roles.ROLE_PARTY_MAKER);
         }
-        if(Roles.ROLE_STREET_DANCER.equals(role)) {
+        if(Roles.ROLE_STREET_DANCER.toString().equals(role)) {
             return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER);
         }
         return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER);
