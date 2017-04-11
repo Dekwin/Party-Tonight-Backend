@@ -33,7 +33,7 @@ public class BottleEntity implements Serializable {
     @Column(name = "created_date")
     private String createdDate;
 
-    @JsonManagedReference(value = "event-bottle")
+    //@JsonManagedReference(value = "event-bottle")
     @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")

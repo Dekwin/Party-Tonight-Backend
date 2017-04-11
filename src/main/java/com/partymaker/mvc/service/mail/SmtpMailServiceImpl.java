@@ -140,12 +140,19 @@ public class SmtpMailServiceImpl implements MailService {
     }
 
     @Override
-    public void sendResetPasswordMail(UserEntity receiver) throws IOException, MessagingException {
+    public void sendResetPasswordMail(UserEntity receiver, String fromUrl) throws IOException, MessagingException {
         String token = jwtService.getToken(receiver, JWTServiceImpl.TOKEN_PURPOSE_RESET_PASSWORD);
+        StringBuilder messageBodyStringBuilder = new StringBuilder();
+        messageBodyStringBuilder.append("Reset password for account ")
+                .append(receiver.getEmail())
+                .append(" by this link : ")
+                .append(fromUrl)
+                .append(resetPasswordUrl)
+                .append("?token=" + token);
+
         sendMail(receiver.getEmail(),
-                "Testing Subject",
-                "Reset password for account " + receiver.getEmail() + " by this link : "
-                        + resetPasswordUrl + "token=" + token);
+                "Reset password",
+                messageBodyStringBuilder.toString());
     }
 
     @Override
@@ -155,13 +162,20 @@ public class SmtpMailServiceImpl implements MailService {
 
 
     @Override
-    public void sendVerifyUserMail(UserEntity receiver) throws IOException, MessagingException {
-
+    public void sendVerifyUserMail(UserEntity receiver, String fromUrl) throws IOException, MessagingException {
         String token = jwtService.getToken(receiver, JWTServiceImpl.TOKEN_PURPOSE_VERIFY_USER);
+
+        StringBuilder messageBodyStringBuilder = new StringBuilder();
+        messageBodyStringBuilder.append("Please confirm your account ")
+                .append(receiver.getEmail())
+                .append(" by this link : ")
+                .append(fromUrl)
+                .append(verifyUserUrl)
+                .append("?token=" + token);
+
         sendMail(receiver.getEmail(),
-                "Testing Subject",
-                "Please confirm your account by this link : "
-                        + verifyUserUrl + "token=" + token);
+                "Verify account",
+                messageBodyStringBuilder.toString());
 
     }
 

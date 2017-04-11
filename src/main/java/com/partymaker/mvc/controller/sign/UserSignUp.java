@@ -1,18 +1,17 @@
 package com.partymaker.mvc.controller.sign;
 
-import com.partymaker.mvc.dao.user.UserRoleDao;
 import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.admin.AdminService;
 import com.partymaker.mvc.service.user.UserService;
-import com.partymaker.mvc.service.user.role.UserRoleService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.Callable;
 
 /**
@@ -83,14 +82,14 @@ public class UserSignUp {
 
 
     @PostMapping(value = {"/admin/signup"})
-    public Callable<ResponseEntity<?>> signUpAdmin(@RequestBody UserEntity user1) {
+    public Callable<ResponseEntity<?>> signUpAdmin(@RequestBody UserEntity user1, HttpServletRequest request) {
         return () -> {
 
             //mock
             UserEntity user = new UserEntity();
             user.setUserName("test");
             user.setPassword("a");
-            user.setVerified(true);
+            user.setVerified(false);
             String email = "dekstersniper@gmail.com";
             user.setEmail(email);
             user.setBillingEmail(email);
@@ -113,6 +112,8 @@ public class UserSignUp {
 
                 userService.saveUser(user);
 
+                adminService.sendVerificationMail(user.getEmail(),request.getServerName());
+
                 return new ResponseEntity<String>("", HttpStatus.CREATED);
             } catch (Exception e) {
                 logger.info("Failed to create admin = " + user + ", due to: ", e);
@@ -134,10 +135,11 @@ public class UserSignUp {
     }
 
     @PostMapping(value = {"/accounts/reset"})
-    public Callable<ResponseEntity<?>> resetPassword(@RequestParam("email") String email) {
+    public Callable<ResponseEntity<?>> resetPassword(@RequestParam("email") String email,  HttpServletRequest request) {
         return () -> {
             try {
-                adminService.sendTokenToResetPassword(email);
+
+                adminService.sendTokenToResetPassword(email, request.getServerName());
                 return new ResponseEntity<Object>(HttpStatus.OK);
             }catch (Exception e){
                 e.printStackTrace();

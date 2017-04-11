@@ -33,14 +33,20 @@ public class MainUserDetailsService implements UserDetailsService {
 
         UserEntity user = (UserEntity) userService.findUserByEmail(s);
         logger.info("Auth user " + user);
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
-                true, true, true, true, getGrantedAuthorities(user));
+        if(user!=null && user.isEnable()&&user.isVerified()){
+            return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+                    true, true, true, true, getGrantedAuthorities(user));
+        }else{
+            throw new UsernameNotFoundException("user disabled or not verified");
+        }
+
+
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(UserEntity user) {
         List<GrantedAuthority> setAuths = new ArrayList<GrantedAuthority>();
 
-        setAuths.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getUserRole()));
+        setAuths.add(new SimpleGrantedAuthority( user.getRole().getUserRole()));
         logger.info("Grants = " + setAuths);
         return setAuths;
     }

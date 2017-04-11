@@ -34,6 +34,7 @@ public class AdminServiceImpl implements AdminService{
 
 
 
+
     @Override
     public void saveUserAsAdmin(UserEntity admin) {
             logger.info("Checking user data on existing ");
@@ -52,10 +53,10 @@ public class AdminServiceImpl implements AdminService{
 
 
     @Override
-    public void sendTokenToResetPassword(String email) throws IOException, MessagingException {
+    public void sendTokenToResetPassword(String email, String fromUrl) throws IOException, MessagingException {
        UserEntity user = (UserEntity)userService.findUserByEmail(email);
         if(user != null) {
-            smtpMailService.sendResetPasswordMail(user);
+            smtpMailService.sendResetPasswordMail(user, fromUrl);
         }else {
             throw new BadCredentialsException("Not valid entity");
         }
@@ -83,8 +84,21 @@ public class AdminServiceImpl implements AdminService{
         }else{
             logger.info("User not found");
         }
-
     }
+
+    @Override
+    public void sendVerificationMail(String email, String fromUrl) throws IOException, MessagingException {
+        UserEntity user = (UserEntity)userService.findUserByEmail(email);
+        if(user != null) {
+            smtpMailService.sendVerifyUserMail(user, fromUrl);
+        }else {
+            throw new BadCredentialsException("Not valid entity");
+        }
+    }
+
+
+
+
 
 
 //    public UserEntity getAdminEntity(int id) {

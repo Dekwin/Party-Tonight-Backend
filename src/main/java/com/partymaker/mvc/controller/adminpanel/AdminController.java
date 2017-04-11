@@ -6,14 +6,22 @@ import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.admin.AdminService;
 import com.partymaker.mvc.service.event.EventService;
 import com.partymaker.mvc.service.user.UserService;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Order;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -47,30 +55,33 @@ public class AdminController {
     @GetMapping(value = {"/events"})
     public Callable<ResponseEntity<?>> getAllEvents(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit) {
         return () -> {
+
             logger.info("Get all events by " + getPrincipal());
-            return new ResponseEntity<Object>(eventService.findAll(offset, limit), HttpStatus.OK);
+            return new ResponseEntity<Object>(eventService.findAll(offset, limit, null), HttpStatus.OK);
         };
     }
+
 
     @GetMapping(value = {"/users"})
     public Callable<ResponseEntity<?>> getAllUsers(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit, @RequestParam("role") String role) {
         return () -> {
             logger.info("Get all users by " + getPrincipal());
-            return new ResponseEntity<Object>(userService.findByRole(offset, limit, role), HttpStatus.OK);
+            return new ResponseEntity<Object>(userService.findByRole(offset, limit, role, Order.asc("userName")), HttpStatus.OK);
         };
     }
 
-    @PostMapping(value = {"/users/hold"})
-    public Callable<ResponseEntity<?>> holdUser(@RequestHeader("user_id") String user_id) {
+    @PostMapping(value = {"/users/lock"})
+    public Callable<ResponseEntity<?>> holdUser(@RequestBody Map<String, String> json) {
         return () -> {
-            logger.info("Hold user with id " + user_id);
+            String userId = json.get("id");
+            logger.info("Lock user with id " + userId);
 
-            if (user_id == null || user_id.equals(""))
+            if (userId == null || userId.equals(""))
                 return new ResponseEntity<Object>("User data cannot be null", HttpStatus.BAD_REQUEST);
 
             try {
 
-                userService.disableUserById(Integer.parseInt(user_id));
+                userService.disableUserById(Integer.parseInt(userId));
 
                 return new ResponseEntity<Object>("User is locked.", HttpStatus.OK);
             } catch (Exception e) {
@@ -80,17 +91,39 @@ public class AdminController {
         };
     }
 
-    @DeleteMapping(value = {"/users"})
-    public Callable<ResponseEntity<?>> deleteUser(@RequestHeader("user_id") String user_id) {
+    @PostMapping(value = {"/users/unlock"})
+    public Callable<ResponseEntity<?>> unholdUser(@RequestBody Map<String, String> json) {
         return () -> {
-            logger.info("Delete user with id ");
+            String userId = json.get("id");
+            logger.info("Unlock user with id " + userId);
 
-            if (user_id == null || user_id.equals(""))
+            if (userId == null || userId.equals(""))
                 return new ResponseEntity<Object>("User data cannot be null", HttpStatus.BAD_REQUEST);
 
             try {
 
-                userService.deleteUser(Long.parseLong(user_id));
+                userService.enableUserById(Integer.parseInt(userId));
+
+                return new ResponseEntity<Object>("User is unlocked.", HttpStatus.OK);
+            } catch (Exception e) {
+                logger.error("Error unlocking user ", e);
+                return new ResponseEntity<Object>("Something was wrong, please try again.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        };
+    }
+
+    @PostMapping(value = {"/users/delete"})
+    public Callable<ResponseEntity<?>> deleteUser(@RequestBody Map<String, String> json) {
+        return () -> {
+            String userId = json.get("id");
+            logger.info("Delete user with id ");
+
+            if (userId == null || userId.equals(""))
+                return new ResponseEntity<Object>("User data cannot be null", HttpStatus.BAD_REQUEST);
+
+            try {
+
+                userService.deleteUser(Integer.parseInt(userId));
 
                 return new ResponseEntity<Object>("Deleted", HttpStatus.OK);
             } catch (Exception e) {
@@ -100,10 +133,13 @@ public class AdminController {
         };
     }
 
+
     @PostMapping(value = {"/users/verify"})
-    public Callable<ResponseEntity<?>> verifyUser(@RequestHeader("user_id") Integer user_id) {
+    public Callable<ResponseEntity<?>> verifyUser(@RequestBody Map<String, String> json) {
         return () -> {
-            userService.setUserVerifiedById(user_id);
+
+
+            userService.setUserVerifiedById(Integer.parseInt(json.get("id")));
             return new ResponseEntity<Object>(HttpStatus.OK);
         };
     }
@@ -123,26 +159,33 @@ public class AdminController {
         return userName;
     }
 
-//    @PostMapping(value = "/credentials/change")
-//    public Callable<ResponseEntity<?>> changeAdminCredentials(@RequestBody JsonNode requestBody) {
-//        return () -> {
-//            logger.info("Changing admin credentials by " + getPrincipal());
-//            try {
-//
-//                UserEntity entity = (UserEntity) userService.findUserByEmail(getPrincipal());
-//                entity.setEmail(requestBody.get("new_login").textValue());
-//                entity.setEmail(requestBody.get("new_password").textValue());
-//
-//                logger.info("Updated user " + entity);
-//                userService.updateUser(entity);
-//
-//                return new ResponseEntity<Object>(HttpStatus.OK);
-//            } catch (Exception e) {
-//                logger.error("Error during change admin credentials due to ", e);
-//                return new ResponseEntity<Object>(e, HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        };
-//    }
+    @PostMapping(value = "/credentials")
+    public Callable<ResponseEntity<?>> changeAdminCredentials(@RequestBody JsonNode requestBody, HttpServletRequest request) {
+        return () -> {
+            logger.info("Changing admin credentials by " + getPrincipal());
+            try {
+
+                String newEmail = requestBody.get("newEmail").textValue();
+                String newPassword = requestBody.get("newPassword").textValue();
+
+                UserEntity entity = null;
+                if (newEmail != null && !newEmail.equals("")) {
+                     entity = userService.updateEmail(getPrincipal(), newEmail);
+                    logger.info("Updated user " + entity);
+                }
+                if (newPassword != null && !newPassword.equals("")) {
+                    adminService.sendTokenToResetPassword(entity != null ? entity.getEmail() : getPrincipal(), request.getServerName());
+                }
+
+              //  userService.updateUser(entity);
+
+                return new ResponseEntity<Object>(HttpStatus.OK);
+            } catch (Exception e) {
+                logger.error("Error during change admin credentials due to ", e);
+                return new ResponseEntity<Object>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        };
+    }
 
     @PostMapping(value = "/create")
     public Callable<ResponseEntity<?>> createAdmin(@RequestBody UserEntity admin) {
@@ -158,4 +201,32 @@ public class AdminController {
             }
         };
     }
+
+
+    @GetMapping(value = {"/commercial/fee"})
+    public Callable<ResponseEntity<?>> getCommercialFee() {
+        return () -> {
+           // logger.info("Get fee by " + getPrincipal());
+
+            //todo change paypal mock
+            Double feePercent = 2.1;
+
+            return new ResponseEntity<Object>(feePercent, HttpStatus.OK);
+        };
+    }
+
+    @PostMapping(value = {"/commercial/fee"})
+    public Callable<ResponseEntity<?>> setCommercialFee(@RequestBody JsonNode requestBody) {
+        return () -> {
+            Double feePercent = requestBody.get("amount").asDouble();
+
+            //todo set paypal fee
+            System.out.println("feePercent "+feePercent);
+
+            return new ResponseEntity<Object>(HttpStatus.OK);
+        };
+    }
+
+
+
 }

@@ -3,11 +3,15 @@ package com.partymaker.mvc.service.user;
 import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.dao.user.UserDao;
 import com.partymaker.mvc.dao.user.UserToEventDAO;
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -63,10 +67,37 @@ public class UserServiceImpl implements UserService<UserEntity> {
         return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER);
     }
 
+
+    @Override
+    public DataResponse<UserEntity> findByRole(int offset, int limit, String role, Order order){
+
+        if(Roles.ROLE_ADMIN.toString().equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_ADMIN, order);
+        }
+        if(Roles.ROLE_PARTY_MAKER.toString().equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_PARTY_MAKER, order);
+        }
+        if(Roles.ROLE_STREET_DANCER.toString().equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER, order);
+        }
+        return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER, order);
+    }
+
+    @Override
+    public UserEntity updateEmail(String currentEmail,String newEmail){
+        UserEntity entity = findUserByEmail(currentEmail);
+        EmailValidator emailValidator = EmailValidator.getInstance();
+        if (emailValidator.isValid(newEmail) && !entity.getEmail().equals(newEmail)) {
+            entity.setEmail(newEmail);
+        }else throw new BadCredentialsException("email is invalid");
+      updateUser(entity);
+        return entity;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public void deleteUser(Long id) {
-        userDao.deleteUser(id);
+    public void deleteUser(Integer id) {
+        userDao.deleteUser(userDao.findById(id));
     }
 
     @Override

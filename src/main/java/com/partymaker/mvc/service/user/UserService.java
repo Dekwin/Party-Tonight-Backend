@@ -1,8 +1,9 @@
 package com.partymaker.mvc.service.user;
 
-import com.partymaker.mvc.model.enums.Roles;
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
+import org.hibernate.criterion.Order;
 
 import java.util.List;
 
@@ -17,11 +18,15 @@ public interface UserService<T> {
 
     List<UserEntity> findByRole(int offset, int limit, String role);
 
-    void deleteUser(Long id);
+    DataResponse<UserEntity> findByRole(int offset, int limit, String role, Order order);
+
+    void deleteUser(Integer id);
 
     void saveUser(T user);
 
     void updateUser(T user);
+
+    UserEntity updateEmail(String currentEmail,String newEmail);
 
     void addEvent(String userEmail, event event);
 

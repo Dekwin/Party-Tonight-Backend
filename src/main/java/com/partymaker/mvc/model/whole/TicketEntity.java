@@ -28,7 +28,7 @@ public class TicketEntity implements Serializable {
     @Column(name = "created_date", nullable = true, length = 45)
     private String created_date;
 
-    @JsonManagedReference(value = "event-ticket")
+    //@JsonManagedReference(value = "event-ticket")
     @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")

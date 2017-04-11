@@ -1,7 +1,9 @@
 package com.partymaker.mvc.dao.event;
 
 
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.whole.event;
+import org.hibernate.criterion.Order;
 
 import java.util.List;
 
@@ -16,6 +18,8 @@ public interface EventDAO<T> {
     List<T> getAll();
 
     List<T> getAll(int offset, int limit);
+
+    DataResponse<event> getAll(int offset, int limit, Order order);
 
     List<T> getAllByUserId(int id_user);
 

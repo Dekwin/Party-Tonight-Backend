@@ -3,6 +3,8 @@ package com.partymaker.mvc.model.whole;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,12 +27,15 @@ public class UserEntity implements Serializable {
     @Column(name = "phone_number", nullable = true, length = 45)
     private String phoneNumber;
 
+    @NotEmpty
+    @Email
     @Column(name = "email", nullable = true, length = 45)
     private String email;
 
     @Column(name = "emergency_contact", nullable = true, length = 45)
     private String emergencyContact;
 
+    @NotEmpty
     @Column(name = "password", nullable = true, length = 45)
     private String password;
 
@@ -56,7 +61,7 @@ public class UserEntity implements Serializable {
     @JsonProperty("billing")
     @Transient
     private BillingEntity billingEntity;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     @JoinTable(name = "user_has_event",
             joinColumns = {@JoinColumn(name = "id_user")},
             inverseJoinColumns = {@JoinColumn(name = "id_event")})

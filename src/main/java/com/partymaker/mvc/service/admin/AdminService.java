@@ -10,7 +10,8 @@ import java.io.IOException;
  */
 public interface AdminService {
     void saveUserAsAdmin(UserEntity admin);
-    void sendTokenToResetPassword(String email) throws IOException, MessagingException;
+    void sendTokenToResetPassword(String email, String fromUrl) throws IOException, MessagingException;
     void verifyTokenToResetPassword(String token) throws IOException, MessagingException;
     void verifyUserByToken(String token) throws IOException, MessagingException;
+    void sendVerificationMail(String email, String fromUrl) throws IOException, MessagingException;
 }

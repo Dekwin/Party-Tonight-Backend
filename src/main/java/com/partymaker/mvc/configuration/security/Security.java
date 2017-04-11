@@ -1,5 +1,6 @@
 package com.partymaker.mvc.configuration.security;
 
+import com.partymaker.mvc.model.enums.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -40,13 +41,15 @@ public class Security extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/maker/signup", "/dancer/signup", "/user", "/event","/maker/event/photo",
                         "/accounts/reset","/accounts/verify",
-                        "/admin/signup",
-                        "/admin/**"
+                        "/admin/signup"// todo remove after testing
+
                         ).permitAll()
-                .antMatchers("/signin").access("hasRole('ROLE_STREET_DANCER') or hasRole('ROLE_PARTY_MAKER')")
-                .antMatchers("/maker/event/**").access("hasRole('ROLE_PARTY_MAKER')")
-                .antMatchers("/dancer/event/**").access("hasRole('ROLE_STREET_DANCER')")
-               // .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+                .antMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
+                .antMatchers("/signin").access("hasRole('"+Roles.ROLE_STREET_DANCER.toString()+"') or hasRole('"+Roles.ROLE_PARTY_MAKER.toString()+"') or hasRole('"+Roles.ROLE_ADMIN.toString()+"')")
+                .antMatchers("/maker/event/**").access("hasRole('"+Roles.ROLE_PARTY_MAKER.toString()+"')")
+                .antMatchers("/dancer/event/**").access("hasRole('"+Roles.ROLE_STREET_DANCER.toString()+"')")
+                .antMatchers("/admin/**").access("hasRole('"+Roles.ROLE_ADMIN.toString()+"')")
                 .anyRequest().authenticated()
 
                 /*.and().formLogin().defaultSuccessUrl("/token")*/

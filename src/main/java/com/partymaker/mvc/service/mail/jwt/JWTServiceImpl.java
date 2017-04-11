@@ -38,9 +38,13 @@ public class JWTServiceImpl implements JWTService {
         Map<String, Object> tokenData = new HashMap<>();
 
         tokenData.put("userID", forUser.getId_user());
-        tokenData.put("salt", forUser.getPassword());
+
         if (purpose != null)
             tokenData.put("purpose", purpose);
+        if(TOKEN_PURPOSE_RESET_PASSWORD.equals(purpose)) {
+            tokenData.put("salt", forUser.getPassword());
+            tokenData.put("email", forUser.getEmail());
+        }
 
         tokenData.put("TOKEN_CREATE_DATE", new Date().getTime());
         Calendar calendar = Calendar.getInstance();
@@ -71,12 +75,15 @@ public class JWTServiceImpl implements JWTService {
 
             UserEntity foundUser = (UserEntity) userService.findUserById(claims.get("userID", Integer.class));
 
+           if(TOKEN_PURPOSE_RESET_PASSWORD.equals(claims.get("purpose",String.class)))
+            if (foundUser.getPassword().equals(claims.get("salt",String.class))
+                    &&foundUser.getEmail().equals(claims.get("email",String.class))){
+                return  foundUser;
+            }else{
+                throw new AuthenticationServiceException("Token was used");
+            }
+
             return foundUser;
-//            if (foundUser.getPassword().equals(claims.get("salt",String.class))){
-//                return  foundUser;
-//            }else{
-//                throw new AuthenticationServiceException("Token was used");
-//            }
         } else
             throw new AuthenticationServiceException("Token expired date error");
     }

@@ -1,10 +1,12 @@
 package com.partymaker.mvc.dao.event;
 
 import com.partymaker.mvc.dao.AbstractDao;
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.whole.event;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -46,6 +48,23 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
         criteria.setMaxResults(limit);
         criteria.addOrder(Order.desc("date"));
         return criteria.list();
+
+
+    }
+
+
+    public DataResponse<event> getAll(int offset, int limit, Order order) {
+        Criteria c = createEntityCriteria();
+        if(order != null)
+        c.addOrder(order);
+        c.setFirstResult(offset);
+        c.setMaxResults(limit);
+        List<event> items = c.list();
+
+        c = createEntityCriteria();
+        c.setProjection(Projections.rowCount());
+        Long count = (Long) c.uniqueResult();
+        return new DataResponse<>(items,count) ;
     }
 
     @SuppressWarnings("unchecked")

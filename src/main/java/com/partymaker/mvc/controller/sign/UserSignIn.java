@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +27,8 @@ import java.util.logging.Logger;
 /**
  * Created by anton on 10/10/16.
  */
+
+
 @RestController
 public class UserSignIn {
 
@@ -40,10 +43,13 @@ public class UserSignIn {
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
 
+
+
     @GetMapping(value = {"/signin"})
     public Callable<?> tokens(HttpSession session) {
         logger.info("Sign in user: with token = " + session.getId());
         logger.info("User details : " + getPrincipal());
+
         return () -> new ResponseEntity<>(Collections.singletonMap("token", session.getId()), HttpStatus.OK);
     }
 

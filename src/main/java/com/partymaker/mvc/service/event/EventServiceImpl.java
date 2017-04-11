@@ -2,6 +2,7 @@ package com.partymaker.mvc.service.event;
 
 
 import com.partymaker.mvc.dao.event.EventDAO;
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.business.DoorRevenue;
 import com.partymaker.mvc.model.business.StatementTotal;
 import com.partymaker.mvc.model.whole.*;
@@ -11,6 +12,7 @@ import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +67,11 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<event> findAll(int offset, int limit) {
         return eventDAO.getAll(offset,limit);
+    }
+
+    @Override
+    public DataResponse findAll(int offset, int limit, Order order) {
+        return eventDAO.getAll(offset,limit,order);
     }
 
     @Override

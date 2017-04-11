@@ -25,7 +25,7 @@ public class RoleEntity implements Serializable {
     private String userRole;
 
     @JsonManagedReference(value="user-role")
-    @OneToMany(mappedBy = "role",  fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "role",  fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<UserEntity> users = new ArrayList<>();
 

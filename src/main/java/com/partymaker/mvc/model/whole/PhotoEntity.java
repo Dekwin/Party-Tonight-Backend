@@ -24,7 +24,7 @@ public class PhotoEntity implements Serializable {
 
 
     @JsonIgnore
-    @JsonManagedReference(value = "event-photo")
+    //@JsonManagedReference(value = "event-photo")
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_event")
     private event eventEntity;

@@ -34,7 +34,7 @@ public class TableEntity implements Serializable {
 
     @JsonIgnore
     @ManyToOne(optional = false)
-    @JsonManagedReference(value = "event-table")
+    //@JsonManagedReference(value = "event-table")
     @JoinColumn(name = "id_event")
     private event eventEntity;
 

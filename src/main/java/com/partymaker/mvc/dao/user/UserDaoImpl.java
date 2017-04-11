@@ -1,11 +1,14 @@
 package com.partymaker.mvc.dao.user;
 
 import com.partymaker.mvc.dao.AbstractDao;
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
+import com.partymaker.mvc.model.whole.event;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -45,6 +48,41 @@ public class UserDaoImpl extends AbstractDao<Integer, UserEntity> implements Use
         crit.addOrder(Order.asc("userName"));
         return (List<UserEntity>) crit.list();
     }
+
+
+    @Override
+    public DataResponse<UserEntity> findAll(int offset, int limit, Roles role, Order order) {
+
+        Criteria c = createEntityCriteria();
+        if(order != null)
+            c.addOrder(order);
+
+        c.createCriteria("role")
+                .add(Restrictions.like("userRole", role.toString()))
+                .list();
+        c.setFirstResult(offset);
+        c.setMaxResults(limit);
+        List<UserEntity> items = c.list();
+
+        c = createEntityCriteria();
+        c.createCriteria("role")
+                .add(Restrictions.like("userRole", role.toString()))
+                .list();
+        c.setProjection(Projections.rowCount());
+        Long count = (Long) c.uniqueResult();
+        return new DataResponse<UserEntity>(items,count) ;
+
+//        Criteria crit = createEntityCriteria();
+//        crit.createCriteria("role")
+//                .add(Restrictions.like("userRole", role.toString()))
+//                .list();
+//        crit.setFirstResult(offset);
+//        crit.setMaxResults(limit);
+//        crit.addOrder(Order.asc("userName"));
+//        return (List<UserEntity>) crit.list();
+    }
+
+
 
 
     @Override

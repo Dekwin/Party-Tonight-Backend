@@ -42,22 +42,22 @@ public class event implements Serializable {
     @Column(name = "zip_code")
     private String zip_code;
 
-    @JsonBackReference(value = "event-bottle")
+    //@JsonBackReference(value = "event-bottle")
     @OneToMany(mappedBy = "event",  fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<BottleEntity> bottles = new ArrayList<>();
 
-    @JsonBackReference(value = "event-ticket")
+    //@JsonBackReference(value = "event-ticket")
     @OneToMany(mappedBy = "eventEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<TicketEntity> tickets = new ArrayList<>();
 
-    @JsonBackReference(value = "event-table")
+    //@JsonBackReference(value = "event-table")
     @OneToMany(mappedBy = "eventEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<TableEntity> tables = new ArrayList<>();
 
-    @JsonBackReference(value = "event-photo")
+    //@JsonBackReference(value = "event-photo")
     //@JsonManagedReference
     @OneToMany(mappedBy = "eventEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)

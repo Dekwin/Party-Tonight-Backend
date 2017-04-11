@@ -1,9 +1,11 @@
 package com.partymaker.mvc.service.event;
 
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.business.DoorRevenue;
 import com.partymaker.mvc.model.business.StatementTotal;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
+import org.hibernate.criterion.Order;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ public interface EventService {
     List<event> findAll();
 
     List<event> findAll(int offset,int limit);
+
+    DataResponse findAll(int offset, int limit, Order order);
 
     List<event> findAllByUserId(int id_user);
 

@@ -1,8 +1,10 @@
 package com.partymaker.mvc.dao.user;
 
 
+import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.UserEntity;
+import org.hibernate.criterion.Order;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,4 +24,6 @@ public interface UserDao<T, PK extends Serializable> {
     T findByName(String name);
 
     List<UserEntity> findAll(int offset, int limit, Roles role);
+
+    DataResponse<UserEntity> findAll(int offset, int limit, Roles role, Order order);
 }
