@@ -33,7 +33,7 @@ import java.util.concurrent.Callable;
 public class EventDancer {
 
     private static final Logger logger = Logger.getLogger(EventDancer.class);
-    private static final double OWNER_FEE = 0.05;
+    public static  double OWNER_FEE = 0.05;
     private static final String OWNER_EMAIL = "owner@owner.owner";
     private static final String OWNER_BILLING_EMAIL = "owner_billing@owner.owner";
 

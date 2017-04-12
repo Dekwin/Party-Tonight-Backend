@@ -1,5 +1,6 @@
 package com.partymaker.mvc.controller.sign;
 
+import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
@@ -34,7 +35,7 @@ public class UserSignUp {
     AdminService adminService;
 
     @PostMapping(value = {"/maker/signup"})
-    public Callable<ResponseEntity<?>> signUpMaker(@RequestBody UserEntity user) {
+    public Callable<ResponseEntity<?>> signUpMaker(@RequestBody UserEntity user, HttpServletRequest request) {
         return () -> {
             logger.info("Sign up maker = " + user);
             try {
@@ -43,10 +44,13 @@ public class UserSignUp {
                 userService.isExistUserRequiredFields(user);
 
                 logger.info("Creating user ");
-                user.setRole(new RoleEntity(1, "PARTY_MAKER"));
+                user.setRole(new RoleEntity(2, Roles.ROLE_PARTY_MAKER.toString()));
                 user.setBillingEmail(user.getBillingEntity().getBilling_email());
-
+                user.setVerified(false);
+                user.setEnable(true);
                 userService.saveUser(user);
+
+                adminService.sendVerificationMail(user.getEmail(),request.getServerName());
 
                 return new ResponseEntity<String>("", HttpStatus.CREATED);
             } catch (Exception e) {
@@ -57,7 +61,7 @@ public class UserSignUp {
     }
 
     @PostMapping(value = {"/dancer/signup"})
-    public Callable<ResponseEntity<?>> signUpDancer(@RequestBody UserEntity user) {
+    public Callable<ResponseEntity<?>> signUpDancer(@RequestBody UserEntity user, HttpServletRequest request) {
         return () -> {
             logger.info("Sing up dancer = " + user);
             try {
@@ -66,9 +70,12 @@ public class UserSignUp {
 
                 logger.info("Saving user ");
                 // hard code
-                user.setRole(new RoleEntity(2, "STREET_DANCER"));
-
+                user.setRole(new RoleEntity(3, Roles.ROLE_STREET_DANCER.toString()));
+                user.setVerified(false);
+                user.setEnable(true);
                 userService.saveUser(user);
+
+                adminService.sendVerificationMail(user.getEmail(),request.getServerName());
 
                 logger.info("User has been saved");
 

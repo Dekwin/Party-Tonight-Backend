@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Table(name = "photo", schema = "partymaker2")
 public class PhotoEntity implements Serializable {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id_photo", nullable = false)
     @JsonIgnore
     private int idPhoto;

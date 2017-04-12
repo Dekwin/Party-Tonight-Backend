@@ -8,6 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,14 +62,16 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
     public List<BottleEntity> findAllByEventId(int id_event) {
         Query query = null;
         try {
-            query = getSession().createSQLQuery("SELECT * FROM bottle WHERE bottle.id_event = :id_event")
+            query = getSession().createSQLQuery("SELECT * FROM partymaker2.bottle WHERE partymaker2.bottle.id_event = :id_event")
                     .addEntity(BottleEntity.class)
                     .setParameter("id_event", id_event);
             return (List<BottleEntity>) query.list();
         } catch (Exception e) {
             // ignore
+            e.printStackTrace();
+            return new ArrayList<>();
         }
-        return (List<BottleEntity>) query;
+
     }
 
     public void delete(BottleEntity eventEntity) {

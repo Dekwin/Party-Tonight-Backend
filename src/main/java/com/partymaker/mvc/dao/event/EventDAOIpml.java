@@ -70,7 +70,7 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
     @SuppressWarnings("unchecked")
     @Override
     public List<event> getAllByUserId(int id_user) {
-        Query query = getSession().createSQLQuery("SELECT * from event JOIN user_has_event ON event.id_event = user_has_event.id_event JOIN user on user_has_event.id_user = user.id_user WHERE user.id_user=:user_id")
+        Query query = getSession().createSQLQuery("SELECT * from partymaker2.event JOIN partymaker2.user_has_event ON partymaker2.event.id_event = partymaker2.user_has_event.id_event JOIN partymaker2.user on partymaker2.user_has_event.id_user = partymaker2.user.id_user WHERE partymaker2.user.id_user=:user_id")
                 .addEntity(event.class)
                 .setParameter("user_id", id_user);
         return (List<event>) query.list();
@@ -79,7 +79,7 @@ public class EventDAOIpml extends AbstractDao<Integer, event> implements EventDA
     @SuppressWarnings("unchecked")
     @Override
     public List<event> getAllCode(String code) {
-        Query query = getSession().createSQLQuery("SELECT * from event where event.zip_code =:code")
+        Query query = getSession().createSQLQuery("SELECT * from partymaker2.event where partymaker2.event.zip_code =:code")
                 .addEntity(event.class)
                 .setParameter("code", code);
         return (List<event>) query.list();

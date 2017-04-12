@@ -24,6 +24,8 @@ import java.net.InetAddress;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import static com.partymaker.mvc.controller.functional.dancer.event.EventDancer.OWNER_FEE;
+
 /**
  * Created by igorkasyanenko on 07.04.17.
  */
@@ -208,8 +210,7 @@ public class AdminController {
         return () -> {
            // logger.info("Get fee by " + getPrincipal());
 
-            //todo change paypal mock
-            Double feePercent = 2.1;
+            Double feePercent = getFee();
 
             return new ResponseEntity<Object>(feePercent, HttpStatus.OK);
         };
@@ -218,15 +219,26 @@ public class AdminController {
     @PostMapping(value = {"/commercial/fee"})
     public Callable<ResponseEntity<?>> setCommercialFee(@RequestBody JsonNode requestBody) {
         return () -> {
-            Double feePercent = requestBody.get("amount").asDouble();
+            double feePercent = requestBody.get("amount").asDouble();
 
-            //todo set paypal fee
-            System.out.println("feePercent "+feePercent);
+            setFee(feePercent);
 
             return new ResponseEntity<Object>(HttpStatus.OK);
         };
     }
 
+    //fixme must be in paypal service
+    private void setFee(double fee){
+        if(fee >= 0 && fee <= 100){
+            double resultFee = fee/100;
+            logger.info("New fee was set: "+resultFee);
+            OWNER_FEE =  resultFee;
+        }
+    }
+
+    private double getFee(){
+      return OWNER_FEE;
+    }
 
 
 }

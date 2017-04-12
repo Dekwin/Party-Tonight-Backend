@@ -21,7 +21,7 @@ public class event implements Serializable {
 
     @Id
     @Column(name = "id_event")
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int id_event;
 
     @Column(name = "club_name")

@@ -18,6 +18,7 @@ import java.util.List;
 @Table(name = "user", schema = "partymaker2")
 public class UserEntity implements Serializable {
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id_user", nullable = false)
     private int id_user;
 
@@ -61,11 +62,14 @@ public class UserEntity implements Serializable {
     @JsonProperty("billing")
     @Transient
     private BillingEntity billingEntity;
+
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_has_event",
+    @JoinTable(name = "user_has_event", schema = "partymaker2",
             joinColumns = {@JoinColumn(name = "id_user")},
             inverseJoinColumns = {@JoinColumn(name = "id_event")})
     private List<event> events = new ArrayList<>();
+
+
 
     public BillingEntity getBillingEntity() {
         return billingEntity;
