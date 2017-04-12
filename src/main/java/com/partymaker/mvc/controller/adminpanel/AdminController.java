@@ -237,7 +237,7 @@ public class AdminController {
     }
 
     private double getFee(){
-      return OWNER_FEE;
+      return OWNER_FEE*100;
     }
 
 

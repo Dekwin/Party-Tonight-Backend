@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -49,8 +47,12 @@ public class UserSignIn {
     public Callable<?> tokens(HttpSession session) {
         logger.info("Sign in user: with token = " + session.getId());
         logger.info("User details : " + getPrincipal());
-
-        return () -> new ResponseEntity<>(Collections.singletonMap("token", session.getId()), HttpStatus.OK);
+        UserEntity userEntity = (UserEntity) userService.findUserByEmail(getPrincipal());
+        Map<String, String> m = new HashMap<String , String >();
+        m.put("token", session.getId());
+        m.put("role",userEntity.getRole().getUserRole());
+        //Collections.singletonMap("token", session.getId())
+        return () -> new ResponseEntity<>(m, HttpStatus.OK);
     }
 
 
