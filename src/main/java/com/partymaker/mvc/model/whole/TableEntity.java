@@ -20,16 +20,14 @@ public class TableEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_table")
     private int id_table;
-    @Column(name = "price", nullable = true, length = 45)
-    private String price;
-
+    @Column(name = "price",  length = 45)
+    private String price = "0";
     @Column(name = "type", nullable = true, length = 45)
     private String type;
-
-    @Column(name = "available", nullable = true, length = 45)
-    private String available;
-    @Column(name = "booked", nullable = true, length = 45)
-    private String booked;
+    @Column(name = "available", length = 45)
+    private String available = "0";
+    @Column(name = "booked", length = 45)
+    private String booked = "0";
 
 
     @JsonIgnore

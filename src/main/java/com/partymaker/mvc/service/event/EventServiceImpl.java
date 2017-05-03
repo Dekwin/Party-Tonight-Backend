@@ -218,9 +218,9 @@ public class EventServiceImpl implements EventService {
             statementTotal.setRefunds(String.valueOf(
                     Double.parseDouble(statementTotal.getRefunds())
                             -
-                            ((Double.parseDouble(v.getAvailable())
-                                    - Double.parseDouble(v.getBooked()))
-                                    * Double.parseDouble(v.getPrice())
+                            ((Double.parseDouble(v.getAvailable() != null ? v.getAvailable() : "0")
+                                    - Double.parseDouble(v.getBooked() != null ? v.getBooked() : "0"))
+                                    * Double.parseDouble(v.getPrice() != null ? v.getPrice() : "0")
                             )
             ));
             /**
@@ -312,8 +312,8 @@ public class EventServiceImpl implements EventService {
             doorRevenue.setRevenue(String.valueOf(
                     Double.parseDouble(doorRevenue.getRevenue())
                             +
-                            (Double.parseDouble(v.getAvailable())
-                                    * Double.parseDouble(v.getPrice())
+                            (Double.parseDouble(v.getAvailable() != null ? v.getAvailable() : "0")
+                                    * Double.parseDouble(v.getPrice() != null ? v.getPrice() : "0")
                             )
             ));
         });
