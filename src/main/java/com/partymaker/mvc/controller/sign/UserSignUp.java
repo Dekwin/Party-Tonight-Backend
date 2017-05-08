@@ -12,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.concurrent.Callable;
 
 /**
@@ -50,10 +53,25 @@ public class UserSignUp {
                 user.setEnable(true);
                 userService.saveUser(user);
 
+
                 adminService.sendVerificationMail(user.getEmail(),request.getServerName());
 
                 return new ResponseEntity<String>("", HttpStatus.CREATED);
-            } catch (Exception e) {
+            }catch (ConnectException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }catch(IOException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }catch(MessagingException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            catch(RuntimeException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+            catch (Exception e) {
                 logger.info("Failed to create maker = " + user + ", due to: ", e);
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
