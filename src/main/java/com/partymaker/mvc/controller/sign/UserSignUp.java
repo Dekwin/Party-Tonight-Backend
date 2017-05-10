@@ -1,5 +1,6 @@
 package com.partymaker.mvc.controller.sign;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
@@ -160,10 +161,10 @@ public class UserSignUp {
     }
 
     @PostMapping(value = {"/accounts/reset"})
-    public Callable<ResponseEntity<?>> resetPassword(@RequestParam("email") String email,  HttpServletRequest request) {
+    public Callable<ResponseEntity<?>> resetPassword(@RequestBody JsonNode requestBody,HttpServletRequest request) {
         return () -> {
             try {
-
+                String email = requestBody.get("email").asText();
                 adminService.sendTokenToResetPassword(email, request.getServerName());
                 return new ResponseEntity<Object>(HttpStatus.OK);
             }catch (Exception e){
