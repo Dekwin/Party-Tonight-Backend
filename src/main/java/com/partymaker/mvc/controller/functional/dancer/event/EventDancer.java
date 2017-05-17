@@ -1,6 +1,8 @@
 package com.partymaker.mvc.controller.functional.dancer.event;
 
 import com.partymaker.mvc.model.business.booking.BookedBottle;
+import com.partymaker.mvc.model.business.booking.BookedTable;
+import com.partymaker.mvc.model.business.booking.BookedTicket;
 import com.partymaker.mvc.model.business.booking.Booking;
 import com.partymaker.mvc.model.business.order.*;
 import com.partymaker.mvc.model.whole.ReviewEntity;
@@ -21,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -90,6 +93,24 @@ public class EventDancer {
     public Callable<ResponseEntity<?>> book(@RequestBody Transaction transaction) {
         return () -> {
             transactionService.save(transaction);
+
+            List<Booking> bookings = new ArrayList<>(transaction.getOrders().size());
+            for (OrderEntity order : transaction.getOrders()) {
+                Booking booking = new Booking();
+
+                booking.setId_event(order.getEventId());
+
+                booking.setTable(new BookedTable(order.getTable()));
+                booking.setTicket(new BookedTicket(order.getTicket()));
+
+                for (OrderedBottle bottle : order.getBottles()) {
+                    booking.getBottles().add(new BookedBottle(bottle));
+                }
+
+                bookings.add(booking);
+            }
+
+            bookService.book(bookings);
 
             return new ResponseEntity<>(HttpStatus.OK);
         };

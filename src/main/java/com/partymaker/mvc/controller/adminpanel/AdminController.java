@@ -1,26 +1,21 @@
 package com.partymaker.mvc.controller.adminpanel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.admin.AdminService;
 import com.partymaker.mvc.service.event.EventService;
+import com.partymaker.mvc.service.order.TransactionService;
 import com.partymaker.mvc.service.user.UserService;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Order;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -44,6 +39,9 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
+    @Autowired
+    TransactionService transactionService;
+
 
 //    @GetMapping(value = {"/events"})
 //    public Callable<ResponseEntity<?>> getAllEvents() {
@@ -63,6 +61,14 @@ public class AdminController {
         };
     }
 
+    @GetMapping(value = {"/transactions/{event_id}"})
+    public Callable<ResponseEntity<?>> getTransactionsForEvent(@PathVariable("event_id") int eventId) {
+        return () -> {
+
+            logger.info("Get all transactions for event: " + eventId);
+            return new ResponseEntity<Object>(transactionService.getAllTransactionsForEvent(eventService.findById(eventId)), HttpStatus.OK);
+        };
+    }
 
     @GetMapping(value = {"/users"})
     public Callable<ResponseEntity<?>> getAllUsers(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit, @RequestParam("role") String role) {
@@ -227,6 +233,10 @@ public class AdminController {
         };
     }
 
+    private double getFee() {
+        return OWNER_FEE * 100;
+    }
+
     //fixme must be in paypal service
     private void setFee(double fee){
         if(fee >= 0 && fee <= 100){
@@ -234,10 +244,6 @@ public class AdminController {
             logger.info("New fee was set: "+resultFee);
             OWNER_FEE =  resultFee;
         }
-    }
-
-    private double getFee(){
-      return OWNER_FEE*100;
     }
 
 

@@ -1,6 +1,7 @@
 package com.partymaker.mvc.model.business.booking;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.partymaker.mvc.model.business.order.OrderedTable;
 
 public class BookedTable {
 
@@ -12,6 +13,20 @@ public class BookedTable {
 
     @JsonProperty("price")
     private double price;
+
+    public BookedTable(String type, int number, double price) {
+        this.type = type;
+        this.number = number;
+        this.price = price;
+    }
+
+    public BookedTable(OrderedTable orderedTable) {
+        this.type = orderedTable.getType();
+        this.number = orderedTable.getNumber();
+    }
+
+    public BookedTable() {
+    }
 
     public String getType() {
         return type;

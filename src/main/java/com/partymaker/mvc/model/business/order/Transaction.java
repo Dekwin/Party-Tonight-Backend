@@ -31,7 +31,7 @@ public class Transaction implements Serializable {
     private String serviceBillingEmail;
 
     @OneToMany(mappedBy = "transaction", cascade = {CascadeType.ALL})
-    private List<OrderEntity> order = new ArrayList<>();
+    private List<OrderEntity> orders = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -65,16 +65,16 @@ public class Transaction implements Serializable {
         this.serviceBillingEmail = serviceBillingEmail;
     }
 
-    public List<OrderEntity> getOrder() {
-        return order;
+    public List<OrderEntity> getOrders() {
+        return orders;
     }
 
-    public void setOrder(List<OrderEntity> order) {
-        this.order = order;
+    public void setOrders(List<OrderEntity> order) {
+        this.orders = order;
     }
 
     public void addOrder(OrderEntity order) {
-        this.order.add(order);
+        this.orders.add(order);
     }
 
     public String getCustomerEmail() {

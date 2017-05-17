@@ -66,12 +66,12 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<event> findAll(int offset, int limit) {
-        return eventDAO.getAll(offset,limit);
+        return eventDAO.getAll(offset, limit);
     }
 
     @Override
     public DataResponse findAll(int offset, int limit, Order order) {
-        return eventDAO.getAll(offset,limit,order);
+        return eventDAO.getAll(offset, limit, order);
     }
 
     @Override
@@ -240,9 +240,9 @@ public class EventServiceImpl implements EventService {
                 logger.info("Bad object = " + v);
                 v.setBooked("0");
             }
-            /**
-             * calculate the unbooked tables
-             * */
+            /*
+              calculate the unbooked tables
+              */
             statementTotal.setRefunds(String.valueOf(
                     Double.parseDouble(statementTotal.getRefunds())
                             -
@@ -251,9 +251,9 @@ public class EventServiceImpl implements EventService {
                                     * Double.parseDouble(v.getPrice())
                             )
             ));
-            /**
-             * calculate the booked tables
-             * */
+            /*
+              calculate the booked tables
+              */
             statementTotal.setTableSales(String.valueOf(
                     Double.parseDouble(statementTotal.getTableSales())
                             + Double.parseDouble(v.getBooked())
