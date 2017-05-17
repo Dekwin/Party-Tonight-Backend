@@ -1,8 +1,6 @@
 package com.partymaker.mvc.model.business.order;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,12 +21,75 @@ public class Transaction implements Serializable {
     @Column(name = "service_tax")
     private double serviceTax;
 
-    @Column(name = "customer_billing_email")
-    private String customerBillingEmail;
+    @Column(name = "customer_email")
+    private String customerEmail;
+
+    @Column(name = "service_email")
+    private String serviceEmail;
 
     @Column(name = "service_billing_email")
     private String serviceBillingEmail;
 
     @OneToMany(mappedBy = "transaction", cascade = {CascadeType.ALL})
     private List<OrderEntity> order = new ArrayList<>();
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPayKey() {
+        return payKey;
+    }
+
+    public void setPayKey(String payKey) {
+        this.payKey = payKey;
+    }
+
+    public double getServiceTax() {
+        return serviceTax;
+    }
+
+    public void setServiceTax(double serviceTax) {
+        this.serviceTax = serviceTax;
+    }
+
+    public String getServiceBillingEmail() {
+        return serviceBillingEmail;
+    }
+
+    public void setServiceBillingEmail(String serviceBillingEmail) {
+        this.serviceBillingEmail = serviceBillingEmail;
+    }
+
+    public List<OrderEntity> getOrder() {
+        return order;
+    }
+
+    public void setOrder(List<OrderEntity> order) {
+        this.order = order;
+    }
+
+    public void addOrder(OrderEntity order) {
+        this.order.add(order);
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public String getServiceEmail() {
+        return serviceEmail;
+    }
+
+    public void setServiceEmail(String serviceEmail) {
+        this.serviceEmail = serviceEmail;
+    }
 }

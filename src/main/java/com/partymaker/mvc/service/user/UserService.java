@@ -44,6 +44,8 @@ public interface UserService<T> {
 
     String getPrincipal();
 
+    UserEntity getServiceTaxAccount();
+
     UserEntity findByName(String name);
 
     UserEntity getCurrentUser();

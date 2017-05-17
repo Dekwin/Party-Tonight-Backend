@@ -1,7 +1,8 @@
 package com.partymaker.mvc.controller.functional.dancer.event;
 
+import com.partymaker.mvc.model.business.booking.BookedBottle;
 import com.partymaker.mvc.model.business.booking.Booking;
-import com.partymaker.mvc.model.business.order.Transaction;
+import com.partymaker.mvc.model.business.order.*;
 import com.partymaker.mvc.model.whole.ReviewEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
@@ -14,14 +15,12 @@ import com.partymaker.mvc.service.review.ReviewService;
 import com.partymaker.mvc.service.table.TableService;
 import com.partymaker.mvc.service.ticket.TicketService;
 import com.partymaker.mvc.service.user.UserService;
-import com.partymaker.mvc.util.Utils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -33,10 +32,9 @@ import java.util.concurrent.Callable;
 public class EventDancer {
 
     private static final Logger logger = Logger.getLogger(EventDancer.class);
-    public static  double OWNER_FEE = 0.05;
     private static final String OWNER_EMAIL = "owner@owner.owner";
     private static final String OWNER_BILLING_EMAIL = "owner_billing@owner.owner";
-
+    public static double OWNER_FEE = 0.05;
     @Autowired
     EventService eventService;
     @Autowired
@@ -89,14 +87,9 @@ public class EventDancer {
     }
 
     @PostMapping(value = {"/confirm_invoices"})
-    public Callable<ResponseEntity<?>> book(@RequestParam("bookings[]") String
-                                                    bookingsJson, @RequestParam("transactions[]") String transactionsJson) {
+    public Callable<ResponseEntity<?>> book(@RequestBody Transaction transaction) {
         return () -> {
-            List<Booking> bookings = Utils.parseEncodedCollection(bookingsJson, Booking.class);
-            List<Transaction> transactions = Utils.parseEncodedCollection(transactionsJson, Transaction.class);
-
-            transactionService.save(transactions, bookings);
-            bookService.book(bookings);
+            transactionService.save(transaction);
 
             return new ResponseEntity<>(HttpStatus.OK);
         };
@@ -133,9 +126,12 @@ public class EventDancer {
             }
 
             try {
-                List<Transaction> response = new ArrayList<>(bookings.length + 1);
-
                 double fee = 0;
+
+                Transaction response = new Transaction();
+                response.setCustomerEmail(userService.getCurrentUser().getBillingEmail());
+                response.setServiceBillingEmail(userService.getServiceTaxAccount().getBillingEmail());
+                response.setServiceEmail(userService.getServiceTaxAccount().getEmail());
 
                 for (Booking booking : bookings) {
                     event mEvent = eventService.findById(booking.getId_event());
@@ -149,34 +145,35 @@ public class EventDancer {
                         partyCreator = (UserEntity) userService.findUserById(userId);
 
                         if (partyCreator != null) {
-                            Transaction current = new Transaction();
+                            OrderEntity order = new OrderEntity();
 
-                            current.setId_event(booking.getId_event());
-                            current.setSellerEmail(partyCreator.getEmail());
-                            current.setBillingEmail(partyCreator.getBillingEmail());
-                            current.setCustomerEmail(userService.getCurrentUser().getEmail());
+                            order.setEventId(eventId);
+                            order.setSellerBillingEmail(partyCreator.getBillingEmail());
+                            order.setSellerEmail(partyCreator.getEmail());
+
+                            order.setTable(new OrderedTable(booking.getTable()));
+                            order.setTicket(new OrderedTicket(booking.getTicket()));
+
+                            for (BookedBottle bottle : booking.getBottles()) {
+                                order.addBottle(new OrderedBottle(bottle));
+                            }
 
                             // now we divide sum onto fee and real payment
 
                             double subtotal = Booking.getSubtotal(booking);
 
-                            current.setSubtotal((1 - OWNER_FEE) * subtotal);
+                            order.setSubtotal((1 - OWNER_FEE) * subtotal);
                             fee += OWNER_FEE * subtotal;
 
-                            response.add(current);
-
+                            response.addOrder(order);
                         }
                     }
 
-                    Transaction transactionForOwner = new Transaction();
-                    transactionForOwner.setSellerEmail(OWNER_EMAIL);
-                    transactionForOwner.setBillingEmail(OWNER_BILLING_EMAIL);
-                    transactionForOwner.setCustomerEmail(userService.getCurrentUser().getEmail());
-                    transactionForOwner.setSubtotal(fee);
-
-                    response.add(transactionForOwner);
                 }
-                return new ResponseEntity<List>(response, HttpStatus.OK);
+
+                response.setServiceTax(fee);
+
+                return new ResponseEntity<Transaction>(response, HttpStatus.OK);
             } catch (Exception e) {
                 logger.error("Error during getting order (with commission) for book: ", e);
                 return new ResponseEntity<Object>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

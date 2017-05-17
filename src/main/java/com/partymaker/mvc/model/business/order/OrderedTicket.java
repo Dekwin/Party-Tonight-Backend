@@ -34,6 +34,12 @@ public class OrderedTicket {
         }
     }
 
+    public OrderedTicket(BookedTicket ticket) {
+        if (ticket != null) {
+            this.type = ticket.getType();
+        }
+    }
+
     public int getId_ticket() {
         return id_ticket;
     }

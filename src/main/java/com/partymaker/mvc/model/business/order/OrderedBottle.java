@@ -33,6 +33,12 @@ public class OrderedBottle {
         this.amount = bookedBottle.getAmount();
     }
 
+    public OrderedBottle(BookedBottle bookedBottle) {
+        this.title = bookedBottle.getTitle();
+        this.amount = bookedBottle.getAmount();
+    }
+
+
     public String getTitle() {
         return title;
     }

@@ -36,6 +36,13 @@ public class OrderedTable {
         }
     }
 
+    public OrderedTable(BookedTable table) {
+        if (table != null) {
+            this.type = table.getType();
+            this.number = table.getNumber();
+        }
+    }
+
     public int getId_table() {
         return id_table;
     }

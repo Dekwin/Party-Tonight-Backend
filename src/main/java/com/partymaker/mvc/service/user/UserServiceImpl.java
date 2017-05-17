@@ -64,6 +64,10 @@ public class UserServiceImpl implements UserService<UserEntity> {
         if(Roles.ROLE_STREET_DANCER.toString().equals(role)) {
             return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER);
         }
+
+        if (Roles.ROLE_SERVICE_TAX.toString().equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_SERVICE_TAX);
+        }
         return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER);
     }
 
@@ -79,6 +83,9 @@ public class UserServiceImpl implements UserService<UserEntity> {
         }
         if(Roles.ROLE_STREET_DANCER.toString().equals(role)) {
             return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER, order);
+        }
+        if (Roles.ROLE_SERVICE_TAX.toString().equals(role)) {
+            return userDao.findAll(offset, limit, Roles.ROLE_SERVICE_TAX, order);
         }
         return userDao.findAll(offset, limit, Roles.ROLE_STREET_DANCER, order);
     }
@@ -205,6 +212,10 @@ public class UserServiceImpl implements UserService<UserEntity> {
             userName = principal.toString();
         }
         return userName;
+    }
+
+    public UserEntity getServiceTaxAccount() {
+        return findByRole(0, 1, Roles.ROLE_SERVICE_TAX.toString()).get(0);
     }
 
 

@@ -6,7 +6,8 @@ package com.partymaker.mvc.model.enums;
 public enum Roles {
     ROLE_ADMIN ("ROLE_ADMIN"),
     ROLE_PARTY_MAKER ("ROLE_PARTY_MAKER"),
-    ROLE_STREET_DANCER ("ROLE_STREET_DANCER");
+    ROLE_STREET_DANCER("ROLE_STREET_DANCER"),
+    ROLE_SERVICE_TAX("ROLE_SERVICE_TAX");
 
 
     private final String name;
