@@ -43,15 +43,16 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
         Query query = null;
         try {
             query = getSession().createSQLQuery("SELECT *\n" +
-                    "FROM bottle\n" +
-                    "  JOIN event ON bottle.id_event = event.id_event AND event.party_name =:party_name\n" +
-                    "  JOIN user_has_event ON event.id_event = user_has_event.id_event\n" +
-                    "WHERE user_has_event.id_user =:user_id")
+                    "FROM partymaker2.bottle\n" +
+                    "  JOIN partymaker2.event ON partymaker2.bottle.id_event = partymaker2.event.id_event AND partymaker2.event.party_name =:party_name\n" +
+                    "  JOIN partymaker2.user_has_event ON partymaker2.event.id_event = partymaker2.user_has_event.id_event\n" +
+                    "WHERE partymaker2.user_has_event.id_user =:user_id")
                     .addEntity(BottleEntity.class)
                     .setParameter("party_name", party_name)
                     .setParameter("user_id", id_user);
             return (List<BottleEntity>) query.list();
         } catch (Exception e) {
+            e.printStackTrace();
             // ignore
         }
         return (List<BottleEntity>) query;

@@ -1,5 +1,6 @@
 package com.partymaker.mvc.controller.sign;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.partymaker.mvc.model.enums.Roles;
 import com.partymaker.mvc.model.whole.BillingEntity;
 import com.partymaker.mvc.model.whole.RoleEntity;
@@ -12,7 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.concurrent.Callable;
 
 /**
@@ -50,10 +54,25 @@ public class UserSignUp {
                 user.setEnable(true);
                 userService.saveUser(user);
 
+
                 adminService.sendVerificationMail(user.getEmail(),request.getServerName());
 
                 return new ResponseEntity<String>("", HttpStatus.CREATED);
-            } catch (Exception e) {
+            }catch (ConnectException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }catch(IOException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }catch(MessagingException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            catch(RuntimeException e){
+                logger.info("Failed to create maker = " + user + ", due to: ", e);
+                return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+            catch (Exception e) {
                 logger.info("Failed to create maker = " + user + ", due to: ", e);
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
@@ -142,10 +161,10 @@ public class UserSignUp {
     }
 
     @PostMapping(value = {"/accounts/reset"})
-    public Callable<ResponseEntity<?>> resetPassword(@RequestParam("email") String email,  HttpServletRequest request) {
+    public Callable<ResponseEntity<?>> resetPassword(@RequestBody JsonNode requestBody,HttpServletRequest request) {
         return () -> {
             try {
-
+                String email = requestBody.get("email").asText();
                 adminService.sendTokenToResetPassword(email, request.getServerName());
                 return new ResponseEntity<Object>(HttpStatus.OK);
             }catch (Exception e){

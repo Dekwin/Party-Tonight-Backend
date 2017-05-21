@@ -40,7 +40,7 @@ public class Security extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/maker/signup", "/dancer/signup", "/user", "/event","/maker/event/photo",
-                        "/accounts/reset","/accounts/verify",
+                        "/accounts/reset","/accounts/verify","/adminpanel/**",
                         "/admin/signup"// todo remove after testing
 
                         ).permitAll()

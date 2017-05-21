@@ -43,6 +43,11 @@ public class AdminController {
     TransactionService transactionService;
 
 
+//    @RequestMapping("/panel")
+//    public String adminPanel() {
+//
+//        return "forward:/static/admin/index.html";
+//    }
 //    @GetMapping(value = {"/events"})
 //    public Callable<ResponseEntity<?>> getAllEvents() {
 //        return () -> {

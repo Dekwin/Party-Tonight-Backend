@@ -19,12 +19,12 @@ public class TicketEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ticket")
     private int idTicket;
-    @Column(name = "price", nullable = true, length = 45)
-    private String price;
-    @Column(name = "available", nullable = true, length = 45)
-    private String available;
-    @Column(name = "booked", nullable = true, length = 45)
-    private String booked;
+    @Column(name = "price",  length = 45)
+    private String price = "0";
+    @Column(name = "available",  length = 45)
+    private String available = "0";
+    @Column(name = "booked",  length = 45)
+    private String booked = "0";
     @Column(name = "created_date", nullable = true, length = 45)
     private String created_date;
 
