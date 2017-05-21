@@ -61,7 +61,15 @@ public class AdminController {
         };
     }
 
-    @GetMapping(value = {"/transactions/{event_id}"})
+    @GetMapping(value = {"/sales"})
+    public Callable<ResponseEntity<?>> getSales(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit) {
+        return () -> {
+            logger.info("Get all the sales for");
+            return new ResponseEntity<Object>(eventService.getAllTotals(offset, limit), HttpStatus.OK);
+        };
+    }
+
+    @GetMapping(value = {"/sales/{event_id}"})
     public Callable<ResponseEntity<?>> getTransactionsForEvent(@PathVariable("event_id") int eventId) {
         return () -> {
 

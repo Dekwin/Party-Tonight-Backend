@@ -38,6 +38,10 @@ public interface EventService {
 
     void validation(event event);
 
+    List<StatementTotal> getAllTotals(int offset, int limit);
+
+    StatementTotal getTotal(String partyName);
+
     StatementTotal getTotal(String partyName,UserEntity user);
 
     DoorRevenue getRevenue(String partyName,UserEntity user);

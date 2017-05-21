@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -196,6 +197,118 @@ public class EventServiceImpl implements EventService {
         for (TicketEntity t : event.getTickets()) {
             t.setBooked("0");
         }
+    }
+
+    @Override
+    public List<StatementTotal> getAllTotals(int offset, int limit) {
+        List<event> events = findAll(offset, limit);
+
+        List<StatementTotal> statements = new ArrayList<>();
+
+        for (event e : events) {
+            statements.add(getTotal(e.getParty_name()));
+        }
+
+        return statements;
+    }
+
+    @Override
+    public StatementTotal getTotal(String partyName) {
+        StatementTotal statementTotal = new StatementTotal();
+        statementTotal.setBottleSales("0");
+        statementTotal.setTicketsSales("0");
+        statementTotal.setTableSales("0");
+        statementTotal.setRefunds("0");
+
+        ticketService.findAllTicketsByEventId(findByName(partyName).getId_event()).forEach(v -> {
+            if (Objects.isNull(v.getBooked()) || v.getBooked().equals("")) {
+                logger.info("Bad object = " + v);
+                v.setBooked("0");
+            }
+            /**
+             * calculate the unbooked tickets
+             * */
+            statementTotal.setRefunds(String.valueOf(
+                    Double.parseDouble(statementTotal.getRefunds())
+                            -
+                            ((Double.parseDouble(v.getAvailable())
+                                    - Double.parseDouble(v.getBooked()))
+                                    * Double.parseDouble(v.getPrice())
+                            )
+            ));
+            /**
+             * calculate the booked tickets
+             * */
+            statementTotal.setTicketsSales(String.valueOf(
+                    Double.parseDouble(statementTotal.getTicketsSales())
+                            +
+                            (Double.parseDouble(v.getBooked())
+                                    * Double.parseDouble(v.getPrice())
+                            )
+            ));
+        });
+
+        tableService.findAllTablesByEventId(findByName(partyName).getId_event()).forEach(v -> {
+            if (Objects.isNull(v.getBooked()) || v.getBooked().equals("")) {
+                logger.info("Bad object = " + v);
+                v.setBooked("0");
+            }
+            /*
+              calculate the unbooked tables
+              */
+            statementTotal.setRefunds(String.valueOf(
+                    Double.parseDouble(statementTotal.getRefunds())
+                            -
+                            ((Double.parseDouble(v.getAvailable())
+                                    - Double.parseDouble(v.getBooked()))
+                                    * Double.parseDouble(v.getPrice())
+                            )
+            ));
+            /*
+              calculate the booked tables
+              */
+            statementTotal.setTableSales(String.valueOf(
+                    Double.parseDouble(statementTotal.getTableSales())
+                            + Double.parseDouble(v.getBooked())
+                            * Double.parseDouble(v.getPrice())));
+        });
+
+        bottleService.findAllBottlesByEventID(findByName(partyName).getId_event()).forEach(v -> {
+            if (Objects.isNull(v.getBooked()) || v.getBooked().equals("")) {
+                logger.info("Bad object = " + v);
+                v.setBooked("0");
+            }
+            /**
+             * calculate the unbooked bottles
+             * */
+            statementTotal.setRefunds(String.valueOf(
+                    Double.parseDouble(statementTotal.getRefunds())
+                            -
+                            ((Double.parseDouble(v.getAvailable())
+                                    - Double.parseDouble(v.getBooked()))
+                                    * Double.parseDouble(v.getPrice())
+                            )
+            ));
+            /**
+             * calculate the booked bottles
+             * */
+            statementTotal.setBottleSales(String.valueOf(
+                    Double.parseDouble(statementTotal.getBottleSales())
+                            +
+                            (Double.parseDouble(v.getBooked())
+                                    * Double.parseDouble(v.getPrice())
+                            )
+            ));
+        });
+        /**
+         * add withdrawn summary of all above components
+         * */
+        statementTotal.setWithdrawn(String.valueOf(
+                Double.parseDouble(statementTotal.getBottleSales())
+                        + Double.parseDouble(statementTotal.getTableSales())
+                        + Double.parseDouble(statementTotal.getTicketsSales())
+        ));
+        return statementTotal;
     }
 
     @Override
