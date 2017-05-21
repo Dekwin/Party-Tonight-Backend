@@ -163,48 +163,16 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`ranting`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS partymaker2.`ranting` (
-  `id_ranting` INT NOT NULL,
-  `text` LONGTEXT NULL DEFAULT NULL,
-  `id_event` INT NOT NULL,
-  `id_user` INT NOT NULL,
-  `id_role` INT NOT NULL,
-  PRIMARY KEY (`id_ranting`, `id_event`, `id_user`, `id_role`),
-  INDEX `fk_ranting_event1_idx` (`id_event` ASC),
-  INDEX `fk_ranting_user1_idx` (`id_user` ASC, `id_role` ASC),
-  CONSTRAINT `fk_ranting_event1`
-    FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (`id_event`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ranting_user1`
-    FOREIGN KEY (`id_user` , `id_role`)
-    REFERENCES partymaker2.`user` (`id_user` , `id_role`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `mydb`.`transactions`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS partymaker2.`transaction` (
-  `id_transaction` INT NOT NULL AUTO_INCREMENT,
-  `billing_email` VARCHAR(256) NULL DEFAULT NULL,
-  `seller_email` VARCHAR(256) NULL DEFAULT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `pay_key` VARCHAR(256) NULL DEFAULT NULL,
+  `service_tax` DECIMAL(7,2) NULL DEFAULT NULL,
   `customer_email` VARCHAR(256) NULL DEFAULT NULL,
-  `subtotal` DOUBLE NOT NULL,
-  `completed` TINYINT(1) NULL DEFAULT 0,
-  `id_event` INT NOT NULL,
-  PRIMARY KEY (`id_transaction`),
-  INDEX `fk_transaction_idx` (`id_event` ASC),
-  CONSTRAINT `fk_transaction_event_id`
-    FOREIGN KEY (`id_event`)
-    REFERENCES partymaker2.`event` (id_event)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  `service_email` VARCHAR(256) NULL DEFAULT NULL,
+  `service_billing_email` VARCHAR(256) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`))
   ENGINE = InnoDB;
 
 
