@@ -166,13 +166,13 @@ ENGINE = InnoDB;
 -- Table `mydb`.`transactions`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS partymaker2.`transaction` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id_transaction` INT NOT NULL AUTO_INCREMENT,
   `pay_key` VARCHAR(256) NULL DEFAULT NULL,
   `service_tax` DECIMAL(7,2) NULL DEFAULT NULL,
   `customer_email` VARCHAR(256) NULL DEFAULT NULL,
   `service_email` VARCHAR(256) NULL DEFAULT NULL,
   `service_billing_email` VARCHAR(256) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id_transaction`))
   ENGINE = InnoDB;
 
 
@@ -181,8 +181,10 @@ CREATE TABLE IF NOT EXISTS partymaker2.`transaction` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS partymaker2.`order` (
   `id_order` INT NOT NULL AUTO_INCREMENT,
-  `customer` VARCHAR(256) NULL DEFAULT NULL,
-  `date_created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `subtotal` DECIMAL(7,2) NULL DEFAULT NULL,
+  `seller_email` VARCHAR(256) NULL DEFAULT NULL,
+  `seller_billing_email` VARCHAR(256) NULL DEFAULT NULL,
+  `event_id` INT NOT NULL,
   `id_transaction` INT NOT NULL,
   PRIMARY KEY (`id_order`, `id_transaction`),
   INDEX `fk_order_transaction_idx` (`id_transaction` ASC),

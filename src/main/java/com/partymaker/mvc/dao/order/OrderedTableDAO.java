@@ -18,8 +18,7 @@ public class OrderedTableDAO extends AbstractDao<Integer, OrderedTable> {
     public OrderedTable getTableByIdEventAndNumber(int id_event, int number) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
                 "`ordered_table` JOIN `order` ON `ordered_table`.`id_order` \n" +
-                "JOIN `transaction` ON `order`.`id_transaction` \n" +
-                "WHERE (`transaction`.`id_event`=:id_event AND \n" +
+                "WHERE (`order`.`event_id`=:id_event AND \n" +
                 "`ordered_table`.`number`=:number)")
                 .addEntity(OrderedTable.class)
                 .setParameter("id_event", id_event)
@@ -31,8 +30,7 @@ public class OrderedTableDAO extends AbstractDao<Integer, OrderedTable> {
     public List<OrderedTable> getOrderedTables(int id_event) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
                 "`ordered_table` JOIN `order` ON `ordered_table`.`id_order` \n" +
-                "JOIN `transaction` ON `order`.`id_transaction` \n" +
-                "WHERE (`transaction`.`id_event`=:id_event)")
+                "WHERE (`order`.`event_id`=:id_event)")
                 .addEntity(OrderedTable.class)
                 .setParameter("id_event", id_event);
         return (List<OrderedTable>) query.list();

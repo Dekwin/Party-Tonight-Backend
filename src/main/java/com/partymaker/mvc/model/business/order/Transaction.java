@@ -12,7 +12,7 @@ public class Transaction implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
+    @Column(name = "id_transaction")
     private int id;
 
     @Column(name = "pay_key")

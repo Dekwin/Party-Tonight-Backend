@@ -245,13 +245,11 @@ response:
 
 Getting list of free tables (6 phase, appendix 2.0):
 
-uri: /dancer/event/get_free_tables
+uri: /dancer/event/{event_id}/tables/
 
-method: POST
+method: GET
 
 header: x-auth-token = signInToken
-
-body: id of event
 
 **Response**
 

@@ -1,5 +1,7 @@
 package com.partymaker.mvc.model.business.order;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ public class OrderEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(name="subtotal")
+    @Column(name = "subtotal")
     private double subtotal;
 
     @Column(name = "seller_email")
@@ -35,9 +37,10 @@ public class OrderEntity implements Serializable {
     @OneToOne(mappedBy = "order", cascade = {CascadeType.ALL})
     private OrderedTicket ticket;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "transaction_id")
-    private Transaction transactionId;
+    @JoinColumn(name = "id_transaction")
+    private Transaction transaction;
 
     public int getId() {
         return id;
@@ -104,11 +107,11 @@ public class OrderEntity implements Serializable {
     }
 
     public Transaction getTransactionId() {
-        return transactionId;
+        return transaction;
     }
 
     public void setTransactionId(Transaction transactionId) {
-        this.transactionId = transactionId;
+        this.transaction = transactionId;
     }
 
     public String getSellerEmail() {

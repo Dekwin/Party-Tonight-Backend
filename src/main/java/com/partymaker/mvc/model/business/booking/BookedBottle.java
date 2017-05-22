@@ -14,6 +14,9 @@ public class BookedBottle {
     @JsonProperty("price")
     private double price;
 
+    public BookedBottle() {
+    }
+
     public BookedBottle(OrderedBottle bottle) {
         this.amount = bottle.getAmount();
         this.title = bottle.getTitle();

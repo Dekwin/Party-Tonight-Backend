@@ -35,8 +35,6 @@ import java.util.concurrent.Callable;
 public class EventDancer {
 
     private static final Logger logger = Logger.getLogger(EventDancer.class);
-    private static final String OWNER_EMAIL = "owner@owner.owner";
-    private static final String OWNER_BILLING_EMAIL = "owner_billing@owner.owner";
     public static double OWNER_FEE = 0.05;
     @Autowired
     EventService eventService;
@@ -116,8 +114,8 @@ public class EventDancer {
         };
     }
 
-    @PostMapping(value = {"/get_free_tables"})
-    public Callable<ResponseEntity<?>> getFreeTables(@RequestBody int id_event) {
+    @GetMapping(value = {"/{event_id}/tables"})
+    public Callable<ResponseEntity<?>> getFreeTables(@PathVariable("event_id") int id_event) {
         return () -> new ResponseEntity<List>(bookService.getTables(id_event), HttpStatus.OK);
     }
 
@@ -139,7 +137,7 @@ public class EventDancer {
         };
     }
 
-    @PostMapping(value = {"/get_invoices"})
+    @PostMapping(value = {"/invoices"})
     public Callable<ResponseEntity<?>> getInvoices(@RequestBody Booking[] bookings) {
         return () -> {
             if (bookings == null) {
@@ -150,7 +148,7 @@ public class EventDancer {
                 double fee = 0;
 
                 Transaction response = new Transaction();
-                response.setCustomerEmail(userService.getCurrentUser().getBillingEmail());
+                response.setCustomerEmail(userService.getCurrentUser().getEmail());
                 response.setServiceBillingEmail(userService.getServiceTaxAccount().getBillingEmail());
                 response.setServiceEmail(userService.getServiceTaxAccount().getEmail());
 

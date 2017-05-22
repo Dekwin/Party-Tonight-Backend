@@ -25,7 +25,7 @@ public class TransactionDAOImpl extends AbstractDao<Integer, Transaction> implem
     }
 
     @Override
-    public List<Transaction> getTransactionsForEvent(event event) {
+    public List<Transaction> getAllTransactionsForEvent(event event) {
         Criteria criteria = createEntityCriteria();
 
         criteria.add(Restrictions.eq("event_id", event.getId_event()));
