@@ -33,8 +33,11 @@ public class UserEntity implements Serializable {
     @Column(name = "email", nullable = true, length = 45)
     private String email;
 
-    @Column(name = "emergency_contact", nullable = true, length = 45)
-    private String emergencyContact;
+    @Column(name = "emergency_name", nullable = true, length = 45)
+    private String emergencyName;
+
+    @Column(name = "emergency_phone", nullable = true, length = 45)
+    private String emergencyPhone;
 
     @NotEmpty
     @Column(name = "password", nullable = true, length = 45)
@@ -59,6 +62,7 @@ public class UserEntity implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_role")
     private RoleEntity role;
+
     @JsonProperty("billing")
     @Transient
     private BillingEntity billingEntity;
@@ -120,12 +124,20 @@ public class UserEntity implements Serializable {
         this.email = email;
     }
 
-    public String getEmergencyContact() {
-        return emergencyContact;
+    public String getEmergencyName() {
+        return emergencyName;
     }
 
-    public void setEmergencyContact(String emergencyContact) {
-        this.emergencyContact = emergencyContact;
+    public void setEmergencyName(String emergencyName) {
+        this.emergencyName = emergencyName;
+    }
+
+    public String getEmergencyPhone() {
+        return emergencyPhone;
+    }
+
+    public void setEmergencyPhone(String emergencyPhone) {
+        this.emergencyPhone = emergencyPhone;
     }
 
     public String getPassword() {
@@ -191,7 +203,8 @@ public class UserEntity implements Serializable {
         sb.append(", userName='").append(userName).append('\'');
         sb.append(", phoneNumber='").append(phoneNumber).append('\'');
         sb.append(", email='").append(email).append('\'');
-        sb.append(", emergencyContact='").append(emergencyContact).append('\'');
+        sb.append(", emergencyName='").append(emergencyName).append('\'');
+        sb.append(", emergencyPhone='").append(emergencyPhone).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append(", verified=").append(verified);
         sb.append(", enable=").append(enable);

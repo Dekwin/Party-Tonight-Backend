@@ -2,6 +2,7 @@ package com.partymaker.mvc.model.business.booking;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Booking {
@@ -10,7 +11,7 @@ public class Booking {
     private int id_event;
 
     @JsonProperty("bottles")
-    private List<BookedBottle> bottles;
+    private List<BookedBottle> bottles = new ArrayList<>();
 
     @JsonProperty("table")
     private BookedTable table;

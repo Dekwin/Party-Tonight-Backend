@@ -98,8 +98,13 @@ public class EventDancer {
 
                 booking.setId_event(order.getEventId());
 
-                booking.setTable(new BookedTable(order.getTable()));
-                booking.setTicket(new BookedTicket(order.getTicket()));
+                if (order.getTable().getNumber() != 0) {
+                    booking.setTable(new BookedTable(order.getTable()));
+                }
+
+                if (order.getTicket().getId_ticket() != 0) {
+                    booking.setTicket(new BookedTicket(order.getTicket()));
+                }
 
                 for (OrderedBottle bottle : order.getBottles()) {
                     booking.getBottles().add(new BookedBottle(bottle));
