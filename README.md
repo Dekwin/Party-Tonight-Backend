@@ -397,7 +397,7 @@ body: review
   billing_email (of merchant-promoter) and subtotal for single transaction.
   It is used MPL library by PayPal to send parallel payments. So data is formed according to it.
   
- **url**: dancer/event/get_invoices
+ **url**: dancer/event/invoices
  
  **method**: POST
  
@@ -427,27 +427,39 @@ body: review
   **response**
   
   ```json
-  [
+  {
+    "id": 0,
+    "serviceTax": 0.15000000000000002,
+    "customerEmail": "dancer@dancer.dancer",
+    "serviceEmail": "fff@fff.fff",
+    "serviceBillingEmail": "fff@fff.ff",
+    "orders": [
       {
-        "id_transaction": 0,
-        "completed": 0,
-        "order": [],
-        "billing_email": "promoter2@promoter.promoter",
-        "subtotal": 190.0,
-        "customer_email": "dancer@dancer.dancer",
-        "seller_email": "promoter2@promoter.promoter",
-        "id_event": 3
-      }, {
-        "id_transaction": 0,
-        "completed": 0,
-        "order": [],
-        "billing_email": "owner_billing@owner.owner",
-        "subtotal": 10.0,
-        "customer_email": "dancer@dancer.dancer",
-        "seller_email": "owner@owner.owner",
-        "id_event": 0
+        "id": 0,
+        "subtotal": 2.8499999999999996,
+        "sellerEmail": "promoter2@promoter.promoter",
+        "sellerBillingEmail": "promoter2@promoter.promoter",
+        "eventId": 1,
+        "bottles": [
+          {
+            "id_bottle": 0,
+            "title": "1",
+            "amount": 3
+          }
+        ],
+        "table": {
+          "id_table": 0,
+          "type": null,
+          "number": 0
+        },
+        "ticket": {
+          "id_ticket": 0,
+          "type": null
+        },
+        "transactionId": null
       }
-  ]
+    ]
+  }
   ```
 ## Confirm invoices (book)
 
@@ -463,49 +475,48 @@ _NOTE_: can receive url-encoded request
 **method**: POST
 
 **headers**: 
-* x-auth-token
-* bookings[] - array of bookings that 
-* transactions[] - array of payed transactions
+- x-auth-token
+
+**body**
+Transaction.class entity with filled payKey field
 
 **request**:
 
-1. bookings[] =
 ```json
-[
+{
+  "id": 0,
+  "payKey": "asasas1",
+  "serviceTax": 0.15000000000000002,
+  "customerEmail": "dancer@dancer.dancer",
+  "serviceEmail": "fff@fff.fff",
+  "serviceBillingEmail": "fff@fff.ff",
+  "orders": [
     {
-        "bottles": [{
-            "amount": 4,
-            "price": 25.0,
-            "title": "Big"
-        }],
-        "id_event": 3,
-        "table": {
-            "number": 7,
-            "price": 100.0,
-            "type": "Bigger"
+      "id": 0,
+      "subtotal": 2.8499999999999996,
+      "sellerEmail": "promoter2@promoter.promoter",
+      "sellerBillingEmail": "promoter2@promoter.promoter",
+      "eventId": 1,
+      "bottles": [
+        {
+          "id_bottle": 0,
+          "title": "1",
+          "amount": 3
         }
+      ],
+      "table": {
+        "id_table": 0,
+        "type": null,
+        "number": 0
+      },
+      "ticket": {
+        "id_ticket": 0,
+        "type": null
+      },
+      "transactionId": null
     }
-] 
-```
-2. transactions[] = 
-```json
-[
-    {
-        "billing_email": "promoter2@promoter.promoter",
-        "customer_email": "dancer@dancer.dancer",
-        "id_event": 3,
-        "id_transaction": 0,
-        "seller_email": "promoter2@promoter.promoter",
-        "subtotal": 190.0
-    }, {
-        "billing_email": "owner_billing@owner.owner",
-        "customer_email": "dancer@dancer.dancer",
-        "id_event": 0,
-        "id_transaction": 0,
-        "seller_email": "owner@owner.owner",
-        "subtotal": 10.0
-    }
-]
+  ]
+}
 ```
 
 response: 200 OK 
