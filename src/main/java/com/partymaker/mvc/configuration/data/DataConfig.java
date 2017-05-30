@@ -51,6 +51,7 @@ public class DataConfig {
         properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
         properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
         properties.put("hibernate.hbm2ddl.import_files", environment.getRequiredProperty("hibernate.hbm2ddl.import_files"));
+        properties.put("hibernate.connection.max_allowed_packet", environment.getRequiredProperty("hibernate.connection.max_allowed_packet"));
         return properties;
     }
 
