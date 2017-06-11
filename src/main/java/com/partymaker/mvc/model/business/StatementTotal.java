@@ -5,11 +5,11 @@ package com.partymaker.mvc.model.business;
  */
 public class StatementTotal {
 
-    private String withdrawn = "0";
-    private String ticketsSales = "0";
-    private String bottleSales = "0";
-    private String tableSales = "0";
-    private String refunds = "0";
+    protected String withdrawn = "0";
+    protected String ticketsSales = "0";
+    protected String bottleSales = "0";
+    protected String tableSales = "0";
+    protected String refunds = "0";
 
     public StatementTotal() {
     }

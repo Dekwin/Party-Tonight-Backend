@@ -3,6 +3,7 @@ package com.partymaker.mvc.service.event;
 import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.business.DoorRevenue;
 import com.partymaker.mvc.model.business.StatementTotal;
+import com.partymaker.mvc.model.business.StatementWrapper;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
 import org.hibernate.criterion.Order;
@@ -38,7 +39,7 @@ public interface EventService {
 
     void validation(event event);
 
-    List<StatementTotal> getAllTotals(int offset, int limit);
+    List<StatementWrapper> getAllTotals(int offset, int limit);
 
     StatementTotal getTotal(String partyName);
 

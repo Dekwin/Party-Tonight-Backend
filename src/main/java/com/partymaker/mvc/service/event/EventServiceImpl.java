@@ -5,6 +5,7 @@ import com.partymaker.mvc.dao.event.EventDAO;
 import com.partymaker.mvc.model.DataResponse;
 import com.partymaker.mvc.model.business.DoorRevenue;
 import com.partymaker.mvc.model.business.StatementTotal;
+import com.partymaker.mvc.model.business.StatementWrapper;
 import com.partymaker.mvc.model.whole.*;
 import com.partymaker.mvc.service.bottle.BottleService;
 import com.partymaker.mvc.service.photo.PhotoService;
@@ -200,13 +201,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<StatementTotal> getAllTotals(int offset, int limit) {
+    public List<StatementWrapper> getAllTotals(int offset, int limit) {
         List<event> events = findAll(offset, limit);
 
-        List<StatementTotal> statements = new ArrayList<>();
+        List<StatementWrapper> statements = new ArrayList<>();
 
         for (event e : events) {
-            statements.add(getTotal(e.getParty_name()));
+            statements.add(new StatementWrapper(e.getId_event(), e.getParty_name(),
+                    getTotal(e.getParty_name())));
         }
 
         return statements;
