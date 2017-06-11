@@ -520,3 +520,51 @@ Transaction.class entity with filled payKey field
 ```
 
 response: 200 OK 
+
+# Administrator Panel
+
+### Get sales info for all the events as an array
+
+**url**: /admin/sales
+
+**parameters**:
+- offset: integer
+- limit: integer
+
+**headers**:
+- x-auth-token
+
+**Response**
+```json
+[
+  {
+    "event_id": 1,
+    "event_name": "party1",
+    "withdrawn": "1200.0",
+    "ticketsSales": "24.0",
+    "bottleSales": "20.0",
+    "tableSales": "30.0",
+    "refunds": "-1126.0"
+  }
+]
+```
+
+### Get sales info for one single event 
+
+**url**: /admin/sales/{event_id}
+
+**headers**:
+- x-auth-token
+
+**Response**
+```json
+{
+  "event_id": 1,
+  "event_name": "party1",
+  "withdrawn": "1200.0",
+  "ticketsSales": "24.0",
+  "bottleSales": "20.0",
+  "tableSales": "30.0",
+  "refunds": "-1126.0"
+}
+```
