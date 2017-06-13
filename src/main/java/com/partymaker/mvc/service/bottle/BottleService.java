@@ -14,4 +14,6 @@ public interface BottleService {
     List<BottleEntity> findAllBottlesByEventAndUser(int id_user, String party_name);
 
     List<BottleEntity> findAllBottlesByEventID(int id_event);
+
+    BottleEntity findBottleByEventIdAndType(int id_event, String type);
 }

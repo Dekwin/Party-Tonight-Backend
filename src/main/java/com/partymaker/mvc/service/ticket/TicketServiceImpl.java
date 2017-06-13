@@ -42,4 +42,9 @@ public class TicketServiceImpl implements TicketService {
         return ticketDAO.findAllByEventId(id_event);
     }
 
+    @Override
+    public TicketEntity findTicket(int id_event) {
+        return ticketDAO.getTicketByEventId(id_event);
+    }
+
 }

@@ -50,7 +50,7 @@ public class TableDAOImpl extends AbstractDao<Integer, TableEntity> implements T
     }
 
     @Override
-    public TableEntity getTableByEventId(int id, String type) {
+    public TableEntity getTableByEventIdAndType(int id, String type) {
         Query query = getSession().createSQLQuery("SELECT * FROM partymaker2.table WHERE (partymaker2.table.id_event =:id AND partymaker2.table.type = :given_type)")
                 .addEntity(TableEntity.class)
                 .setParameter("id", id)

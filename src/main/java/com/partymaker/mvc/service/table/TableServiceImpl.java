@@ -32,4 +32,9 @@ public class TableServiceImpl implements TableService {
     public List<TableEntity> findAllTablesByEventId(int id_event) {
         return tableDAO.findAllByEventId(id_event);
     }
+
+    @Override
+    public TableEntity findTableByEventIdAndType(int id_event, String type) {
+        return tableDAO.getTableByEventIdAndType(id_event, type);
+    }
 }

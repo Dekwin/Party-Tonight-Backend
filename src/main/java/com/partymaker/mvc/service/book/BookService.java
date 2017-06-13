@@ -72,7 +72,7 @@ public class BookService {
                 // we store in old repo
                 // storing in the new one -> in the "confirm invoices" method
                 // we can order just one table at once
-                TableEntity t = tableDAO.getTableByEventId(
+                TableEntity t = tableDAO.getTableByEventIdAndType(
                         bookingItem.getId_event(), bookedTable.getType());
                 t.setBooked(String.valueOf(Integer.parseInt(t.getBooked()) + 1));
 

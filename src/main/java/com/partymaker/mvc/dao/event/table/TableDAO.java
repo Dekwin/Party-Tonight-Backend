@@ -15,5 +15,5 @@ public interface TableDAO {
 
     List<TableEntity> findAllByEventId(int id_event);
 
-    TableEntity getTableByEventId(int id, String type);
+    TableEntity getTableByEventIdAndType(int id, String type);
 }

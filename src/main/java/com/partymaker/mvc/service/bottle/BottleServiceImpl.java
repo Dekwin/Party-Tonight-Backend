@@ -32,4 +32,9 @@ public class BottleServiceImpl implements BottleService {
     public List<BottleEntity> findAllBottlesByEventID(int id_event) {
         return bottleDAO.findAllByEventId(id_event);
     }
+
+    @Override
+    public BottleEntity findBottleByEventIdAndType(int id_event, String type) {
+        return bottleDAO.getBottleByEventIdAndType(id_event, type);
+    }
 }

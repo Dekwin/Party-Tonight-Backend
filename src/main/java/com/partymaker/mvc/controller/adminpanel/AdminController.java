@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.service.admin.AdminService;
 import com.partymaker.mvc.service.event.EventService;
+import com.partymaker.mvc.service.order.OrderService;
 import com.partymaker.mvc.service.order.TransactionService;
 import com.partymaker.mvc.service.user.UserService;
 import org.apache.log4j.Logger;
@@ -42,6 +43,9 @@ public class AdminController {
     @Autowired
     TransactionService transactionService;
 
+    @Autowired
+    OrderService orderService;
+
 
 //    @RequestMapping("/panel")
 //    public String adminPanel() {
@@ -76,11 +80,7 @@ public class AdminController {
 
     @GetMapping(value = {"/sales/{event_id}"})
     public Callable<ResponseEntity<?>> getTransactionsForEvent(@PathVariable("event_id") int eventId) {
-        return () -> {
-
-            logger.info("Get all transactions for event: " + eventId);
-            return new ResponseEntity<Object>(transactionService.getAllTransactionsForEvent(eventService.findById(eventId)), HttpStatus.OK);
-        };
+        return () -> new ResponseEntity<Object>(orderService.getAllOrdersWrapped(eventId), HttpStatus.OK);
     }
 
     @GetMapping(value = {"/users"})

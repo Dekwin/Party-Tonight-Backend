@@ -13,4 +13,6 @@ public interface TableService {
     List<TableEntity> findAllTablesByEventAndUser(int id_user, String party_name);
 
     List<TableEntity> findAllTablesByEventId(int id_event);
+
+    TableEntity findTableByEventIdAndType(int id_event, String type);
 }
