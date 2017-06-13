@@ -19,7 +19,7 @@ public class OrderDAO extends AbstractDao<Integer, OrderEntity> {
     public List<OrderEntity> findAllForEvent(event event) {
         Criteria criteria = createEntityCriteria();
 
-        criteria.add(Restrictions.eq("event_id", event.getId_event()));
+        criteria.add(Restrictions.eq("eventId", event.getId_event()));
 
         return (List<OrderEntity>) criteria.list();
     }

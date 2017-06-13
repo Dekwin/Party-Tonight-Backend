@@ -1,7 +1,10 @@
 package com.partymaker.mvc.service.order;
 
 import com.partymaker.mvc.dao.order.OrderDAO;
-import com.partymaker.mvc.model.business.order.*;
+import com.partymaker.mvc.model.business.order.OrderEntity;
+import com.partymaker.mvc.model.business.order.OrderWrapped;
+import com.partymaker.mvc.model.business.order.OrderedBottle;
+import com.partymaker.mvc.model.business.order.OrderedTable;
 import com.partymaker.mvc.model.whole.TicketEntity;
 import com.partymaker.mvc.model.whole.UserEntity;
 import com.partymaker.mvc.model.whole.event;
@@ -69,31 +72,26 @@ public class OrderService {
 
 
     public List<OrderWrapped> getAllOrdersWrapped(event event) {
-        List<Transaction> transactions = transactionService.getAllTransactionsForEvent(event);
-
         List<OrderWrapped> ordersWrapped = new ArrayList<>();
 
-        if (transactions != null) {
-            for (Transaction transaction : transactions) {
-                for (OrderEntity order : transaction.getOrders()) {
-                    UserEntity customer = userService.findUserByEmail(transaction.getCustomerEmail());
 
-                    double ticketsSubtotal = calculateSubtotalForTickets(order);
-                    double tablesSubtotal = calculateSubtotalForTables(order);
-                    double bottlesSubtotal = calculateSubtotalForBottles(order);
+        for (OrderEntity order : findAllForEvent(event)) {
+            UserEntity customer = userService.findUserByEmail(order.getTransactionId().getCustomerEmail());
 
-                    double subtotal = ticketsSubtotal + tablesSubtotal + bottlesSubtotal;
+            double ticketsSubtotal = calculateSubtotalForTickets(order);
+            double tablesSubtotal = calculateSubtotalForTables(order);
+            double bottlesSubtotal = calculateSubtotalForBottles(order);
 
-                    ordersWrapped.add(new OrderWrapped(
-                            customer.getId_user(),
-                            customer.getUserName(),
-                            ticketsSubtotal,
-                            tablesSubtotal,
-                            bottlesSubtotal,
-                            subtotal
-                    ));
-                }
-            }
+            double subtotal = ticketsSubtotal + tablesSubtotal + bottlesSubtotal;
+
+            ordersWrapped.add(new OrderWrapped(
+                    customer.getId_user(),
+                    customer.getUserName(),
+                    ticketsSubtotal,
+                    tablesSubtotal,
+                    bottlesSubtotal,
+                    subtotal
+            ));
         }
 
         return ordersWrapped;
@@ -108,12 +106,14 @@ public class OrderService {
     // so it's necessary to update this method
     // if types of ticket are added
     private double calculateSubtotalForTickets(OrderEntity order) {
-        TicketEntity ticketOfEvent = ticketService.findTicket(order.getEventId());
+        if (order.getTicket() != null) {
+            TicketEntity ticketOfEvent = ticketService.findTicket(order.getEventId());
 
-        // we can order only one ticket
-        // idk why. but only one
-        return Double.parseDouble(ticketOfEvent.getPrice())
-                * 1;
+            // we can order only one ticket
+            // idk why. but only one
+            return Double.parseDouble(ticketOfEvent.getPrice())
+                    * 1;
+        } else return 0;
     }
 
     private double calculateSubtotalForBottles(OrderEntity order) {
@@ -130,10 +130,12 @@ public class OrderService {
 
     // we can order only one table
     private double calculateSubtotalForTables(OrderEntity order) {
-        OrderedTable table = order.getTable();
+        if (order.getTable() != null) {
+            OrderedTable table = order.getTable();
 
-        return Double.parseDouble(
-                tableService.findTableByEventIdAndType(order.getEventId(), table.getType())
-                        .getPrice());
+            return Double.parseDouble(
+                    tableService.findTableByEventIdAndType(order.getEventId(), table.getType())
+                            .getPrice());
+        } else return 0;
     }
 }

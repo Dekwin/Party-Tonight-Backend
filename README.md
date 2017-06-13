@@ -534,17 +534,20 @@ response: 200 OK
 **headers**:
 - x-auth-token
 
+**Request**
+```/admin/sales?offset=0&limit=100```
+
 **Response**
 ```json
 [
   {
-    "event_id": 1,
-    "event_name": "party1",
-    "withdrawn": "1200.0",
-    "ticketsSales": "24.0",
-    "bottleSales": "20.0",
-    "tableSales": "30.0",
-    "refunds": "-1126.0"
+    "withdrawn": "7.0",
+    "ticketsSales": "0",
+    "bottleSales": "5.0",
+    "tableSales": "2.0",
+    "refunds": "-13.0",
+    "eventId": 1,
+    "eventName": "1"
   }
 ]
 ```
@@ -556,15 +559,35 @@ response: 200 OK
 **headers**:
 - x-auth-token
 
+**Request** 
+```/admin/sales/1```
+
 **Response**
 ```json
-{
-  "event_id": 1,
-  "event_name": "party1",
-  "withdrawn": "1200.0",
-  "ticketsSales": "24.0",
-  "bottleSales": "20.0",
-  "tableSales": "30.0",
-  "refunds": "-1126.0"
-}
+[
+  {
+    "userId": 2,
+    "userName": "dancer",
+    "ticketsSubtotal": 0,
+    "tablesSubtotal": 2,
+    "bottlesSubtotal": 0,
+    "subtotal": 1
+  },
+  {
+    "userId": 2,
+    "userName": "dancer",
+    "ticketsSubtotal": 0,
+    "tablesSubtotal": 0,
+    "bottlesSubtotal": 3,
+    "subtotal": 3
+  },
+  {
+    "userId": 2,
+    "userName": "dancer",
+    "ticketsSubtotal": 0,
+    "tablesSubtotal": 0,
+    "bottlesSubtotal": 2,
+    "subtotal": 3
+  }
+]
 ```
