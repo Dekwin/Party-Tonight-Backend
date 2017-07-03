@@ -107,7 +107,7 @@ public class OrderService {
     // if types of ticket are added
     private double calculateSubtotalForTickets(OrderEntity order) {
         if (order.getTicket() != null) {
-            TicketEntity ticketOfEvent = ticketService.findTicket(order.getEventId());
+            TicketEntity ticketOfEvent = ticketService.findTicket(order.getId_event());
 
             // we can order only one ticket
             // idk why. but only one
@@ -121,7 +121,7 @@ public class OrderService {
 
         for (OrderedBottle bottle : order.getBottles()) {
             result += Double.parseDouble(bottleService.findBottleByEventIdAndType(
-                    order.getEventId(), bottle.getTitle()).getPrice()) *
+                    order.getId_event(), bottle.getTitle()).getPrice()) *
                     bottle.getAmount();
         }
 
@@ -134,7 +134,7 @@ public class OrderService {
             OrderedTable table = order.getTable();
 
             return Double.parseDouble(
-                    tableService.findTableByEventIdAndType(order.getEventId(), table.getType())
+                    tableService.findTableByEventIdAndType(order.getId_event(), table.getType())
                             .getPrice());
         } else return 0;
     }

@@ -26,7 +26,7 @@ public class OrderEntity implements Serializable {
     private String sellerBillingEmail;
 
     @Column(name = "event_id")
-    private int eventId;
+    private int id_event;
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "order")
     private List<OrderedBottle> bottles = new ArrayList<>();
@@ -66,12 +66,12 @@ public class OrderEntity implements Serializable {
         this.sellerBillingEmail = sellerBillingEmail;
     }
 
-    public int getEventId() {
-        return eventId;
+    public int getId_event() {
+        return id_event;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setId_event(int id_event) {
+        this.id_event = id_event;
     }
 
     public List<OrderedBottle> getBottles() {

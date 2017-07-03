@@ -17,8 +17,8 @@ public class OrderedBottleDAO extends AbstractDao<Integer, OrderedBottle> {
     @SuppressWarnings("unchecked")
     public List<OrderedBottle> getBottleByEventIdAndTitle(int id_event, String title) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
-                "`ordered_bottle` JOIN `order` ON `ordered_bottle`.`id_order` \n" +
-                "WHERE (`order`.`id_event`=:id_event AND `ordered_bottle`.`title`=:title)")
+                "partymaker2.ordered_bottle JOIN partymaker2.order ON partymaker2.ordered_bottle.id_order \n" +
+                "WHERE (partymaker2.order.id_event=:id_event AND partymaker2.ordered_bottle.title=:title)")
                 .addEntity(OrderedBottle.class)
                 .setParameter("id_event", id_event)
                 .setParameter("title", title);

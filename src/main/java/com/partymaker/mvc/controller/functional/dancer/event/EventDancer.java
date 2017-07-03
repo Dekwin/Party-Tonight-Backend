@@ -96,7 +96,7 @@ public class EventDancer {
             for (OrderEntity order : transaction.getOrders()) {
                 Booking booking = new Booking();
 
-                booking.setId_event(order.getEventId());
+                booking.setId_event(order.getId_event());
 
                 if (order.getTable().getNumber() != 0) {
                     booking.setTable(new BookedTable(order.getTable()));
@@ -171,7 +171,7 @@ public class EventDancer {
                         if (partyCreator != null) {
                             OrderEntity order = new OrderEntity();
 
-                            order.setEventId(eventId);
+                            order.setId_event(eventId);
                             order.setSellerBillingEmail(partyCreator.getBillingEmail());
                             order.setSellerEmail(partyCreator.getEmail());
 

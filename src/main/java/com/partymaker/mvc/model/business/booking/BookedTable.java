@@ -23,6 +23,7 @@ public class BookedTable {
     public BookedTable(OrderedTable orderedTable) {
         this.type = orderedTable.getType();
         this.number = orderedTable.getNumber();
+        this.price = orderedTable.getPrice();
     }
 
     public BookedTable() {

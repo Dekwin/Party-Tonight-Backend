@@ -81,7 +81,7 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
 
     @Override
     public List<BottleEntity> getBottleByEventId(int id) {
-        Query query = getSession().createSQLQuery("SELECT * FROM bottle WHERE bottle.id_event =:id")
+        Query query = getSession().createSQLQuery("SELECT * FROM partymaker2.bottle WHERE partymaker2.bottle.id_event =:id")
                 .addEntity(BottleEntity.class)
                 .setParameter("id", id);
         return (List<BottleEntity>) query.list();
@@ -89,7 +89,7 @@ public class BottleDAOImpl extends AbstractDao<Integer, BottleEntity> implements
 
     @Override
     public BottleEntity getBottleByEventIdAndType(int id, String type) {
-        Query query = getSession().createSQLQuery("SELECT * FROM bottle WHERE (bottle.id_event =:id AND bottle.`type`=:type)")
+        Query query = getSession().createSQLQuery("SELECT * FROM partymaker2.bottle WHERE (partymaker2.bottle.id_event =:id AND partymaker2.bottle.type=:type)")
                 .addEntity(BottleEntity.class)
                 .setParameter("id", id)
                 .setParameter("type", type);

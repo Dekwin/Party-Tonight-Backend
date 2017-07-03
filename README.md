@@ -439,7 +439,7 @@ body: review
         "subtotal": 2.8499999999999996,
         "sellerEmail": "promoter2@promoter.promoter",
         "sellerBillingEmail": "promoter2@promoter.promoter",
-        "eventId": 1,
+        "id_event": 1,
         "bottles": [
           {
             "id_bottle": 0,
@@ -496,7 +496,7 @@ Transaction.class entity with filled payKey field
       "subtotal": 2.8499999999999996,
       "sellerEmail": "promoter2@promoter.promoter",
       "sellerBillingEmail": "promoter2@promoter.promoter",
-      "eventId": 1,
+      "id_event": 1,
       "bottles": [
         {
           "id_bottle": 0,
@@ -546,7 +546,7 @@ response: 200 OK
     "bottleSales": "5.0",
     "tableSales": "2.0",
     "refunds": "-13.0",
-    "eventId": 1,
+    "id_event": 1,
     "eventName": "1"
   }
 ]

@@ -17,9 +17,9 @@ public class OrderedTableDAO extends AbstractDao<Integer, OrderedTable> {
     @SuppressWarnings("unchecked")
     public OrderedTable getTableByIdEventAndNumber(int id_event, int number) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
-                "`ordered_table` JOIN `order` ON `ordered_table`.`id_order` \n" +
-                "WHERE (`order`.`event_id`=:id_event AND \n" +
-                "`ordered_table`.`number`=:number)")
+                "partymaker2.ordered_table JOIN partymaker2.order ON partymaker2.ordered_table.id_order = partymaker2.order.id_order \n" +
+                "WHERE (partymaker2.order.event_id=:id_event AND \n" +
+                "partymaker2.ordered_table.number=:number)")
                 .addEntity(OrderedTable.class)
                 .setParameter("id_event", id_event)
                 .setParameter("number", number);
@@ -29,8 +29,8 @@ public class OrderedTableDAO extends AbstractDao<Integer, OrderedTable> {
     @SuppressWarnings("unchecked")
     public List<OrderedTable> getOrderedTables(int id_event) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
-                "`ordered_table` JOIN `order` ON `ordered_table`.`id_order` \n" +
-                "WHERE (`order`.`event_id`=:id_event)")
+                "partymaker2.ordered_table JOIN partymaker2.order ON partymaker2.ordered_table.id_order = partymaker2.order.id_order \n" +
+                "WHERE (partymaker2.order.event_id = :id_event)")
                 .addEntity(OrderedTable.class)
                 .setParameter("id_event", id_event);
         return (List<OrderedTable>) query.list();

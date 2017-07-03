@@ -19,6 +19,9 @@ public class OrderedTicket {
     @Column(name = "type", nullable = true, length = 45)
     private String type;
 
+    @Column(name = "price")
+    private double price;
+
     @JsonIgnore
     @OneToOne(optional = false)
     @JoinColumn(name = "id_order")
@@ -31,12 +34,14 @@ public class OrderedTicket {
         this.order = entity;
         if (ticket != null) {
             this.type = ticket.getType();
+            this.price = ticket.getPrice();
         }
     }
 
     public OrderedTicket(BookedTicket ticket) {
         if (ticket != null) {
             this.type = ticket.getType();
+            this.price = ticket.getPrice();
         }
     }
 
@@ -58,6 +63,14 @@ public class OrderedTicket {
 
     public OrderEntity getOrder() {
         return order;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public void setOrder(OrderEntity order) {

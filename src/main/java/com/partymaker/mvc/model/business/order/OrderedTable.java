@@ -20,6 +20,9 @@ public class OrderedTable {
     @Column(name = "number")
     private int number;
 
+    @Column(name = "price")
+    private double price;
+
     @JsonIgnore
     @OneToOne(optional = false)
     @JoinColumn(name = "id_order")
@@ -33,6 +36,7 @@ public class OrderedTable {
         if (table != null) {
             this.type = table.getType();
             this.number = table.getNumber();
+            this.price = table.getPrice();
         }
     }
 
@@ -40,6 +44,7 @@ public class OrderedTable {
         if (table != null) {
             this.type = table.getType();
             this.number = table.getNumber();
+            this.price = table.getPrice();
         }
     }
 
@@ -75,4 +80,11 @@ public class OrderedTable {
         this.order = order;
     }
 
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
 }

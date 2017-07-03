@@ -19,6 +19,9 @@ public class OrderedBottle {
     @Column(name = "amount")
     private int amount;
 
+    @Column(name = "price")
+    private double price;
+
     @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_order")
@@ -36,6 +39,7 @@ public class OrderedBottle {
     public OrderedBottle(BookedBottle bookedBottle) {
         this.title = bookedBottle.getTitle();
         this.amount = bookedBottle.getAmount();
+        this.price = bookedBottle.getPrice();
     }
 
 
@@ -71,4 +75,11 @@ public class OrderedBottle {
         this.order = order;
     }
 
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
 }

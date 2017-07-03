@@ -20,6 +20,7 @@ public class BookedBottle {
     public BookedBottle(OrderedBottle bottle) {
         this.amount = bottle.getAmount();
         this.title = bottle.getTitle();
+        this.price = bottle.getPrice();
     }
 
     public String getTitle() {

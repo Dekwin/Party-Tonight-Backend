@@ -18,9 +18,9 @@ public class OrderedTicketDAO extends AbstractDao<Integer, OrderedTicket> {
     @SuppressWarnings("unchecked")
     public List<OrderedTicket> getTicketsByType(int id_event, String type) {
         Query query = getSession().createSQLQuery("SELECT * from \n" +
-                "`ordered_ticket` JOIN `order` ON `ordered_ticket`.`id_order` \n" +
-                "JOIN `transaction` ON `order`.`id_transaction` \n" +
-                "WHERE (`transaction`.`id_event`=:id_event AND `ordered_ticket`.`type`=:type)")
+                "partymaker2.ordered_ticket JOIN partymaker2.order ON partymaker2.ordered_ticket.id_order = partymaker2.order.id_order \n" +
+                "JOIN partymaker2.transaction ON partymaker2.order.id_transaction = partymaker2.transaction.id_transaction \n" +
+                "WHERE (partymaker2.order.event_id=:id_event AND partymaker2.ordered_ticket.type=:type)")
                 .addEntity(OrderedTicket.class)
                 .setParameter("id_event", id_event)
                 .setParameter("type", type);

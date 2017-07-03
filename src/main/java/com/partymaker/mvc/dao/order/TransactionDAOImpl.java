@@ -53,7 +53,7 @@ public class TransactionDAOImpl extends AbstractDao<Integer, Transaction> implem
                 tempOrder.setTicket(tempTicket);
             }
 
-            tempOrder.setEventId(order.getEventId());
+            tempOrder.setId_event(order.getId_event());
             tempOrder.setSellerEmail(order.getSellerEmail());
             tempOrder.setSellerBillingEmail(order.getSellerBillingEmail());
             tempOrder.setSubtotal(order.getSubtotal());

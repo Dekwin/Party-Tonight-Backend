@@ -13,6 +13,10 @@ public class BookedTicket {
 
     public BookedTicket(OrderedTicket ticket) {
         this.type = ticket.getType();
+        this.price = ticket.getPrice();
+    }
+
+    public BookedTicket() {
     }
 
     public String getType() {
